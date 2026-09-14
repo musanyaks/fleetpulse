@@ -1,0 +1,24 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: ingestion-service
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+
+fleetpulse:
+  mqtt:
+    broker: tcp://${MQTT_HOST:localhost}:1883
+    client-id: fleetpulse-ingestion-${random.value}
+    topic-filter: fleet/+/telemetry
+
+logging:
+  level:
+    root: INFO

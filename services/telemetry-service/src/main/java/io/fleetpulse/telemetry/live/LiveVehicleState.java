@@ -1,0 +1,16 @@
+package io.fleetpulse.telemetry.live;
+
+import io.fleetpulse.common.TelemetryMessage;
+
+import java.time.Instant;
+
+public record LiveVehicleState(
+        String vehicleId, double latitude, double longitude, double speedKph,
+        Double engineTempC, Double fuelLevelPct, String status, Instant lastSeen) {
+
+    public static LiveVehicleState from(TelemetryMessage m) {
+        return new LiveVehicleState(m.vehicleId(), m.latitude(), m.longitude(), m.speedKph(),
+                m.engineTempC(), m.fuelLevelPct(),
+                m.speedKph() < 1 ? "IDLE" : "MOVING", m.timestamp());
+    }
+}

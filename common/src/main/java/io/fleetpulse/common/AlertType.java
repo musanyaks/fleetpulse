@@ -1,0 +1,6 @@
+package io.fleetpulse.common;
+
+public enum AlertType {
+    SPEEDING, ENGINE_OVERHEATING, LOW_FUEL,
+    HARSH_BRAKING, HARSH_ACCELERATION, FUEL_ANOMALY, EXCESSIVE_IDLING, GEOFENCE
+}

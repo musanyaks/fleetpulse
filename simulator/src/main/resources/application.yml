@@ -1,0 +1,11 @@
+spring:
+  main:
+    web-application-type: none
+
+fleetpulse:
+  simulator:
+    broker: tcp://${MQTT_HOST:localhost}:1883
+    fleet-size: ${FLEET_SIZE:25}
+    interval-ms: 2000
+    base-lat: -1.286389     # Nairobi CBD
+    base-lon: 36.817223
