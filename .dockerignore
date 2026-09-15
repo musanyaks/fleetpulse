@@ -1,0 +1,7 @@
+.git
+**/target/
+docs/
+architecture/
+scripts/
+.github/
+*.md

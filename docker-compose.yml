@@ -1,5 +1,41 @@
 services:
 
+  ingestion:
+    build:
+      context: .
+      args: { MODULE_DIR: services/ingestion-service }
+    ports: ["8081:8081"]
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      MQTT_HOST: mosquitto
+    depends_on:
+      - kafka
+      - mosquitto
+
+  telemetry:
+    build:
+      context: .
+      args: { MODULE_DIR: services/telemetry-service }
+    ports: ["8082:8082"]
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      DB_HOST: timescaledb
+    depends_on:
+      kafka:
+        condition: service_started
+      timescaledb:
+        condition: service_healthy
+
+  simulator:
+    build:
+      context: .
+      args: { MODULE_DIR: simulator }
+    environment:
+      MQTT_HOST: mosquitto
+      FLEET_SIZE: ${FLEET_SIZE:-25}
+    depends_on:
+      - mosquitto
+
   mosquitto:
     image: eclipse-mosquitto:2
     ports: ["1883:1883"]
@@ -7,16 +43,17 @@ services:
       - ./infrastructure/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
 
   kafka:
-    image: apache/kafka:3.7.0          # KRaft — no ZooKeeper
-    ports: ["9094:9092"]
+    image: apache/kafka:3.7.0
+    ports: ["9094:9094"]          # host access only; containers use the internal listener
     environment:
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: broker,controller
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9094
+      KAFKA_LISTENERS: INTERNAL://0.0.0.0:9092,EXTERNAL://0.0.0.0:9094,CONTROLLER://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9092,EXTERNAL://localhost:9094
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
       KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
