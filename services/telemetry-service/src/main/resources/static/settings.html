@@ -15,7 +15,9 @@ nav a{display:flex;align-items:center;gap:11px;padding:10px 12px;margin:2px 0;bo
 nav a .ic{width:18px;text-align:center}
 nav a:hover{background:rgba(255,255,255,.06);color:#fff}
 nav a.active{background:var(--blue2);color:#fff;font-weight:600}
+.signout{display:flex;align-items:center;gap:8px;margin:0 12px 12px;padding:9px 12px;border-radius:9px;background:rgba(239,68,68,.12);color:#fca5a5;text-decoration:none;font-size:13px}
 main{flex:1;min-width:0;padding:20px 24px;display:flex;flex-direction:column;gap:16px}
+.pagehead{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .pagehead h1{font-size:20px;font-weight:700}
 .banner{background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;border-radius:12px;padding:10px 14px;font-size:12.5px}
 .cards{display:grid;gap:14px}
@@ -29,6 +31,8 @@ main{flex:1;min-width:0;padding:20px 24px;display:flex;flex-direction:column;gap
 .st{font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:99px}
 .st.up{background:#d1fae5;color:#065f46}.st.down{background:#fee2e2;color:#991b1b}.st.warn{background:#fef3c7;color:#92400e}
 .role{font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:99px;background:#dbeafe;color:#1e40af;margin-left:4px}
+.role.me{background:#d1fae5;color:#065f46}
+.ok{color:var(--green);font-weight:700}.no{color:#94a3b8;font-weight:700}
 table{width:100%;border-collapse:collapse;font-size:13px}
 th{text-align:left;color:var(--muted);font-size:11.5px;text-transform:uppercase;letter-spacing:.5px;padding:8px 12px;border-bottom:1px solid var(--line);background:#fafbfe;position:sticky;top:0}
 td{padding:7px 12px;border-bottom:1px solid var(--line)}
@@ -36,11 +40,13 @@ tbody tr:hover td{background:#f8fafc}
 .tblwrap{overflow:auto;max-height:420px}
 .plate{font-weight:700;letter-spacing:.4px}
 input{border:1px solid var(--line);border-radius:8px;padding:6px 10px;font:inherit;width:80px}
+input:disabled{background:#f1f5f9;color:var(--muted)}
 .btn{border:0;border-radius:8px;padding:6px 12px;font:inherit;font-weight:600;background:var(--blue);color:#fff;cursor:pointer}
-.btn:disabled{opacity:.5;cursor:default}
 #toast{position:fixed;bottom:20px;right:20px;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;display:none;box-shadow:0 8px 24px rgba(2,6,23,.2)}
 .muted{color:var(--muted)}.small{font-size:12px}
 .metric{font-size:19px;font-weight:700}
+.locked{display:flex;gap:10px;align-items:flex-start;padding:4px 0}
+.locked .ic{font-size:16px}
 ::-webkit-scrollbar{width:7px}::-webkit-scrollbar-thumb{background:#d3dae6;border-radius:4px}
 </style>
 </head>
@@ -59,20 +65,26 @@ input{border:1px solid var(--line);border-radius:8px;padding:6px 10px;font:inher
     <a href="geofences.html"><span class="ic">🎯</span> Geofences</a>
     <a class="active" href="settings.html"><span class="ic">⚙️</span> Settings</a>
   </nav>
+  <a class="signout" href="/logout">⏻ Sign out</a>
 </aside>
 <main>
-  <div class="pagehead"><h1>Settings & System</h1></div>
-  <div class="banner">Speed-limit changes take effect on the <b>next telemetry reading</b> — no restart. Writes require ADMIN or FLEET_MANAGER. Try setting a vehicle to 60 km/h and watch speeding alerts on the Overview within seconds.</div>
+  <div class="pagehead"><h1>Settings & System</h1><span id="roleBadge"></span></div>
+  <div class="banner" id="banner"></div>
 
   <div class="cards grid3">
     <div class="card"><h3>Session</h3><div class="pad" id="session"><span class="muted small">Checking…</span></div></div>
+    <div class="card"><h3>Your Access</h3><div class="pad" id="access"><span class="muted small">Checking…</span></div></div>
     <div class="card"><h3>Services</h3><div class="pad" id="services"><span class="muted small">Checking…</span></div></div>
-    <div class="card"><h3>Pipeline Throughput</h3><div class="pad" id="metrics"><span class="muted small">Checking…</span></div></div>
   </div>
 
-  <div class="card">
-    <h3>Fleet Speed Limits <span class="muted small">— per-vehicle override (default 100)</span></h3>
-    <div class="tblwrap"><table><thead><tr><th>Plate</th><th>Vehicle</th><th>Current limit (km/h)</th><th></th></tr></thead>
+  <div class="card" id="metricsCard">
+    <h3>Pipeline Throughput</h3>
+    <div class="pad" id="metrics"><span class="muted small">Checking…</span></div>
+  </div>
+
+  <div class="card" id="limitsCard">
+    <h3>Fleet Speed Limits <span class="muted small" id="limitsHint"></span></h3>
+    <div class="tblwrap"><table><thead><tr><th>Plate</th><th>Vehicle</th><th>Limit (km/h)</th><th id="thAction"></th></tr></thead>
     <tbody id="limits"><tr><td colspan="4" class="muted">Loading…</td></tr></tbody></table></div>
   </div>
 
@@ -86,17 +98,16 @@ input{border:1px solid var(--line);border-radius:8px;padding:6px 10px;font:inher
       <div class="srow"><span class="k">Kafka (host)</span><span>localhost:9094</span></div>
     </div></div>
     <div class="card"><h3>Roles & Access</h3><div class="pad small">
-      <div class="srow"><span class="k">Read APIs</span><span>ADMIN · FLEET_MANAGER · DISPATCHER · ANALYST</span></div>
+      <div class="srow"><span class="k">Read APIs</span><span>ADMIN · FLEET_MANAGER · DISPATCHER · ANALYST · MAINTENANCE</span></div>
       <div class="srow"><span class="k">Write APIs</span><span>ADMIN · FLEET_MANAGER</span></div>
       <div class="srow"><span class="k">Metrics</span><span>ADMIN</span></div>
-      <div class="srow"><span class="k">Auth style</span><span>HTTP Basic (JWT = next milestone)</span></div>
+      <div class="srow"><span class="k">Auth</span><span>Session (form login) · JWT planned</span></div>
     </div></div>
-    <div class="card"><h3>Demo Users</h3><div class="pad small">
+    <div class="card" id="demoCard"><h3>Demo Users</h3><div class="pad small" id="demo">
       <div class="srow"><span class="k">admin</span><span>admin123</span></div>
       <div class="srow"><span class="k">manager</span><span>manager123</span></div>
-      <div class="srow"><span class="k">dispatcher</span><span>dispatch123</span></div>
       <div class="srow"><span class="k">analyst</span><span>analyst123</span></div>
-      <div class="srow muted"><span class="k">Sign out</span><span>use the sidebar Sign out button</span></div>
+      <div class="srow"><span class="k">dispatcher</span><span>dispatch123</span></div>
     </div></div>
   </div>
 </main>
@@ -105,52 +116,85 @@ input{border:1px solid var(--line);border-radius:8px;padding:6px 10px;font:inher
 <script>
 const esc = s => (s ?? '').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
 const fmtPlate = id => { const m = /^(K[A-Z]{2})(\d{3}[A-Z])$/.exec(id||''); return m ? m[1]+' '+m[2] : id||''; };
-const api = async p => { const r = await fetch(p); if(!r.ok) throw new Error(r.status); return r.json(); };
+const api = async p => { const r = await fetch(p); if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); };
 const badge = (txt, cls) => `<span class="st ${cls}">${txt}</span>`;
 const toast = (msg, ok) => { const t=document.getElementById('toast');
   t.textContent=msg; t.style.background= ok?'#d1fae5':'#fee2e2'; t.style.color= ok?'#065f46':'#991b1b';
   t.style.display='block'; setTimeout(()=>t.style.display='none',2500); };
 
-/* ---------- session ---------- */
+/* capabilities derived from the session — the server remains the enforcer */
+let ME = null;
+const canWrite = () => ME.roles.includes('ADMIN') || ME.roles.includes('FLEET_MANAGER');
+const isAdmin  = () => ME.roles.includes('ADMIN');
+const canRead  = () => !ME.roles.includes('DRIVER');
+
 async function loadSession(){
   const el = document.getElementById('session');
   try{
-    const me = await api('/api/v1/me');
-    el.innerHTML = `<div class="srow"><span class="k">Signed in as</span><b>${esc(me.username)}</b></div>
-      <div class="srow"><span class="k">Roles</span><span>${me.roles.map(r=>`<span class="role">${esc(r)}</span>`).join('')}</span></div>
-      <div class="srow"><span class="k">Auth</span><span>HTTP Basic</span></div>`;
+    ME = await api('/api/v1/me');
+    el.innerHTML = `<div class="srow"><span class="k">Signed in as</span><b>${esc(ME.username)}</b></div>
+      <div class="srow"><span class="k">Roles</span><span>${ME.roles.map(r=>`<span class="role me">${esc(r)}</span>`).join('')}</span></div>
+      <div class="srow"><span class="k">Auth</span><span>Session (form login)</span></div>`;
+    document.getElementById('roleBadge').innerHTML = ME.roles.map(r=>`<span class="role me">${esc(r)}</span>`).join(' ');
+
+    document.getElementById('access').innerHTML = [
+      ['View fleet data', canRead()],
+      ['Edit speed limits / zones', canWrite()],
+      ['View pipeline metrics', isAdmin()],
+      ['See demo credentials', isAdmin()]
+    ].map(([label, yes]) => `<div class="srow"><span class="k">${label}</span><span class="${yes?'ok':'no'}">${yes?'✓ allowed':'✕ denied'}</span></div>`).join('');
+
+    document.getElementById('banner').innerHTML = canWrite()
+      ? 'Speed-limit changes take effect on the <b>next telemetry reading</b> — no restart. Try 60 km/h on a vehicle and watch speeding alerts on the Overview.'
+      : (canRead()
+          ? 'You have <b>read-only</b> access. Speed limits are shown but not editable — sign in as admin or manager to change them.'
+          : 'Your role has no API read access. Settings are visible but fleet data is restricted — sign in as analyst or above.');
+
+    if(!isAdmin()){
+      document.getElementById('metrics').innerHTML =
+        `<div class="locked"><span class="ic">🔒</span><span><b>ADMIN only.</b> Pipeline counters (consumed, persisted, alerts, events/sec) are hidden for your role.</span></div>`;
+      document.getElementById('demo').innerHTML =
+        `<div class="locked"><span class="ic">🔒</span><span><b>ADMIN only.</b> Demo credentials are hidden for your role.</span></div>`;
+    }
+    loadServices(); loadLimits();
+    if(isAdmin()){ loadMetrics(); setInterval(loadMetrics, 5000); }
   }catch(e){
-    el.innerHTML = `<div class="srow"><span class="k">Signed in as</span>${badge('NOT SIGNED IN','warn')}</div>
-      <p class="muted small" style="margin-top:8px">Open any API link to trigger the login prompt.</p>`;
+    el.innerHTML = `<div class="srow"><span class="k">Session</span>${badge('NOT SIGNED IN','warn')}</div>
+      <p class="muted small" style="margin-top:8px"><a href="/login.html">Go to sign-in →</a></p>`;
+    document.getElementById('banner').textContent = 'Sign in to view settings.';
+    document.getElementById('metrics').innerHTML = '<p class="muted small">Requires sign-in.</p>';
+    document.getElementById('limits').innerHTML = '<tr><td colspan="4" class="muted">Requires sign-in.</td></tr>';
+    document.getElementById('demo').innerHTML = '<p class="muted small">Requires sign-in.</p>';
   }
 }
 
-/* ---------- services ---------- */
-async function ping(path){
+/* ---------- services (all authenticated roles) ---------- */
+async function ping(path, opts){
   const t0 = performance.now();
-  await fetch(path);                      // throws on network failure
+  await fetch(path, opts);
   return (performance.now()-t0).toFixed(0);
 }
 async function loadServices(){
+  if(!ME || !canRead()){ return; }
   const rows = [];
   try { const ms = await ping('/actuator/health');
         rows.push(['Telemetry API (8082)', badge('UP','up'), ms+' ms']); }
   catch(e){ rows.push(['Telemetry API (8082)', badge('DOWN','down'), '–']); }
   try { const t0=performance.now();
-        await fetch('http://localhost:8081/actuator/health', {mode:'no-cors'});   // opaque = reachable
+        await fetch('http://localhost:8081/actuator/health', {mode:'no-cors'});
         rows.push(['Ingestion API (8081)', badge('REACHABLE','up'), (performance.now()-t0).toFixed(0)+' ms']); }
   catch(e){ rows.push(['Ingestion API (8081)', badge('UNREACHABLE','down'), '–']); }
   try { const s = await api('/api/v1/vehicles/summary');
         rows.push(['Database + live stream', badge('CONNECTED','up'), s.total+' vehicles']); }
-  catch(e){ rows.push(['Database + live stream', badge('UNKNOWN','warn'), '–']); }
+  catch(e){ rows.push(['Database + live stream', badge('DENIED','warn'), 'role']); }
   document.getElementById('services').innerHTML =
     rows.map(([k,b,l])=>`<div class="srow"><span class="k">${k}</span><span>${b} <span class="muted small">${l}</span></span></div>`).join('');
 }
 
-/* ---------- throughput (ADMIN-gated metrics) ---------- */
+/* ---------- throughput (ADMIN only — pre-empted by role, enforced by server) ---------- */
 let prev = null;
 async function loadMetrics(){
-  const el = document.getElementById('metrics');
+  if(!ME || !isAdmin()) return;
   try{
     const text = await (await fetch('/actuator/prometheus')).text();
     const get = n => { const m = text.match(new RegExp('^'+n+'\\\\s+([0-9.eE+-]+)','m')); return m?parseFloat(m[1]):0; };
@@ -164,31 +208,46 @@ async function loadMetrics(){
       rate = ((consumed - prev.c) / ((now - prev.t)/1000)).toFixed(1) + '/s';
     }
     prev = { t: now, c: consumed };
-    el.innerHTML = `
+    document.getElementById('metrics').innerHTML = `
       <div class="srow"><span class="k">Consumed</span><span class="metric">${consumed.toLocaleString()}</span></div>
       <div class="srow"><span class="k">Persisted</span><span class="metric">${persisted.toLocaleString()}</span></div>
       <div class="srow"><span class="k">Write failures</span><span class="metric" style="color:${failures>0?'var(--red)':'inherit'}">${failures}</span></div>
       <div class="srow"><span class="k">Alerts published</span><span class="metric">${alerts.toLocaleString()}</span></div>
       <div class="srow"><span class="k">Consume rate</span><span class="metric" style="color:var(--blue)">${rate}</span></div>`;
   }catch(e){
-    el.innerHTML = `<div class="srow"><span class="k">Metrics</span>${badge('ADMIN ONLY','warn')}</div>
-      <p class="muted small" style="margin-top:8px">Sign in as <b>admin</b> to view pipeline throughput.</p>`;
+    document.getElementById('metrics').innerHTML =
+      `<div class="locked"><span class="ic">🔒</span><span>Metrics endpoint denied (server enforced).</span></div>`;
   }
 }
 
-/* ---------- speed limits ---------- */
-let vehicles = [];
+/* ---------- speed limits: editable / read-only / denied ---------- */
 async function loadLimits(){
+  if(!ME || !canRead()){
+    document.getElementById('limits').innerHTML =
+      '<tr><td colspan="4"><div class="locked"><span class="ic">🔒</span><span><b>Your role has no fleet read access.</b> Sign in as admin, manager, dispatcher, analyst or maintenance.</span></div></td></tr>';
+    document.getElementById('limitsHint').textContent = '';
+    document.getElementById('thAction').textContent = '';
+    return;
+  }
+  document.getElementById('limitsHint').textContent = canWrite() ? '— editable, live in seconds' : '— read-only for your role';
+  document.getElementById('thAction').textContent = canWrite() ? '' : '';
   try{
-    vehicles = await api('/api/v1/settings/speed-limits');
-    document.getElementById('limits').innerHTML = vehicles.map(v=>`
-      <tr><td><span class="plate">${fmtPlate(v.vehicleId)}</span></td>
+    const vehicles = await api('/api/v1/settings/speed-limits');
+    document.getElementById('limits').innerHTML = vehicles.map(v=>{
+      if(canWrite()){
+        return `<tr><td><span class="plate">${fmtPlate(v.vehicleId)}</span></td>
+          <td class="muted">${esc(v.make||'—')} ${esc(v.model||'')}</td>
+          <td><input id="lim_${esc(v.vehicleId)}" type="number" min="20" max="200" value="${v.speedLimitKph}"/></td>
+          <td><button class="btn" onclick="saveLimit('${esc(v.vehicleId)}')">Save</button></td></tr>`;
+      }
+      return `<tr><td><span class="plate">${fmtPlate(v.vehicleId)}</span></td>
         <td class="muted">${esc(v.make||'—')} ${esc(v.model||'')}</td>
-        <td><input id="lim_${esc(v.vehicleId)}" type="number" min="20" max="200" value="${v.speedLimitKph}"/></td>
-        <td><button class="btn" onclick="saveLimit('${esc(v.vehicleId)}')">Save</button></td></tr>`).join('')
-      || '<tr><td colspan="4" class="muted">No vehicles registered yet.</td></tr>';
+        <td><input type="number" value="${v.speedLimitKph}" disabled/></td>
+        <td class="muted small">view only</td></tr>`;
+    }).join('') || '<tr><td colspan="4" class="muted">No vehicles registered yet.</td></tr>';
   }catch(e){
-    document.getElementById('limits').innerHTML='<tr><td colspan="4" class="muted">API unreachable — sign in first.</td></tr>';
+    document.getElementById('limits').innerHTML =
+      `<tr><td colspan="4"><div class="locked"><span class="ic">🔒</span><span>Load failed: ${esc(e.message)} — server denied or not signed in.</span></div></td></tr>`;
   }
 }
 async function saveLimit(id){
@@ -197,15 +256,14 @@ async function saveLimit(id){
     const r = await fetch('/api/v1/settings/speed-limits/'+id, {method:'PUT',
       headers:{'Content-Type':'application/json'}, body: JSON.stringify({speedLimitKph: val})});
     if(r.ok) toast('✅ '+fmtPlate(id)+' limit set to '+val+' km/h — live immediately', true);
-    else if(r.status===403) toast('⛔ Not authorized — ADMIN or FLEET_MANAGER required', false);
+    else if(r.status===403) toast('⛔ Server denied: your role cannot edit limits', false);
     else if(r.status===400) toast('❌ Limit must be 20–200 km/h', false);
     else toast('❌ Failed ('+r.status+')', false);
   }catch(e){ toast('❌ Network error', false); }
 }
 
-loadSession(); loadServices(); loadMetrics(); loadLimits();
+loadSession();
 setInterval(loadServices, 10000);
-setInterval(loadMetrics, 5000);
 </script>
 </body>
 </html>
