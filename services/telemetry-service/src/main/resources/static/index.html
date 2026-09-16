@@ -45,6 +45,20 @@
   .conn{font-size:11px;font-weight:700;padding:4px 10px;border-radius:99px;border:1px solid}
   .conn.live{color:var(--green);border-color:var(--green)}
   .conn.down{color:var(--red);border-color:var(--red)}
+  /* ---------- date dropdown ---------- */
+  .datewrap{position:relative}
+  .datechip{font-size:12.5px;font-weight:600;color:var(--muted);background:#eef2f9;border-radius:9px;
+        padding:7px 12px;white-space:nowrap;cursor:pointer;user-select:none;border:1px solid transparent}
+  .datechip:hover{border-color:var(--line)}
+  .dropdown{position:absolute;top:calc(100% + 6px);right:0;background:#fff;border:1px solid var(--line);
+        border-radius:12px;box-shadow:0 12px 32px rgba(2,6,23,.18);min-width:200px;z-index:1200;display:none;padding:6px}
+  .dropdown.open{display:block}
+  .dd-item{padding:9px 12px;border-radius:8px;cursor:pointer;font-size:13px;display:flex;justify-content:space-between;align-items:center}
+  .dd-item:hover{background:#f8fafc}
+  .dd-item.sel{color:var(--blue);font-weight:700;background:#eff6ff}
+  .dd-sep{border-top:1px solid var(--line);margin:6px 4px}
+  .dd-date{padding:6px 8px}
+  .dd-date input{width:100%;border:1px solid var(--line);border-radius:8px;padding:7px 8px;font:inherit}
   .wrap{padding:18px 24px;display:flex;flex-direction:column;gap:16px}
   .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
   .kpi{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;gap:12px;align-items:center}
@@ -78,10 +92,19 @@
   .fring{--p:60;--c:var(--green);width:34px;height:34px;border-radius:50%;flex:none;
         background:conic-gradient(var(--c) calc(var(--p)*1%), #e8edf5 0);display:grid;place-items:center}
   .fring>div{width:25px;height:25px;border-radius:50%;background:#fff;display:grid;place-items:center;font-size:9.5px;font-weight:700}
+  /* ---------- trip lifecycle timeline ---------- */
   #activity{padding:6px 0;overflow-y:auto;max-height:210px}
-  .ev{display:flex;gap:12px;padding:8px 16px;align-items:baseline}
-  .ev time{color:var(--muted);font-size:11.5px;width:48px;flex:none}
-  .ev .tx{font-size:13px}
+  .tlrow{display:flex;gap:12px;padding:7px 16px}
+  .tlrow .tm{color:var(--muted);font-size:11.5px;width:42px;flex:none;padding-top:4px}
+  .tlrow .rail{width:16px;flex:none;display:flex;justify-content:center;position:relative}
+  .tlrow .rail::before{content:'';position:absolute;top:-10px;bottom:-10px;border-left:2px dashed var(--line)}
+  .tlrow:first-child .rail::before{top:14px}
+  .tlrow:last-child .rail::before{bottom:auto;height:16px}
+  .tlrow .ring{position:relative;z-index:1;width:11px;height:11px;border-radius:50%;border:3px solid var(--green);background:#fff;margin-top:4px}
+  .tlrow.stop .ring{border-color:var(--amber)}
+  .tlrow .tx{flex:1;min-width:0}
+  .tlrow .loc{font-weight:700;font-size:13px}
+  .tlrow .sub{font-size:11.5px;color:var(--muted)}
   .chip{margin-left:auto;font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:99px}
   .chip.g{background:#d1fae5;color:#065f46}.chip.a{background:#fef3c7;color:#92400e}
   #fuelChart{padding:10px 16px 4px}
@@ -148,6 +171,15 @@
       <button data-loc="msa">⚓ Mombasa</button>
     </div>
     <span class="spacer"></span>
+    <div class="datewrap">
+      <span class="datechip" id="dateChip">📅 Today ▾</span>
+      <div class="dropdown" id="dateDrop">
+        <div class="dd-item sel" data-date="">Today</div>
+        <div class="dd-item" data-date="yesterday">Yesterday</div>
+        <div class="dd-sep"></div>
+        <div class="dd-date"><input type="date" id="datePick"/></div>
+      </div>
+    </div>
     <span class="conn down" id="conn">● CONNECTING</span>
     <div class="bell" id="bell">🔔<span class="badge" id="bellBadge">0</span></div>
     <div class="avatar">OP</div>
@@ -160,9 +192,9 @@
       <div class="kpi"><div class="bub" style="background:#dcfce7">📈</div>
         <div><div class="label">Moving Now</div><div class="value" id="kActive">–</div><div class="trend" id="kActivePct"></div></div></div>
       <div class="kpi"><div class="bub" style="background:#ede9fe">🛫</div>
-        <div><div class="label">Departures (session)</div><div class="value" id="kTrips">–</div><div class="trend">idle → moving</div></div></div>
+        <div><div class="label" id="kTripsLabel">Trips Today</div><div class="value" id="kTrips">–</div><div class="trend" id="kTripsSub">departures from history</div></div></div>
       <div class="kpi"><div class="bub" style="background:#ffedd5">🛣️</div>
-        <div><div class="label">Distance Covered</div><div class="value" id="kDist">–</div><div class="trend">km since page load</div></div></div>
+        <div><div class="label">Distance Covered</div><div class="value" id="kDist">–</div><div class="trend" id="kDistSub">km today</div></div></div>
       <div class="kpi"><div class="bub" style="background:#cffafe">⛽</div>
         <div><div class="label">Avg Fuel Level</div><div class="value" id="kFuel">–</div><div class="trend">fleet average</div></div></div>
     </div>
@@ -186,8 +218,8 @@
 
     <div class="row bottom">
       <div class="card">
-        <h3>Trip Activity <a class="view" href="trips.html">View all</a></h3>
-        <div id="activity"><div class="ev"><span class="tx" style="color:var(--muted)">Watching for departures & stops…</span></div></div>
+        <h3>Trip Lifecycle <a class="view" href="trips.html">View all</a></h3>
+        <div id="activity"><div class="pad muted small" style="padding:10px 16px">No trip events yet — waiting for departures & stops…</div></div>
       </div>
       <div class="card">
         <h3>Fuel Analytics <a class="view" href="fuel.html">Live</a></h3>
@@ -230,7 +262,7 @@ document.querySelectorAll('.seg button').forEach(b => b.onclick = () => {
   const l = LOC[b.dataset.loc]; map.setView(l.c, l.z);
 });
 
-/* ---------- constants (declared before use) ---------- */
+/* ---------- constants ---------- */
 const GAUGE_SVG = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round">'
   + '<circle cx="12" cy="12" r="9"/><path d="M12 12l3.5-3.5"/></svg>';
 const TRUCK_SVG = '<svg viewBox="0 0 24 24" width="22" height="22">'
@@ -238,7 +270,6 @@ const TRUCK_SVG = '<svg viewBox="0 0 24 24" width="22" height="22">'
   + '<path d="M13 9h4.2c.5 0 .96.25 1.24.66L20.5 12.5V15H13V9Z" fill="#60a5fa"/>'
   + '<circle cx="6" cy="16.8" r="1.8" fill="#1e293b"/>'
   + '<circle cx="16.5" cy="16.8" r="1.8" fill="#1e293b"/></svg>';
-
 function vClass(make, model){
   const m = `${make ?? ''} ${model ?? ''}`;
   if(/Hiace|Coaster|Rosa|Matatu|Bus/i.test(m))            return 'bus';
@@ -246,7 +277,6 @@ function vClass(make, model){
   if(/FRR|FVR|Fighter|Hino 500|Croner|P280|FTS/i.test(m)) return 'medium';
   return 'heavy';
 }
-/* photo chain: img/<PLATE>.jpg -> img/<class>.jpg -> SVG */
 function vThumb(v){
   const cls = vClass(v.make, v.model);
   return '<img src="img/' + encodeURIComponent(v.vehicleId) + '.jpg"'
@@ -254,18 +284,10 @@ function vThumb(v){
        + ' onerror="window.__thumbErr(this)">';
 }
 window.__thumbErr = function(img){
-  if(!img.dataset.step){
-    img.dataset.step = '2';
-    img.src = 'img/' + img.dataset.cls + '.jpg';
-  } else {
-    const s = document.createElement('span');
-    s.style.display = 'grid'; s.style.placeItems = 'center';
-    s.innerHTML = TRUCK_SVG;
-    img.replaceWith(s);
-  }
+  if(!img.dataset.step){ img.dataset.step='2'; img.src='img/'+img.dataset.cls+'.jpg'; }
+  else{ const s=document.createElement('span'); s.style.display='grid'; s.style.placeItems='center';
+        s.innerHTML=TRUCK_SVG; img.replaceWith(s); }
 };
-
-/* Kenyan reference cities for nearest-place lookup */
 const CITIES = [
   ["Nairobi",-1.286,36.817], ["Thika",-1.039,37.090], ["Limuru",-1.112,36.640],
   ["Machakos",-1.518,37.265], ["Naivasha",-0.717,36.433], ["Nakuru",-0.303,36.080],
@@ -274,103 +296,130 @@ const CITIES = [
   ["Mombasa",-4.043,39.668], ["Malindi",-3.220,40.117], ["Garissa",-0.453,39.646]
 ];
 function nearestCity(lat, lon){
-  let best = "Kenya", bd = Infinity;
-  for(const [n, la, lo] of CITIES){
-    const d = (la - lat) ** 2 + (lo - lon) ** 2;
-    if(d < bd){ bd = d; best = n; }
-  }
+  let best="Kenya", bd=Infinity;
+  for(const [n,la,lo] of CITIES){ const d=(la-lat)**2+(lo-lon)**2; if(d<bd){bd=d;best=n;} }
   return best;
 }
 
 /* ---------- state ---------- */
-const markers = new Map(), trails = new Map(), lastSeen = new Map();
-const prevStatus = new Map();
-let boundsFit = false, departures = 0, distanceKm = 0;
-let knownVehicles = new Set();
-let fuelSamples = [];
+const markers=new Map(), trails=new Map(), lastSeen=new Map(), prevStatus=new Map();
+let boundsFit=false, distanceKm=0, knownVehicles=new Set(), fuelSamples=[], alertsLast60=0;
 const $ = id => document.getElementById(id);
-const fmt = n => n == null ? '–' : Number(n).toFixed(0);
-const esc = s => (s ?? '').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
-const fmtPlate = id => { const m = /^(K[A-Z]{2})(\d{3}[A-Z])$/.exec(id); return m ? m[1]+' '+m[2] : id; };
-const dist = (a,b,c,d) => { const R=6371,r=Math.PI/180,
-  dLa=(c-a)*r, dLo=(d-b)*r, h=Math.sin(dLa/2)**2+Math.cos(a*r)*Math.cos(c*r)*Math.sin(dLo/2)**2;
-  return 2*R*Math.asin(Math.sqrt(h)); };
+const fmt = n => n==null?'–':Number(n).toFixed(0);
+const esc = s => (s??'').replace(/[<>&"]/g, c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+const fmtPlate = id => { const m=/^(K[A-Z]{2})(\d{3}[A-Z])$/.exec(id); return m?m[1]+' '+m[2]:id; };
+const dist=(a,b,c,d)=>{const R=6371,r=Math.PI/180,dLa=(c-a)*r,dLo=(d-b)*r,
+  h=Math.sin(dLa/2)**2+Math.cos(a*r)*Math.cos(c*r)*Math.sin(dLo/2)**2; return 2*R*Math.asin(Math.sqrt(h));};
+async function api(p){ const r=await fetch(p); if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); }
+function countOffline(){ const now=Date.now();
+  return [...knownVehicles].filter(id=>now-(lastSeen.get(id)||0)>60_000).length; }
 
-async function api(p){ const r = await fetch(p); if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); }
-
-/* offline = known vehicle silent > 60s */
-function countOffline(){
-  const now = Date.now();
-  return [...knownVehicles].filter(id => now - (lastSeen.get(id)||0) > 60_000).length;
+/* ---------- date dropdown ---------- */
+let selectedDate = '';   // '' = today
+const dateChip=$('dateChip'), dateDrop=$('dateDrop'), datePick=$('datePick');
+datePick.max = isoToday();
+dateChip.onclick = e => { e.stopPropagation(); dateDrop.classList.toggle('open'); };
+document.addEventListener('click', e => { if(!dateDrop.parentElement.contains(e.target)) dateDrop.classList.remove('open'); });
+document.querySelectorAll('.dd-item').forEach(it => it.onclick = () => {
+  selectedDate = it.dataset.date === 'yesterday'
+      ? localYesterday() : '';
+  dateDrop.classList.remove('open'); markSel(); loadToday();
+});
+datePick.onchange = () => { if(datePick.value){ selectedDate=datePick.value; markSel(); dateDrop.classList.remove('open'); loadToday(); } };
+function localISO(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+  function isoToday(){ return localISO(new Date()); }
+  function localYesterday(){ const d=new Date(); d.setDate(d.getDate()-1); return localISO(d); }
+function markSel(){
+  document.querySelectorAll('.dd-item').forEach(it=>{
+    const v = it.dataset.date==='yesterday'
+        ? localYesterday() : '';
+    it.classList.toggle('sel', v===selectedDate);
+  });
+  if(selectedDate && selectedDate!==isoToday()){
+    const d=new Date(selectedDate+'T00:00:00');
+    dateChip.textContent='📅 '+d.toLocaleDateString([], {day:'numeric',month:'short'})+' ▾';
+  } else if(selectedDate){
+    dateChip.textContent='📅 Today ▾';
+  } else {
+    dateChip.textContent='📅 Today ▾';
+  }
 }
 
-/* ---------- fleet render (map, KPIs, vehicle status, fuel) ---------- */
+/* ---------- today/selected-date aggregates (server-backed) ---------- */
+async function loadToday(){
+  try{
+    const q = selectedDate ? '?date='+selectedDate : '';
+    const d = await api('/api/v1/trips/summary'+q);
+    $('kTrips').textContent = d.departures;
+    $('kDist').textContent = d.distanceKm>=100 ? Math.round(d.distanceKm).toLocaleString() : d.distanceKm.toFixed(1);
+    if(d.isToday){
+      $('kTripsLabel').textContent='Trips Today';
+      $('kTripsSub').textContent='departures from history';
+      $('kDistSub').textContent='km today · '+d.vehiclesActive+' vehicles active';
+    } else {
+      const dt=new Date(d.date+'T00:00:00').toLocaleDateString([], {day:'numeric',month:'short'});
+      $('kTripsLabel').textContent='Trips · '+dt;
+      $('kTripsSub').textContent='departures on '+dt;
+      $('kDistSub').textContent='km on '+dt+' · '+d.vehiclesActive+' vehicles';
+    }
+  }catch(e){ console.error('loadToday failed:', e); }
+}
+loadToday(); setInterval(loadToday, 30000);
+
+/* ---------- fleet render ---------- */
 function renderLive(list, offlineCount){
-  const now = Date.now();
-  list.forEach(v => { lastSeen.set(v.vehicleId, now); knownVehicles.add(v.vehicleId); });
+  const now=Date.now();
+  list.forEach(v=>{ lastSeen.set(v.vehicleId, now); knownVehicles.add(v.vehicleId); });
+  const moving=list.filter(v=>v.status==='MOVING').length, idle=list.length-moving;
+  $('kTotal').textContent=list.length;
+  $('kActive').textContent=moving;
+  $('kActivePct').textContent=list.length?Math.round(moving/list.length*100)+'% of fleet':'';
+  $('lgMove').textContent=moving; $('lgIdle').textContent=idle; $('lgOff').textContent=offlineCount;
 
-  const moving = list.filter(v => v.status === 'MOVING').length;
-  const idle = list.length - moving;
-  $('kTotal').textContent = list.length;
-  $('kActive').textContent = moving;
-  $('kActivePct').textContent = list.length ? Math.round(moving/list.length*100)+'% of fleet' : '';
-  $('kTrips').textContent = departures;
-  $('lgMove').textContent = moving; $('lgIdle').textContent = idle; $('lgOff').textContent = offlineCount;
-
-  const seen = new Set();
-  list.forEach(v => {
+  const seen=new Set();
+  list.forEach(v=>{
     seen.add(v.vehicleId);
-    const ll = [v.latitude, v.longitude];
-    if(prevStatus.get(v.vehicleId) === 'IDLE' && v.status === 'MOVING'){
-      departures++; addEvent(`🟢 <b>${fmtPlate(v.vehicleId)}</b> departed`, 'g');
-    }
-    if(prevStatus.get(v.vehicleId) === 'MOVING' && v.status === 'IDLE'){
-      addEvent(`🟡 <b>${fmtPlate(v.vehicleId)}</b> stopped`, 'a');
-    }
+    const ll=[v.latitude, v.longitude];
+    if(prevStatus.get(v.vehicleId)==='IDLE' && v.status==='MOVING'){ addTrip('depart', v); }
+    if(prevStatus.get(v.vehicleId)==='MOVING' && v.status==='IDLE'){ addTrip('stop', v); }
     prevStatus.set(v.vehicleId, v.status);
 
-    if(v.status === 'MOVING'){
-      const t = trails.get(v.vehicleId);
-      if(t && t.length){ distanceKm += dist(...t[t.length-1], ...ll); }
-    }
-    let tr = trails.get(v.vehicleId) || [];
-    tr.push(ll); if(tr.length > 40) tr.shift();
-    trails.set(v.vehicleId, tr);
+    if(v.status==='MOVING'){ const t=trails.get(v.vehicleId);
+      if(t&&t.length){ distanceKm+=dist(...t[t.length-1],...ll); } }
+    let tr=trails.get(v.vehicleId)||[]; tr.push(ll); if(tr.length>40)tr.shift(); trails.set(v.vehicleId,tr);
 
-    let m = markers.get(v.vehicleId);
+    let m=markers.get(v.vehicleId);
     if(!m){
-      m = L.circleMarker(ll, {radius:7, weight:2, color:'#fff', fillOpacity:.95}).bindTooltip(fmtPlate(v.vehicleId)).addTo(map);
-      markers.set(v.vehicleId, m);
-      m._line = L.polyline(tr, {color:'#3b82f6', weight:3, opacity:.65}).addTo(map);
+      m=L.circleMarker(ll,{radius:7,weight:2,color:'#fff',fillOpacity:.95}).bindTooltip(fmtPlate(v.vehicleId)).addTo(map);
+      markers.set(v.vehicleId,m);
+      m._line=L.polyline(tr,{color:'#3b82f6',weight:3,opacity:.65}).addTo(map);
     }
     m.setLatLng(ll); m._line.setLatLngs(tr);
-    m.setStyle({fillColor: v.status==='MOVING' ? '#10b981' : '#3b82f6'});
-    const drv = v.driverName ? `👤 ${esc(v.driverName)} · ` : '';
-    m.setTooltipContent(`<b>${fmtPlate(v.vehicleId)}</b> · ${esc(v.make ?? '')} ${esc(v.model ?? '')}<br/>${drv}${fmt(v.speedKph)} km/h · fuel ${fmt(v.fuelLevelPct)}%`);
+    m.setStyle({fillColor: v.status==='MOVING'?'#10b981':'#3b82f6'});
+    const drv=v.driverName?('👤 '+esc(v.driverName)+' · '):'';
+    m.setTooltipContent(`<b>${fmtPlate(v.vehicleId)}</b> · ${esc(v.make??'')} ${esc(v.model??'')}<br/>${drv}${fmt(v.speedKph)} km/h · fuel ${fmt(v.fuelLevelPct)}%`);
   });
-  markers.forEach((m,id)=>{ if(!seen.has(id)){ map.removeLayer(m); map.removeLayer(m._line); markers.delete(id); } });
-  if(!boundsFit && list.length){ map.fitBounds(L.latLngBounds(list.map(v=>[v.latitude,v.longitude])).pad(0.25)); boundsFit=true; }
-  $('kDist').textContent = distanceKm >= 100 ? Math.round(distanceKm).toLocaleString() : distanceKm.toFixed(1);
+  markers.forEach((m,id)=>{ if(!seen.has(id)){ map.removeLayer(m); map.removeLayer(m._line); markers.delete(id); }});
+  if(!boundsFit&&list.length){ map.fitBounds(L.latLngBounds(list.map(v=>[v.latitude,v.longitude])).pad(0.25)); boundsFit=true; }
 
-  const fuels = list.map(v=>v.fuelLevelPct).filter(x=>x!=null);
+  const fuels=list.map(v=>v.fuelLevelPct).filter(x=>x!=null);
   if(fuels.length){
-    const avg = fuels.reduce((a,b)=>a+b,0)/fuels.length;
-    $('kFuel').textContent = avg.toFixed(1)+'%';
-    $('fAvg').textContent = avg.toFixed(2)+'%';
-    fuelSamples.push(avg); if(fuelSamples.length>60) fuelSamples.shift();
-    const min=Math.min(...fuelSamples), max=Math.max(...fuelSamples), rng=(max-min)||1;
-    $('fuelPath').setAttribute('d', fuelSamples.map((s,i)=>{
+    const avg=fuels.reduce((a,b)=>a+b,0)/fuels.length;
+    $('kFuel').textContent=avg.toFixed(1)+'%';
+    $('fAvg').textContent=avg.toFixed(2)+'%';
+    fuelSamples.push(avg); if(fuelSamples.length>60)fuelSamples.shift();
+    const min=Math.min(...fuelSamples),max=Math.max(...fuelSamples),rng=(max-min)||1;
+    $('fuelPath').setAttribute('d',fuelSamples.map((s,i)=>{
       const x=i/(fuelSamples.length-1||1)*300, y=62-(s-min)/rng*54+4;
       return (i?'L':'M')+x.toFixed(1)+' '+y.toFixed(1);}).join(' '));
   }
 
-  /* vehicle status rows */
-  $('vlist').innerHTML = [...list].sort((a,b)=>b.speedKph-a.speedKph).slice(0,8).map(v=>{
-    const f = v.fuelLevelPct==null?0:v.fuelLevelPct;
-    const col = f<15?'var(--red)':f<35?'var(--amber)':'var(--green)';
-    const place = nearestCity(v.latitude, v.longitude);
-    const mm = [v.make, v.model].filter(Boolean).join(' ') || '—';
-    const drv = v.driverName ? ` · ${esc(v.driverName)}` : '';
+  $('vlist').innerHTML=[...list].sort((a,b)=>b.speedKph-a.speedKph).slice(0,8).map(v=>{
+    const f=v.fuelLevelPct==null?0:v.fuelLevelPct;
+    const col=f<15?'var(--red)':f<35?'var(--amber)':'var(--green)';
+    const place=nearestCity(v.latitude,v.longitude);
+    const mm=[v.make,v.model].filter(Boolean).join(' ')||'—';
+    const drv=v.driverName?(' · '+esc(v.driverName)):'';
     return `<div class="vrow" onclick="focusVehicle('${esc(v.vehicleId)}')">
       <span class="thumb">${vThumb(v)}</span>
       <span class="vinfo">
@@ -380,102 +429,108 @@ function renderLive(list, offlineCount){
       <span class="spd">${GAUGE_SVG} ${fmt(v.speedKph)} km/h</span>
       <span class="fring" style="--p:${f.toFixed(0)};--c:${col}"><div>${f.toFixed(0)}%</div></span>
       <span class="chev">›</span>
-    </div>`;}).join('') || '<div class="vrow"><span class="st" style="color:var(--muted)">Waiting for telemetry…</span></div>';
+    </div>`;}).join('')||'<div class="vrow"><span class="st" style="color:var(--muted)">Waiting for telemetry…</span></div>';
 
-  /* fleet health ring */
-  const alertsPen = Math.min(40, alertsLast60*3);
-  const score = Math.max(40, 100 - alertsPen - Math.round(idle/(list.length||1)*15) - Math.round(offlineCount*0.4));
-  $('hScore').textContent = score;
-  $('hRing').style.setProperty('--p', score);
-  $('hRing').style.setProperty('--c', score>=80?'var(--green)':score>=60?'var(--amber)':'var(--red)');
-  $('hLabel').textContent = score>=80?'Good':score>=60?'Watch':'Critical';
+  const alertPen=Math.min(40, alertsLast60*3);
+  const score=Math.max(40, 100-alertPen-Math.round(idle/(list.length||1)*15)-Math.round(offlineCount*0.4));
+  $('hScore').textContent=score;
+  $('hRing').style.setProperty('--p',score);
+  $('hRing').style.setProperty('--c',score>=80?'var(--green)':score>=60?'var(--amber)':'var(--red)');
+  $('hLabel').textContent=score>=80?'Good':score>=60?'Watch':'Critical';
 }
 
-/* ---------- DRIVER ACTIVITY (mockup card — counts drivers, not vehicles) ---------- */
+/* ---------- trip lifecycle timeline ---------- */
+const trips=[];
+function addTrip(type, v){
+  trips.unshift({t:new Date(), type, plate:v.vehicleId, city:nearestCity(v.latitude,v.longitude)});
+  if(trips.length>30) trips.pop();
+  renderTrips();
+}
+function renderTrips(){
+  const el=$('activity'); if(!el) return;
+  el.innerHTML=trips.slice(0,6).map(e=>{
+    const moving=prevStatus.get(e.plate)==='MOVING';
+    const chip=(e.type==='depart'&&moving)?['In Transit','g']:['Stopped','a'];
+    const sub=e.type==='depart'?'Departed':'Stopped';
+    return `<div class="tlrow ${e.type==='depart'?'dep':'stop'}">
+      <span class="tm">${e.t.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</span>
+      <span class="rail"><span class="ring"></span></span>
+      <span class="tx"><div class="loc">${esc(e.city)}, Kenya</div>
+        <div class="sub">${fmtPlate(e.plate)} · ${sub}</div></span>
+      <span class="chip ${chip[1]}">${chip[0]}</span>
+    </div>`;}).join('')||'<div class="pad muted small" style="padding:10px 16px">No trip events yet — waiting for departures & stops…</div>';
+}
+
+/* ---------- driver activity ---------- */
 function renderDriverActivity(list, offlineCount){
-  /* one entry per driver (fallback: vehicle) — a driver is Active if any of
-     their vehicles is MOVING right now */
-  const byDriver = new Map();
-  list.forEach(v => {
-    const id = v.driverId || v.vehicleId;
-    if(!byDriver.has(id)) byDriver.set(id, { name: v.driverName || fmtPlate(v.vehicleId), moving:false });
-    if(v.status === 'MOVING') byDriver.get(id).moving = true;
+  const byDriver=new Map();
+  list.forEach(v=>{
+    const id=v.driverId||v.vehicleId;
+    if(!byDriver.has(id)) byDriver.set(id,{moving:false});
+    if(v.status==='MOVING') byDriver.get(id).moving=true;
   });
-
-  const drivers = byDriver.size;
-  const total = drivers + offlineCount || 1;
-  const active = [...byDriver.values()].filter(d => d.moving).length;
-  const idle = drivers - active;
-  const pActive = Math.round(active/total*100), pIdle = Math.round(idle/total*100), pOff = 100-pActive-pIdle;
-
-  $('aDonut').style.setProperty('--p', pActive);
-  $('aPct').textContent = pActive+'%';
-  $('bActive').textContent = `${active} · ${pActive}%`; $('fActive').style.width = pActive+'%';
-  $('bIdle').textContent = `${idle} · ${pIdle}%`;       $('fIdle').style.width = pIdle+'%';
-  $('bOff').textContent = `${offlineCount} · ${pOff}%`; $('fOff').style.width = pOff+'%';
-  $('drvFoot').textContent = `${active} of ${drivers} drivers on the road` +
-      (offlineCount ? ` · ${offlineCount} vehicle(s) silent >60s` : '');
+  const drivers=byDriver.size, total=drivers+offlineCount||1;
+  const active=[...byDriver.values()].filter(d=>d.moving).length, idle=drivers-active;
+  const pA=Math.round(active/total*100), pI=Math.round(idle/total*100), pO=100-pA-pI;
+  $('aDonut').style.setProperty('--p',pA); $('aPct').textContent=pA+'%';
+  $('bActive').textContent=`${active} · ${pA}%`; $('fActive').style.width=pA+'%';
+  $('bIdle').textContent=`${idle} · ${pI}%`;     $('fIdle').style.width=pI+'%';
+  $('bOff').textContent=`${offlineCount} · ${pO}%`; $('fOff').style.width=pO+'%';
+  $('drvFoot').textContent=`${active} of ${drivers} drivers on the road`+
+      (offlineCount?` · ${offlineCount} vehicle(s) silent >60s`:'');
 }
 
-const events = [];
-function addEvent(html, cls){
-  events.unshift({t:new Date(), html, cls});
-  if(events.length>30) events.pop();
-  $('activity').innerHTML = events.map(e=>`<div class="ev"><time>${e.t.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</time>
-     <span class="tx">${e.html}</span><span class="chip ${e.cls}">${e.cls==='g'?'In Transit':'Stopped'}</span></div>`).join('');
-}
-
-let alertsLast60 = 0;
-const TYPE_ICON = {ENGINE_OVERHEATING:'🔥', LOW_FUEL:'⛽', SPEEDING:'💨', HARSH_BRAKING:'🛑', HARSH_ACCELERATION:'🚀', GEOFENCE:'🎯'};
+/* ---------- alerts ---------- */
+const TYPE_ICON={ENGINE_OVERHEATING:'🔥',LOW_FUEL:'⛽',SPEEDING:'💨',HARSH_BRAKING:'🛑',HARSH_ACCELERATION:'🚀',GEOFENCE:'🎯'};
 function renderAlerts(alerts){
-  const hourAgo = Date.now()-3600_000;
-  const recent = alerts.filter(a=>new Date(a.ts).getTime()>hourAgo);
-  alertsLast60 = recent.length;
-  const b = $('bellBadge'); b.textContent = recent.length; b.style.display = recent.length?'block':'none';
-  $('alerts').innerHTML = alerts.slice(0,20).map(a=>`<div class="arow">
+  const hourAgo=Date.now()-3600_000;
+  const recent=alerts.filter(a=>new Date(a.ts).getTime()>hourAgo);
+  alertsLast60=recent.length;
+  const b=$('bellBadge'); b.textContent=recent.length; b.style.display=recent.length?'block':'none';
+  $('alerts').innerHTML=alerts.slice(0,20).map(a=>`<div class="arow">
       <span class="ic">${TYPE_ICON[a.type]||'⚠️'}</span>
       <span class="sev ${esc(a.severity)}">${esc(a.severity)}</span>
       <span class="msg">${esc(a.message)}</span>
       <span class="who">${fmtPlate(esc(a.vehicle_id))}</span>
       <time>${new Date(a.ts).toLocaleTimeString()}</time></div>`).join('')
-      || '<div class="arow"><span class="msg" style="color:var(--muted)">No alerts yet.</span></div>';
+      ||'<div class="arow"><span class="msg" style="color:var(--muted)">No alerts yet.</span></div>';
 }
 
-function focusVehicle(id){ const m = markers.get(id); if(m){ map.setView(m.getLatLng(), 14); m.openTooltip(); } }
+function focusVehicle(id){ const m=markers.get(id); if(m){ map.setView(m.getLatLng(),14); m.openTooltip(); } }
 
 /* ---------- geofence overlays ---------- */
-const zfenceLayers = new Map();
+const zfenceLayers=new Map();
 async function loadZones(){
   try{
-    const zones = await api('/api/v1/geofences');
-    const seen = new Set();
+    const zones=await api('/api/v1/geofences');
+    const seen=new Set();
     zones.filter(z=>z.active).forEach(z=>{
       seen.add(z.id);
       if(zfenceLayers.has(z.id)){ zfenceLayers.get(z.id).setLatLng([z.lat,z.lon]).setRadius(z.radiusM); return; }
-      const c = (z.type==='RESTRICTED'||z.type==='DANGER') ? '#ef4444' : z.type==='DEPOT' ? '#2563eb' : '#10b981';
-      const circle = L.circle([z.lat,z.lon], {radius:z.radiusM, color:c, weight:2, dashArray:'6 4', fillOpacity:.08})
+      const c=(z.type==='RESTRICTED'||z.type==='DANGER')?'#ef4444':z.type==='DEPOT'?'#2563eb':'#10b981';
+      const circle=L.circle([z.lat,z.lon],{radius:z.radiusM,color:c,weight:2,dashArray:'6 4',fillOpacity:.08})
         .bindTooltip(`🎯 ${z.name} (${z.type})`).addTo(map);
-      zfenceLayers.set(z.id, circle);
+      zfenceLayers.set(z.id,circle);
     });
     zfenceLayers.forEach((l,id)=>{ if(!seen.has(id)){ map.removeLayer(l); zfenceLayers.delete(id); }});
   }catch(e){}
 }
 loadZones(); setInterval(loadZones, 60000);
 
-/* ---------- poll loop — every section isolated ---------- */
+/* ---------- poll loop ---------- */
 async function tick(){
-  let ok = true;
+  let ok=true;
   try{
-    const [live, alerts] = await Promise.all([
+    const [live, alerts]=await Promise.all([
       api('/api/v1/vehicles/live'),
       api('/api/v1/alerts/recent?limit=100')]);
-    const offlineCount = countOffline();
+    const offlineCount=countOffline();
     try{ renderLive(live, offlineCount); }catch(e){ ok=false; console.error('renderLive failed:', e); }
     try{ renderDriverActivity(live, offlineCount); }catch(e){ console.error('renderDriverActivity failed:', e); }
     try{ renderAlerts(alerts); }catch(e){ ok=false; console.error('renderAlerts failed:', e); }
-  }catch(e){ ok = false; }
-  $('conn').textContent = ok ? '● LIVE' : '● OFFLINE';
-  $('conn').className = ok ? 'conn live' : 'conn down';
+  }catch(e){ ok=false; }
+  $('conn').textContent=ok?'● LIVE':'● OFFLINE';
+  $('conn').className=ok?'conn live':'conn down';
 }
 tick(); setInterval(tick, 2000);
 </script>
