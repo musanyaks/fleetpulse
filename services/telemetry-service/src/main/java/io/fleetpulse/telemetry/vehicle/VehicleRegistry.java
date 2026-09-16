@@ -26,10 +26,23 @@ public class VehicleRegistry {
                       SET make  = COALESCE(vehicles.make,  EXCLUDED.make),
                           model = COALESCE(vehicles.model, EXCLUDED.model)
                     """, id, id, m.make(), m.model());
-            return jdbc.queryForObject(
-                    "SELECT vehicle_id, speed_limit_kph FROM vehicles WHERE vehicle_id = ?",
-                    (rs, i) -> new VehicleProfile(rs.getString("vehicle_id"), rs.getDouble("speed_limit_kph")),
-                    id);
+            return load(id);
         });
+    }
+
+    /** Persists a new speed limit and refreshes the hot-path cache immediately —
+     *  the next telemetry reading is evaluated against the new limit, no restart. */
+    public VehicleProfile updateSpeedLimit(String vehicleId, double limitKph) {
+        jdbc.update("UPDATE vehicles SET speed_limit_kph = ? WHERE vehicle_id = ?", limitKph, vehicleId);
+        VehicleProfile profile = new VehicleProfile(vehicleId, limitKph);
+        cache.put(vehicleId, profile);
+        return profile;
+    }
+
+    private VehicleProfile load(String id) {
+        return jdbc.queryForObject(
+                "SELECT vehicle_id, speed_limit_kph FROM vehicles WHERE vehicle_id = ?",
+                (rs, i) -> new VehicleProfile(rs.getString("vehicle_id"), rs.getDouble("speed_limit_kph")),
+                id);
     }
 }

@@ -1,34 +1,211 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Settings · FleetPulse</title><link rel="stylesheet" href="/css/app.css"/></head>
-<body data-page="settings">
-<div id="sidebar"></div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Settings · FleetPulse</title>
+<style>
+:root{--bg:#f4f6fb;--panel:#fff;--line:#e6eaf2;--text:#1e293b;--muted:#64748b;--blue:#2563eb;--blue2:#3b82f6;--green:#10b981;--amber:#f59e0b;--red:#ef4444;--navy:#0d2b57}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font:14px/1.5 "Segoe UI",system-ui,sans-serif;display:flex;min-height:100vh}
+aside{width:212px;background:var(--navy);color:#cdd9ee;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;flex:none}
+.logo{display:flex;align-items:center;gap:10px;padding:20px 18px;font-size:17px;font-weight:700;color:#fff}
+.logo .sq{width:30px;height:30px;border-radius:8px;background:var(--blue2);display:grid;place-items:center;font-size:15px}
+nav{flex:1;padding:6px 10px;overflow-y:auto}
+nav a{display:flex;align-items:center;gap:11px;padding:10px 12px;margin:2px 0;border-radius:9px;color:#c3d2e8;text-decoration:none;font-size:13.5px}
+nav a .ic{width:18px;text-align:center}
+nav a:hover{background:rgba(255,255,255,.06);color:#fff}
+nav a.active{background:var(--blue2);color:#fff;font-weight:600}
+main{flex:1;min-width:0;padding:20px 24px;display:flex;flex-direction:column;gap:16px}
+.pagehead h1{font-size:20px;font-weight:700}
+.banner{background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;border-radius:12px;padding:10px 14px;font-size:12.5px}
+.cards{display:grid;gap:14px}
+.grid3{grid-template-columns:repeat(3,1fr)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.card>h3{font-size:13px;font-weight:700;padding:12px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}
+.pad{padding:14px 16px}
+.srow{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--line);font-size:13px}
+.srow:last-child{border-bottom:0}
+.srow .k{color:var(--muted)}
+.st{font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:99px}
+.st.up{background:#d1fae5;color:#065f46}.st.down{background:#fee2e2;color:#991b1b}.st.warn{background:#fef3c7;color:#92400e}
+.role{font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:99px;background:#dbeafe;color:#1e40af;margin-left:4px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;color:var(--muted);font-size:11.5px;text-transform:uppercase;letter-spacing:.5px;padding:8px 12px;border-bottom:1px solid var(--line);background:#fafbfe;position:sticky;top:0}
+td{padding:7px 12px;border-bottom:1px solid var(--line)}
+tbody tr:hover td{background:#f8fafc}
+.tblwrap{overflow:auto;max-height:420px}
+.plate{font-weight:700;letter-spacing:.4px}
+input{border:1px solid var(--line);border-radius:8px;padding:6px 10px;font:inherit;width:80px}
+.btn{border:0;border-radius:8px;padding:6px 12px;font:inherit;font-weight:600;background:var(--blue);color:#fff;cursor:pointer}
+.btn:disabled{opacity:.5;cursor:default}
+#toast{position:fixed;bottom:20px;right:20px;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;display:none;box-shadow:0 8px 24px rgba(2,6,23,.2)}
+.muted{color:var(--muted)}.small{font-size:12px}
+.metric{font-size:19px;font-weight:700}
+::-webkit-scrollbar{width:7px}::-webkit-scrollbar-thumb{background:#d3dae6;border-radius:4px}
+</style>
+</head>
+<body>
+<aside>
+  <div class="logo"><span class="sq">🛰️</span> FleetPulse</div>
+  <nav>
+    <a href="index.html"><span class="ic">🏠</span> Overview</a>
+    <a href="vehicles.html"><span class="ic">🚚</span> Vehicles</a>
+    <a href="trips.html"><span class="ic">🛣️</span> Trips</a>
+    <a href="drivers.html"><span class="ic">🧑‍✈️</span> Drivers</a>
+    <a href="maintenance.html"><span class="ic">🔧</span> Maintenance</a>
+    <a href="fuel.html"><span class="ic">⛽</span> Fuel</a>
+    <a href="alerts.html"><span class="ic">🔔</span> Alerts</a>
+    <a href="reports.html"><span class="ic">📄</span> Reports</a>
+    <a href="geofences.html"><span class="ic">🎯</span> Geofences</a>
+    <a class="active" href="settings.html"><span class="ic">⚙️</span> Settings</a>
+  </nav>
+</aside>
 <main>
-  <div class="pagehead"><h1>System</h1></div>
-  <div class="card"><h3>Endpoint Health (checked from your browser)</h3>
-    <div class="tblwrap"><table><thead><tr><th>Target</th><th>Status</th><th>Latency</th></tr></thead><tbody id="pings"></tbody></table></div></div>
-  <div class="cards grid2">
-    <div class="card"><h3>Environment links</h3><div class="pad small">
-      <p>📊 Grafana — <a href="http://localhost:3000" target="_blank">localhost:3000</a> (admin/admin)</p>
-      <p>🗄️ TimescaleDB — localhost:5432 (fleetpulse/fleetpulse)</p>
-      <p>📡 MQTT broker — tcp://localhost:1883</p>
-      <p>🧵 Kafka (host) — localhost:9094 · (in-network) kafka:9092</p></div></div>
-    <div class="card"><h3>Security</h3><div class="pad small muted">
-      <p>HTTP Basic auth over the API (roles: ADMIN, FLEET_MANAGER, DISPATCHER, MAINTENANCE_MANAGER, ANALYST, DRIVER).</p>
-      <p style="margin-top:6px">Demo users: admin/admin123 · manager/manager123 · analyst/analyst123. JWT + DB-backed users = next security milestone.</p></div></div>
+  <div class="pagehead"><h1>Settings & System</h1></div>
+  <div class="banner">Speed-limit changes take effect on the <b>next telemetry reading</b> — no restart. Writes require ADMIN or FLEET_MANAGER. Try setting a vehicle to 60 km/h and watch speeding alerts on the Overview within seconds.</div>
+
+  <div class="cards grid3">
+    <div class="card"><h3>Session</h3><div class="pad" id="session"><span class="muted small">Checking…</span></div></div>
+    <div class="card"><h3>Services</h3><div class="pad" id="services"><span class="muted small">Checking…</span></div></div>
+    <div class="card"><h3>Pipeline Throughput</h3><div class="pad" id="metrics"><span class="muted small">Checking…</span></div></div>
+  </div>
+
+  <div class="card">
+    <h3>Fleet Speed Limits <span class="muted small">— per-vehicle override (default 100)</span></h3>
+    <div class="tblwrap"><table><thead><tr><th>Plate</th><th>Vehicle</th><th>Current limit (km/h)</th><th></th></tr></thead>
+    <tbody id="limits"><tr><td colspan="4" class="muted">Loading…</td></tr></tbody></table></div>
+  </div>
+
+  <div class="cards grid3">
+    <div class="card"><h3>Environment</h3><div class="pad small">
+      <div class="srow"><span class="k">Telemetry API</span><a href="http://localhost:8082" target="_blank">localhost:8082</a></div>
+      <div class="srow"><span class="k">Ingestion API</span><a href="http://localhost:8081/actuator/health" target="_blank">localhost:8081</a></div>
+      <div class="srow"><span class="k">Grafana</span><a href="http://localhost:3000" target="_blank">localhost:3000</a></div>
+      <div class="srow"><span class="k">TimescaleDB</span><span>localhost:5432</span></div>
+      <div class="srow"><span class="k">MQTT broker</span><span>tcp://localhost:1883</span></div>
+      <div class="srow"><span class="k">Kafka (host)</span><span>localhost:9094</span></div>
+    </div></div>
+    <div class="card"><h3>Roles & Access</h3><div class="pad small">
+      <div class="srow"><span class="k">Read APIs</span><span>ADMIN · FLEET_MANAGER · DISPATCHER · ANALYST</span></div>
+      <div class="srow"><span class="k">Write APIs</span><span>ADMIN · FLEET_MANAGER</span></div>
+      <div class="srow"><span class="k">Metrics</span><span>ADMIN</span></div>
+      <div class="srow"><span class="k">Auth style</span><span>HTTP Basic (JWT = next milestone)</span></div>
+    </div></div>
+    <div class="card"><h3>Demo Users</h3><div class="pad small">
+      <div class="srow"><span class="k">admin</span><span>admin123</span></div>
+      <div class="srow"><span class="k">manager</span><span>manager123</span></div>
+      <div class="srow"><span class="k">dispatcher</span><span>dispatch123</span></div>
+      <div class="srow"><span class="k">analyst</span><span>analyst123</span></div>
+      <div class="srow muted"><span class="k">Sign out</span><span>close the browser (Basic auth is cached per session)</span></div>
+    </div></div>
   </div>
 </main>
-<script src="/js/app.js"></script>
+<div id="toast"></div>
+
 <script>
-const targets=[['Summary API','/api/v1/vehicles/summary'],['Live Vehicles API','/api/v1/vehicles/live'],
-  ['Alerts API','/api/v1/alerts/recent?limit=1'],['Actuator Health','/actuator/health']];
-async function ping(){
-  const rows=await Promise.all(targets.map(async([n,u])=>{
-    const t0=performance.now();
-    try{const r=await fetch(u);const ms=(performance.now()-t0).toFixed(0);
-      return `<tr><td>${n}</td><td><span class="chip g">${r.status} OK</span></td><td>${ms} ms</td></tr>`;}
-    catch(e){return `<tr><td>${n}</td><td><span class="chip CRITICAL">DOWN</span></td><td>–</td></tr>`;}
-  }));
-  document.getElementById('pings').innerHTML=rows.join('');
+const esc = s => (s ?? '').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+const fmtPlate = id => { const m = /^(K[A-Z]{2})(\d{3}[A-Z])$/.exec(id||''); return m ? m[1]+' '+m[2] : id||''; };
+const api = async p => { const r = await fetch(p); if(!r.ok) throw new Error(r.status); return r.json(); };
+const badge = (txt, cls) => `<span class="st ${cls}">${txt}</span>`;
+const toast = (msg, ok) => { const t=document.getElementById('toast');
+  t.textContent=msg; t.style.background= ok?'#d1fae5':'#fee2e2'; t.style.color= ok?'#065f46':'#991b1b';
+  t.style.display='block'; setTimeout(()=>t.style.display='none',2500); };
+
+/* ---------- session ---------- */
+async function loadSession(){
+  const el = document.getElementById('session');
+  try{
+    const me = await api('/api/v1/me');
+    el.innerHTML = `<div class="srow"><span class="k">Signed in as</span><b>${esc(me.username)}</b></div>
+      <div class="srow"><span class="k">Roles</span><span>${me.roles.map(r=>`<span class="role">${esc(r)}</span>`).join('')}</span></div>
+      <div class="srow"><span class="k">Auth</span><span>HTTP Basic</span></div>`;
+  }catch(e){
+    el.innerHTML = `<div class="srow"><span class="k">Signed in as</span>${badge('NOT SIGNED IN','warn')}</div>
+      <p class="muted small" style="margin-top:8px">Open any API link to trigger the login prompt.</p>`;
+  }
 }
-ping(); setInterval(ping,5000);
-</script></body></html>
+
+/* ---------- services ---------- */
+async function ping(path){
+  const t0 = performance.now();
+  await fetch(path);                      // throws on network failure
+  return (performance.now()-t0).toFixed(0);
+}
+async function loadServices(){
+  const rows = [];
+  try { const ms = await ping('/actuator/health');
+        rows.push(['Telemetry API (8082)', badge('UP','up'), ms+' ms']); }
+  catch(e){ rows.push(['Telemetry API (8082)', badge('DOWN','down'), '–']); }
+  try { const t0=performance.now();
+        await fetch('http://localhost:8081/actuator/health', {mode:'no-cors'});   // opaque = reachable
+        rows.push(['Ingestion API (8081)', badge('REACHABLE','up'), (performance.now()-t0).toFixed(0)+' ms']); }
+  catch(e){ rows.push(['Ingestion API (8081)', badge('UNREACHABLE','down'), '–']); }
+  try { const s = await api('/api/v1/vehicles/summary');
+        rows.push(['Database + live stream', badge('CONNECTED','up'), s.total+' vehicles']); }
+  catch(e){ rows.push(['Database + live stream', badge('UNKNOWN','warn'), '–']); }
+  document.getElementById('services').innerHTML =
+    rows.map(([k,b,l])=>`<div class="srow"><span class="k">${k}</span><span>${b} <span class="muted small">${l}</span></span></div>`).join('');
+}
+
+/* ---------- throughput (ADMIN-gated metrics) ---------- */
+let prev = null;
+async function loadMetrics(){
+  const el = document.getElementById('metrics');
+  try{
+    const text = await (await fetch('/actuator/prometheus')).text();
+    const get = n => { const m = text.match(new RegExp('^'+n+'\\\\s+([0-9.eE+-]+)','m')); return m?parseFloat(m[1]):0; };
+    const consumed = get('fleetpulse_telemetry_consumed_total');
+    const persisted = get('fleetpulse_telemetry_persisted_total');
+    const failures = get('fleetpulse_telemetry_write_failures_total');
+    const alerts = get('fleetpulse_alerts_published_total');
+    let rate = '–';
+    const now = Date.now();
+    if(prev && now > prev.t && consumed >= prev.c){
+      rate = ((consumed - prev.c) / ((now - prev.t)/1000)).toFixed(1) + '/s';
+    }
+    prev = { t: now, c: consumed };
+    el.innerHTML = `
+      <div class="srow"><span class="k">Consumed</span><span class="metric">${consumed.toLocaleString()}</span></div>
+      <div class="srow"><span class="k">Persisted</span><span class="metric">${persisted.toLocaleString()}</span></div>
+      <div class="srow"><span class="k">Write failures</span><span class="metric" style="color:${failures>0?'var(--red)':'inherit'}">${failures}</span></div>
+      <div class="srow"><span class="k">Alerts published</span><span class="metric">${alerts.toLocaleString()}</span></div>
+      <div class="srow"><span class="k">Consume rate</span><span class="metric" style="color:var(--blue)">${rate}</span></div>`;
+  }catch(e){
+    el.innerHTML = `<div class="srow"><span class="k">Metrics</span>${badge('ADMIN ONLY','warn')}</div>
+      <p class="muted small" style="margin-top:8px">Sign in as <b>admin</b> to view pipeline throughput.</p>`;
+  }
+}
+
+/* ---------- speed limits ---------- */
+let vehicles = [];
+async function loadLimits(){
+  try{
+    vehicles = await api('/api/v1/settings/speed-limits');
+    document.getElementById('limits').innerHTML = vehicles.map(v=>`
+      <tr><td><span class="plate">${fmtPlate(v.vehicleId)}</span></td>
+        <td class="muted">${esc(v.make||'—')} ${esc(v.model||'')}</td>
+        <td><input id="lim_${esc(v.vehicleId)}" type="number" min="20" max="200" value="${v.speedLimitKph}"/></td>
+        <td><button class="btn" onclick="saveLimit('${esc(v.vehicleId)}')">Save</button></td></tr>`).join('')
+      || '<tr><td colspan="4" class="muted">No vehicles registered yet.</td></tr>';
+  }catch(e){
+    document.getElementById('limits').innerHTML='<tr><td colspan="4" class="muted">API unreachable — sign in first.</td></tr>';
+  }
+}
+async function saveLimit(id){
+  const val = parseFloat(document.getElementById('lim_'+id).value);
+  try{
+    const r = await fetch('/api/v1/settings/speed-limits/'+id, {method:'PUT',
+      headers:{'Content-Type':'application/json'}, body: JSON.stringify({speedLimitKph: val})});
+    if(r.ok) toast('✅ '+fmtPlate(id)+' limit set to '+val+' km/h — live immediately', true);
+    else if(r.status===403) toast('⛔ Not authorized — ADMIN or FLEET_MANAGER required', false);
+    else if(r.status===400) toast('❌ Limit must be 20–200 km/h', false);
+    else toast('❌ Failed ('+r.status+')', false);
+  }catch(e){ toast('❌ Network error', false); }
+}
+
+loadSession(); loadServices(); loadMetrics(); loadLimits();
+setInterval(loadServices, 10000);
+setInterval(loadMetrics, 5000);
+</script>
+</body>
+</html>
