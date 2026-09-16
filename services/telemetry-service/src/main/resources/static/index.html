@@ -29,6 +29,8 @@
   .ring>div{width:56px;height:56px;border-radius:50%;background:var(--navy);display:grid;place-items:center;font-size:16px;font-weight:700;color:#fff}
   .health .st{margin-top:8px;font-weight:600;color:#fff;font-size:13px}
   .health .sys{font-size:10.5px;color:#9fb3d1}
+  .signout{display:flex;align-items:center;gap:8px;margin:0 12px 12px;padding:9px 12px;border-radius:9px;
+        background:rgba(239,68,68,.12);color:#fca5a5;text-decoration:none;font-size:13px}
   main{flex:1;min-width:0}
   .topbar{display:flex;align-items:center;gap:16px;padding:16px 24px;background:var(--panel);border-bottom:1px solid var(--line);flex-wrap:wrap}
   .topbar h1{font-size:21px;font-weight:700}
@@ -108,6 +110,7 @@
   .bar .t b{color:var(--text)}
   .bar .tr{height:7px;border-radius:99px;background:#eef2f9;margin-top:3px;overflow:hidden}
   .bar .fl{height:100%;border-radius:99px}
+  .foot{padding:10px 16px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
   ::-webkit-scrollbar{width:7px}::-webkit-scrollbar-thumb{background:#d3dae6;border-radius:4px}
 </style>
 </head>
@@ -133,7 +136,7 @@
     <div class="st" id="hLabel">Good</div>
     <div class="sys">All systems operational</div>
   </div>
-<a href="/logout" style="display:flex;align-items:center;gap:8px;margin:0 12px 12px;padding:9px 12px;border-radius:9px;background:rgba(239,68,68,.12);color:#fca5a5;text-decoration:none;font-size:13px">⏻ Sign out</a>
+  <a class="signout" href="/logout">⏻ Sign out</a>
 </aside>
 
 <main>
@@ -199,17 +202,18 @@
     </div>
 
     <div class="card">
-      <h3>Fleet Activity</h3>
+      <h3>Driver Activity <a class="view" href="drivers.html">View all</a></h3>
       <div class="act">
-        <div class="donut" id="aDonut" style="--p:60">
+        <div class="donut" id="aDonut" style="--p:0">
           <div><div><div class="n" id="aPct">–</div><div class="l">Active</div></div></div>
         </div>
         <div class="bars">
-          <div class="bar"><div class="t"><span>Moving</span><b id="bMove">0%</b></div><div class="tr"><div class="fl" id="fMove" style="background:var(--green);width:0%"></div></div></div>
-          <div class="bar"><div class="t"><span>Idle</span><b id="bIdle">0%</b></div><div class="tr"><div class="fl" id="fIdle" style="background:var(--blue2);width:0%"></div></div></div>
-          <div class="bar"><div class="t"><span>Offline</span><b id="bOff">0%</b></div><div class="tr"><div class="fl" id="fOff" style="background:#94a3b8;width:0%"></div></div></div>
+          <div class="bar"><div class="t"><span>Active drivers</span><b id="bActive">0</b></div><div class="tr"><div class="fl" id="fActive" style="background:var(--green);width:0%"></div></div></div>
+          <div class="bar"><div class="t"><span>Idle drivers</span><b id="bIdle">0</b></div><div class="tr"><div class="fl" id="fIdle" style="background:var(--blue2);width:0%"></div></div></div>
+          <div class="bar"><div class="t"><span>Offline</span><b id="bOff">0</b></div><div class="tr"><div class="fl" id="fOff" style="background:#94a3b8;width:0%"></div></div></div>
         </div>
       </div>
+      <div class="foot" id="drvFoot">waiting for telemetry…</div>
     </div>
   </div>
 </main>
@@ -226,7 +230,9 @@ document.querySelectorAll('.seg button').forEach(b => b.onclick = () => {
   const l = LOC[b.dataset.loc]; map.setView(l.c, l.z);
 });
 
-/* ---------- vehicle photos (inlined — no external dependency) ---------- */
+/* ---------- constants (declared before use) ---------- */
+const GAUGE_SVG = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round">'
+  + '<circle cx="12" cy="12" r="9"/><path d="M12 12l3.5-3.5"/></svg>';
 const TRUCK_SVG = '<svg viewBox="0 0 24 24" width="22" height="22">'
   + '<rect x="2" y="7" width="11" height="8" rx="1" fill="#3b82f6"/>'
   + '<path d="M13 9h4.2c.5 0 .96.25 1.24.66L20.5 12.5V15H13V9Z" fill="#60a5fa"/>'
@@ -290,14 +296,18 @@ const dist = (a,b,c,d) => { const R=6371,r=Math.PI/180,
   dLa=(c-a)*r, dLo=(d-b)*r, h=Math.sin(dLa/2)**2+Math.cos(a*r)*Math.cos(c*r)*Math.sin(dLo/2)**2;
   return 2*R*Math.asin(Math.sqrt(h)); };
 
-async function api(p){ const r = await fetch(p); if(!r.ok) throw new Error(r.status); return r.json(); }
+async function api(p){ const r = await fetch(p); if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); }
 
-/* ---------- main render ---------- */
-function renderLive(list){
+/* offline = known vehicle silent > 60s */
+function countOffline(){
+  const now = Date.now();
+  return [...knownVehicles].filter(id => now - (lastSeen.get(id)||0) > 60_000).length;
+}
+
+/* ---------- fleet render (map, KPIs, vehicle status, fuel) ---------- */
+function renderLive(list, offlineCount){
   const now = Date.now();
   list.forEach(v => { lastSeen.set(v.vehicleId, now); knownVehicles.add(v.vehicleId); });
-  const offlineCount = [...knownVehicles].filter(id =>
-        now - (lastSeen.get(id)||0) > 60_000 && !list.some(v=>v.vehicleId===id)).length;
 
   const moving = list.filter(v => v.status === 'MOVING').length;
   const idle = list.length - moving;
@@ -335,7 +345,8 @@ function renderLive(list){
     }
     m.setLatLng(ll); m._line.setLatLngs(tr);
     m.setStyle({fillColor: v.status==='MOVING' ? '#10b981' : '#3b82f6'});
-    m.setTooltipContent(`<b>${fmtPlate(v.vehicleId)}</b> · ${esc(v.make ?? '')} ${esc(v.model ?? '')}<br/>${fmt(v.speedKph)} km/h · fuel ${fmt(v.fuelLevelPct)}%`);
+    const drv = v.driverName ? `👤 ${esc(v.driverName)} · ` : '';
+    m.setTooltipContent(`<b>${fmtPlate(v.vehicleId)}</b> · ${esc(v.make ?? '')} ${esc(v.model ?? '')}<br/>${drv}${fmt(v.speedKph)} km/h · fuel ${fmt(v.fuelLevelPct)}%`);
   });
   markers.forEach((m,id)=>{ if(!seen.has(id)){ map.removeLayer(m); map.removeLayer(m._line); markers.delete(id); } });
   if(!boundsFit && list.length){ map.fitBounds(L.latLngBounds(list.map(v=>[v.latitude,v.longitude])).pad(0.25)); boundsFit=true; }
@@ -353,41 +364,58 @@ function renderLive(list){
       return (i?'L':'M')+x.toFixed(1)+' '+y.toFixed(1);}).join(' '));
   }
 
-  /* vehicle status — thumb · plate+dot / make·model · place · gauge · fuel ring · chevron */
+  /* vehicle status rows */
   $('vlist').innerHTML = [...list].sort((a,b)=>b.speedKph-a.speedKph).slice(0,8).map(v=>{
     const f = v.fuelLevelPct==null?0:v.fuelLevelPct;
     const col = f<15?'var(--red)':f<35?'var(--amber)':'var(--green)';
     const place = nearestCity(v.latitude, v.longitude);
     const mm = [v.make, v.model].filter(Boolean).join(' ') || '—';
+    const drv = v.driverName ? ` · ${esc(v.driverName)}` : '';
     return `<div class="vrow" onclick="focusVehicle('${esc(v.vehicleId)}')">
       <span class="thumb">${vThumb(v)}</span>
       <span class="vinfo">
         <div class="id">${fmtPlate(v.vehicleId)} <span class="dot ${v.status.toLowerCase()}"></span></div>
-        <div class="st">${esc(mm)} · ${place}</div>
+        <div class="st">${esc(mm)} · ${place}${drv}</div>
       </span>
       <span class="spd">${GAUGE_SVG} ${fmt(v.speedKph)} km/h</span>
       <span class="fring" style="--p:${f.toFixed(0)};--c:${col}"><div>${f.toFixed(0)}%</div></span>
       <span class="chev">›</span>
     </div>`;}).join('') || '<div class="vrow"><span class="st" style="color:var(--muted)">Waiting for telemetry…</span></div>';
 
-  const total = list.length + offlineCount || 1;
-  const pMove = Math.round(moving/total*100), pIdle = Math.round(idle/total*100), pOff = 100-pMove-pIdle;
-  $('aDonut').style.setProperty('--p', pMove);
-  $('aPct').textContent = pMove+'%';
-  $('bMove').textContent = pMove+'%'; $('fMove').style.width = pMove+'%';
-  $('bIdle').textContent = pIdle+'%'; $('fIdle').style.width = pIdle+'%';
-  $('bOff').textContent  = pOff+'%';  $('fOff').style.width  = pOff+'%';
-
-  const alertPen = Math.min(40, alertsLast60*3), idlePen = Math.round(pIdle*0.15), offPen = Math.round(pOff*0.4);
-  const score = Math.max(40, 100-alertPen-idlePen-offPen);
+  /* fleet health ring */
+  const alertsPen = Math.min(40, alertsLast60*3);
+  const score = Math.max(40, 100 - alertsPen - Math.round(idle/(list.length||1)*15) - Math.round(offlineCount*0.4));
   $('hScore').textContent = score;
   $('hRing').style.setProperty('--p', score);
   $('hRing').style.setProperty('--c', score>=80?'var(--green)':score>=60?'var(--amber)':'var(--red)');
   $('hLabel').textContent = score>=80?'Good':score>=60?'Watch':'Critical';
 }
 
-const GAUGE_SVG = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round">'
-  + '<circle cx="12" cy="12" r="9"/><path d="M12 12l3.5-3.5"/></svg>';
+/* ---------- DRIVER ACTIVITY (mockup card — counts drivers, not vehicles) ---------- */
+function renderDriverActivity(list, offlineCount){
+  /* one entry per driver (fallback: vehicle) — a driver is Active if any of
+     their vehicles is MOVING right now */
+  const byDriver = new Map();
+  list.forEach(v => {
+    const id = v.driverId || v.vehicleId;
+    if(!byDriver.has(id)) byDriver.set(id, { name: v.driverName || fmtPlate(v.vehicleId), moving:false });
+    if(v.status === 'MOVING') byDriver.get(id).moving = true;
+  });
+
+  const drivers = byDriver.size;
+  const total = drivers + offlineCount || 1;
+  const active = [...byDriver.values()].filter(d => d.moving).length;
+  const idle = drivers - active;
+  const pActive = Math.round(active/total*100), pIdle = Math.round(idle/total*100), pOff = 100-pActive-pIdle;
+
+  $('aDonut').style.setProperty('--p', pActive);
+  $('aPct').textContent = pActive+'%';
+  $('bActive').textContent = `${active} · ${pActive}%`; $('fActive').style.width = pActive+'%';
+  $('bIdle').textContent = `${idle} · ${pIdle}%`;       $('fIdle').style.width = pIdle+'%';
+  $('bOff').textContent = `${offlineCount} · ${pOff}%`; $('fOff').style.width = pOff+'%';
+  $('drvFoot').textContent = `${active} of ${drivers} drivers on the road` +
+      (offlineCount ? ` · ${offlineCount} vehicle(s) silent >60s` : '');
+}
 
 const events = [];
 function addEvent(html, cls){
@@ -398,7 +426,7 @@ function addEvent(html, cls){
 }
 
 let alertsLast60 = 0;
-const TYPE_ICON = {ENGINE_OVERHEATING:'🔥', LOW_FUEL:'⛽', SPEEDING:'💨'};
+const TYPE_ICON = {ENGINE_OVERHEATING:'🔥', LOW_FUEL:'⛽', SPEEDING:'💨', HARSH_BRAKING:'🛑', HARSH_ACCELERATION:'🚀', GEOFENCE:'🎯'};
 function renderAlerts(alerts){
   const hourAgo = Date.now()-3600_000;
   const recent = alerts.filter(a=>new Date(a.ts).getTime()>hourAgo);
@@ -434,15 +462,17 @@ async function loadZones(){
 }
 loadZones(); setInterval(loadZones, 60000);
 
-/* ---------- poll loop — each section isolated so one failure never blanks the page ---------- */
+/* ---------- poll loop — every section isolated ---------- */
 async function tick(){
   let ok = true;
   try{
     const [live, alerts] = await Promise.all([
       api('/api/v1/vehicles/live'),
       api('/api/v1/alerts/recent?limit=100')]);
-    try{ renderLive(live); }catch(e){ ok = false; console.error('renderLive failed:', e); }
-    try{ renderAlerts(alerts); }catch(e){ ok = false; console.error('renderAlerts failed:', e); }
+    const offlineCount = countOffline();
+    try{ renderLive(live, offlineCount); }catch(e){ ok=false; console.error('renderLive failed:', e); }
+    try{ renderDriverActivity(live, offlineCount); }catch(e){ console.error('renderDriverActivity failed:', e); }
+    try{ renderAlerts(alerts); }catch(e){ ok=false; console.error('renderAlerts failed:', e); }
   }catch(e){ ok = false; }
   $('conn').textContent = ok ? '● LIVE' : '● OFFLINE';
   $('conn').className = ok ? 'conn live' : 'conn down';
