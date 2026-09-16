@@ -3,6 +3,7 @@ package io.fleetpulse.telemetry.consume;
 import io.fleetpulse.common.TelemetryMessage;
 import io.fleetpulse.common.Topics;
 import io.fleetpulse.telemetry.alert.AlertPublisher;
+import io.fleetpulse.telemetry.geofence.GeofenceEvaluator;
 import io.fleetpulse.telemetry.live.LiveVehicleStateService;
 import io.fleetpulse.telemetry.rules.AlertCooldown;
 import io.fleetpulse.telemetry.rules.TelemetryRule;
@@ -35,23 +36,26 @@ public class TelemetryConsumer {
 
     private final JdbcTemplate jdbc;
     private final VehicleRegistry registry;
-    private final List<TelemetryRule> rules;          // all TelemetryRule beans, injected as a list
+    private final List<TelemetryRule> rules;
     private final AlertPublisher alertPublisher;
     private final AlertCooldown cooldown;
     private final LiveVehicleStateService liveState;
+    private final GeofenceEvaluator geofenceEvaluator;
     private final Counter consumed;
     private final Counter persisted;
     private final Counter writeFailures;
 
     public TelemetryConsumer(JdbcTemplate jdbc, VehicleRegistry registry, List<TelemetryRule> rules,
                              AlertPublisher alertPublisher, AlertCooldown cooldown,
-                             LiveVehicleStateService liveState, MeterRegistry meters) {
+                             LiveVehicleStateService liveState, GeofenceEvaluator geofenceEvaluator,
+                             MeterRegistry meters) {
         this.jdbc = jdbc;
         this.registry = registry;
         this.rules = rules;
         this.alertPublisher = alertPublisher;
         this.cooldown = cooldown;
         this.liveState = liveState;
+        this.geofenceEvaluator = geofenceEvaluator;
         this.consumed = Counter.builder("fleetpulse.telemetry.consumed").register(meters);
         this.persisted = Counter.builder("fleetpulse.telemetry.persisted").register(meters);
         this.writeFailures = Counter.builder("fleetpulse.telemetry.write.failures").register(meters);
@@ -87,12 +91,13 @@ public class TelemetryConsumer {
     }
 
     private void process(TelemetryMessage m) {
-        liveState.update(m);                                        // feeds the digital-twin seed
+        liveState.update(m);
         VehicleProfile profile = registry.profileFor(m);
         for (TelemetryRule rule : rules) {
             rule.evaluate(m, profile)
                 .filter(a -> cooldown.tryAcquire(m.vehicleId() + ":" + a.type(), Duration.ofMinutes(5)))
                 .ifPresent(alertPublisher::publish);
         }
+        geofenceEvaluator.evaluate(m).forEach(alertPublisher::publish);   // edge-triggered, no cooldown
     }
 }

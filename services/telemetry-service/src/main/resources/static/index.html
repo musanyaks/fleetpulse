@@ -414,6 +414,25 @@ function renderAlerts(alerts){
 
 function focusVehicle(id){ const m = markers.get(id); if(m){ map.setView(m.getLatLng(), 14); m.openTooltip(); } }
 
+/* ---------- geofence overlays ---------- */
+const zfenceLayers = new Map();
+async function loadZones(){
+  try{
+    const zones = await api('/api/v1/geofences');
+    const seen = new Set();
+    zones.filter(z=>z.active).forEach(z=>{
+      seen.add(z.id);
+      if(zfenceLayers.has(z.id)){ zfenceLayers.get(z.id).setLatLng([z.lat,z.lon]).setRadius(z.radiusM); return; }
+      const c = (z.type==='RESTRICTED'||z.type==='DANGER') ? '#ef4444' : z.type==='DEPOT' ? '#2563eb' : '#10b981';
+      const circle = L.circle([z.lat,z.lon], {radius:z.radiusM, color:c, weight:2, dashArray:'6 4', fillOpacity:.08})
+        .bindTooltip(`🎯 ${z.name} (${z.type})`).addTo(map);
+      zfenceLayers.set(z.id, circle);
+    });
+    zfenceLayers.forEach((l,id)=>{ if(!seen.has(id)){ map.removeLayer(l); zfenceLayers.delete(id); }});
+  }catch(e){}
+}
+loadZones(); setInterval(loadZones, 60000);
+
 /* ---------- poll loop — each section isolated so one failure never blanks the page ---------- */
 async function tick(){
   let ok = true;

@@ -16,5 +16,7 @@ public record TelemetryMessage(
         @PositiveOrZero Double odometerKm,
         @Pattern(regexp = "ON|OFF") String ignition,
         @Size(max = 40) String make,
-        @Size(max = 40) String model
+        @Size(max = 40) String model,
+        @Size(max = 24) String driverId,
+        @Size(max = 60) String driverName
 ) {}

@@ -1,23 +1,118 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Drivers · FleetPulse</title><link rel="stylesheet" href="/css/app.css"/></head>
-<body data-page="drivers">
-<div id="sidebar"></div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Drivers · FleetPulse</title>
+<style>
+:root{--bg:#f4f6fb;--panel:#fff;--line:#e6eaf2;--text:#1e293b;--muted:#64748b;--blue:#2563eb;--blue2:#3b82f6;--green:#10b981;--amber:#f59e0b;--red:#ef4444;--navy:#0d2b57}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font:14px/1.5 "Segoe UI",system-ui,sans-serif;display:flex;min-height:100vh}
+aside{width:212px;background:var(--navy);color:#cdd9ee;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;flex:none}
+.logo{display:flex;align-items:center;gap:10px;padding:20px 18px;font-size:17px;font-weight:700;color:#fff}
+.logo .sq{width:30px;height:30px;border-radius:8px;background:var(--blue2);display:grid;place-items:center;font-size:15px}
+nav{flex:1;padding:6px 10px;overflow-y:auto}
+nav a{display:flex;align-items:center;gap:11px;padding:10px 12px;margin:2px 0;border-radius:9px;color:#c3d2e8;text-decoration:none;font-size:13.5px}
+nav a .ic{width:18px;text-align:center}
+nav a:hover{background:rgba(255,255,255,.06);color:#fff}
+nav a.active{background:var(--blue2);color:#fff;font-weight:600}
+main{flex:1;min-width:0;padding:20px 24px;display:flex;flex-direction:column;gap:16px}
+.pagehead{display:flex;align-items:center;gap:12px}
+.pagehead h1{font-size:20px;font-weight:700}
+.banner{background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;border-radius:12px;padding:10px 14px;font-size:12.5px}
+.cards{display:grid;gap:14px}
+.grid4{grid-template-columns:repeat(4,1fr)}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.kpi .label{color:var(--muted);font-size:12px}
+.kpi .value{font-size:22px;font-weight:700}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.card>h3{font-size:13px;font-weight:700;padding:12px 16px;border-bottom:1px solid var(--line)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;color:var(--muted);font-size:11.5px;text-transform:uppercase;letter-spacing:.5px;padding:9px 12px;border-bottom:1px solid var(--line);background:#fafbfe;position:sticky;top:0}
+td{padding:9px 12px;border-bottom:1px solid var(--line)}
+tbody tr:hover td{background:#f8fafc}
+.tblwrap{overflow:auto;max-height:calc(100vh - 320px)}
+.rank{width:34px;height:34px;border-radius:10px;background:#eef2f9;display:grid;place-items:center;font-weight:700;color:var(--muted)}
+.rank.top{background:#d1fae5;color:#065f46}
+.avatar{width:36px;height:36px;border-radius:50%;background:var(--navy);color:#fff;display:inline-grid;place-items:center;font-size:12px;font-weight:700}
+.fring{--p:60;--c:var(--green);width:40px;height:40px;border-radius:50%;background:conic-gradient(var(--c) calc(var(--p)*1%),#e8edf5 0);display:grid;place-items:center;flex:none}
+.fring>div{width:30px;height:30px;border-radius:50%;background:#fff;display:grid;place-items:center;font-size:11px;font-weight:700}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.dot.MOVING{background:var(--green)}.dot.IDLE{background:var(--blue2)}
+.chip{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:#eef2f9;color:#475569}
+.chip.bad{background:#fee2e2;color:#991b1b}
+.muted{color:var(--muted)}.small{font-size:12px}
+.plate{font-weight:700;letter-spacing:.4px}
+::-webkit-scrollbar{width:7px}::-webkit-scrollbar-thumb{background:#d3dae6;border-radius:4px}
+</style>
+</head>
+<body>
+<aside>
+  <div class="logo"><span class="sq">🛰️</span> FleetPulse</div>
+  <nav>
+    <a href="index.html"><span class="ic">🏠</span> Overview</a>
+    <a href="vehicles.html"><span class="ic">🚚</span> Vehicles</a>
+    <a href="trips.html"><span class="ic">🛣️</span> Trips</a>
+    <a class="active" href="drivers.html"><span class="ic">🧑‍✈️</span> Drivers</a>
+    <a href="maintenance.html"><span class="ic">🔧</span> Maintenance</a>
+    <a href="fuel.html"><span class="ic">⛽</span> Fuel</a>
+    <a href="alerts.html"><span class="ic">🔔</span> Alerts</a>
+    <a href="reports.html"><span class="ic">📄</span> Reports</a>
+    <a href="geofences.html"><span class="ic">🎯</span> Geofences</a>
+    <a href="settings.html"><span class="ic">⚙️</span> Settings</a>
+  </nav>
+</aside>
 <main>
-  <div class="pagehead"><h1>Drivers</h1></div>
-  <div class="banner">Module on the roadmap — telemetry carries no driver identity yet. The vehicle-simulator and ingestion schema will gain a <code>driverId</code> field, and driver-service will own assignment + scoring.</div>
-  <div class="cards grid2">
-    <div class="card"><h3>Planned: Driver Scoring</h3><div class="pad">
-      <pre style="font-size:12px;background:#f8fafc;border:1px solid var(--line);border-radius:10px;padding:12px;overflow:auto">DriverScore = 100
-  − speedingPenalty
-  − harshBrakingPenalty     (deceleration &gt; threshold)
-  − harshAccelerationPenalty
-  − excessiveIdlingPenalty  (engine ON, speed = 0, &gt; N min)
-  − unauthorizedRoutePenalty</pre>
-      <p class="muted small">Computed per trip from <code>telemetry.raw</code>; published to <code>driver.events</code> and surfaced here.</p></div></div>
-    <div class="card"><h3>Data sources it will consume</h3><div class="pad muted small">
-      <p>• Kafka <code>telemetry.raw</code> (speed deltas → harsh events)</p>
-      <p>• Kafka <code>alerts</code> (per-driver attribution)</p>
-      <p>• PostgreSQL <code>drivers</code> + <code>assignments</code> tables (driver-service, Spring Data JPA)</p>
-      <p>• Geofence events for route compliance</p></div></div>
+  <div class="pagehead"><h1>Drivers</h1><span class="spacer"></span>
+    <input id="q" placeholder="Search driver or plate…" style="border:1px solid var(--line);border-radius:9px;padding:8px 12px;font:inherit"/></div>
+  <div class="banner">Driver Score = 100 − speeding events − harsh braking − harsh acceleration (last 24h, from the live alert stream). Scores floor at 40.</div>
+  <div class="cards grid4" id="stats"></div>
+  <div class="card">
+    <h3>Driver Leaderboard <span class="muted small" id="cnt"></span></h3>
+    <div class="tblwrap"><table><thead><tr>
+      <th></th><th>Driver</th><th>Vehicle</th><th>Status</th><th>Score</th>
+      <th>💨 Speeding</th><th>🛑 Harsh braking</th><th>🚀 Harsh accel</th>
+    </tr></thead><tbody id="rows"><tr><td colspan="8" class="muted">Loading…</td></tr></tbody></table></div>
   </div>
-</main></body></html>
+</main>
+<script>
+const esc = s => (s ?? '').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+const fmtPlate = id => { const m = /^(K[A-Z]{2})(\d{3}[A-Z])$/.exec(id||''); return m ? m[1]+' '+m[2] : id||''; };
+const api = async p => { const r = await fetch(p); if(!r.ok) throw new Error(r.status); return r.json(); };
+const initials = n => (n||'?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+const ring = (score, extra) => {
+  const col = score>=80?'var(--green)':score>=60?'var(--amber)':'var(--red)';
+  return `<span class="fring" style="--p:${score.toFixed(0)};--c:${col}"><div>${score.toFixed(0)}</div></span>`;
+};
+async function load(){
+  try{
+    const data = await api('/api/v1/drivers/summary');
+    const avg = data.length ? data.reduce((a,d)=>a+d.score,0)/data.length : 0;
+    const worst = [...data].reverse().find(d=>d.speeding+d.harshBraking+d.harshAccel>0);
+    document.getElementById('stats').innerHTML = [
+      ['Drivers on duty', data.length],
+      ['Avg score', avg.toFixed(1)],
+      ['Top driver', data.length ? esc(data[0].name.split(' ')[0])+' ('+data[0].score.toFixed(0)+')' : '–'],
+      ['Needs coaching', worst ? esc(worst.name)+' ('+worst.score.toFixed(0)+')' : '–']
+    ].map(([l,v])=>`<div class="kpi"><div class="label">${l}</div><div class="value">${v}</div></div>`).join('');
+    document.getElementById('cnt').textContent = '— scored from last 24h alerts';
+    const q = document.getElementById('q').value.toUpperCase();
+    const rows = data.filter(d => !q || d.name.toUpperCase().includes(q) || d.plates.some(p=>p.includes(q)));
+    document.getElementById('rows').innerHTML = rows.map((d,i)=>{
+      const bad = d.speeding+d.harshBraking+d.harshAccel > 6;
+      return `<tr>
+        <td><span class="rank ${i<3?'top':''}">${i+1}</span></td>
+        <td><span class="avatar">${esc(initials(d.name))}</span> <b>${esc(d.name)}</b></td>
+        <td>${d.plates.map(p=>`<span class="plate">${fmtPlate(p)}</span>`).join(', ')}</td>
+        <td><span class="dot ${esc(d.status)}"></span> ${esc(d.status)}</td>
+        <td>${ring(d.score)} ${bad?'<span class="chip bad">watch</span>':''}</td>
+        <td>${d.speeding}</td><td>${d.harshBraking}</td><td>${d.harshAccel}</td>
+      </tr>`;}).join('') || '<tr><td colspan="8" class="muted">No drivers reporting — is the simulator running?</td></tr>';
+  }catch(e){
+    document.getElementById('rows').innerHTML='<tr><td colspan="8" class="muted">API unreachable — sign in first.</td></tr>';
+  }
+}
+document.getElementById('q').oninput = load;
+load(); setInterval(load, 5000);
+</script>
+</body>
+</html>

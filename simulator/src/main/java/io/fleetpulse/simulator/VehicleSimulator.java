@@ -17,6 +17,8 @@ public final class VehicleSimulator {
     private final String vehicleId;
     private final String make;
     private final String model;
+    private final String driverId;
+    private final String driverName;
     private final SimulatorProperties props;
     private final MqttAsyncClient client;
     private final Random rnd;
@@ -31,10 +33,13 @@ public final class VehicleSimulator {
     private int overheatTicks;
 
     public VehicleSimulator(String vehicleId, String make, String model,
+                            String driverId, String driverName,
                             SimulatorProperties props, MqttAsyncClient client, Random rnd) {
         this.vehicleId = vehicleId;
         this.make = make;
         this.model = model;
+        this.driverId = driverId;
+        this.driverName = driverName;
         this.props = props;
         this.client = client;
         this.rnd = rnd;
@@ -96,6 +101,8 @@ public final class VehicleSimulator {
         json.put("ignition", speed > 0 ? "ON" : "OFF");
         json.put("make", make);
         json.put("model", model);
+        json.put("driverId", driverId);
+        json.put("driverName", driverName);
 
         MqttMessage message = new MqttMessage(mapper.writeValueAsBytes(json));
         message.setQos(0);
