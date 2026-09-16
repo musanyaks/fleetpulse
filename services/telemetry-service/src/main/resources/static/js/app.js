@@ -19,7 +19,9 @@
         <div class="ring" id="hRing"><div id="hScore">–</div></div>
         <div class="st" id="hLabel">–</div>
         <div class="st" style="font-weight:400;font-size:10.5px;color:#9fb3d1">live from pipeline</div>
-      </div></aside>`;
+      </div>
+      <a href="/logout" style="display:flex;align-items:center;gap:8px;margin:0 12px 12px;padding:9px 12px;border-radius:9px;background:rgba(239,68,68,.12);color:#fca5a5;text-decoration:none;font-size:13px">⏻ Sign out</a>
+      </aside>`;
   }
   document.addEventListener('DOMContentLoaded', () => {
     const host = document.getElementById('sidebar');
@@ -45,22 +47,19 @@
     }catch(e){}
   }
 
-  /* ---------- vehicle photos ---------- */
+  /* ---------- vehicle photo chain (used by vehicles.html) ---------- */
   const TRUCK_SVG = '<svg viewBox="0 0 24 24" width="22" height="22">'
     + '<rect x="2" y="7" width="11" height="8" rx="1" fill="#3b82f6"/>'
     + '<path d="M13 9h4.2c.5 0 .96.25 1.24.66L20.5 12.5V15H13V9Z" fill="#60a5fa"/>'
     + '<circle cx="6" cy="16.8" r="1.8" fill="#1e293b"/>'
     + '<circle cx="16.5" cy="16.8" r="1.8" fill="#1e293b"/></svg>';
-
   function vClass(make, model){
     const m = `${make ?? ''} ${model ?? ''}`;
-    if(/Hiace|Coaster|Rosa|Matatu|Bus/i.test(m))                    return 'bus';
-    if(/Canter|Dyna|ELF|Hino 300|NPR|NQR|Kuzer/i.test(m))           return 'light';
-    if(/FRR|FVR|Fighter|Hino 500|Croner|P280|FTS/i.test(m))         return 'medium';
-    return 'heavy';   /* FVZ, Quester, Giga CXZ, R440, Hino 700 */
+    if(/Hiace|Coaster|Rosa|Matatu|Bus/i.test(m))            return 'bus';
+    if(/Canter|Dyna|ELF|Hino 300|NPR|NQR|Kuzer/i.test(m))   return 'light';
+    if(/FRR|FVR|Fighter|Hino 500|Croner|P280|FTS/i.test(m)) return 'medium';
+    return 'heavy';
   }
-
-  /** Photo chain: img/<PLATE>.jpg -> img/<class>.jpg -> SVG. */
   function thumbHTML(v){
     const cls = vClass(v.make, v.model);
     return '<img src="img/' + encodeURIComponent(v.vehicleId) + '.jpg"'
@@ -73,7 +72,7 @@
       img.src = 'img/' + img.dataset.cls + '.jpg';
     } else {
       const s = document.createElement('span');
-      s.className = img.parentElement.className;
+      s.style.display = 'grid'; s.style.placeItems = 'center';
       s.innerHTML = TRUCK_SVG;
       img.replaceWith(s);
     }

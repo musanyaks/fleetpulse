@@ -3,17 +3,16 @@ package io.fleetpulse.telemetry.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -22,18 +21,27 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(AbstractHttpConfigurer::disable)                 // stateless token-style API
-            .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .csrf(AbstractHttpConfigurer::disable)   // MVP; production step: enable with cookie-backed token
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/index.html", "/*.html", "/css/**", "/js/**", "/favicon.ico").permitAll()
+                .requestMatchers("/login.html", "/css/**", "/js/**", "/img/**", "/favicon.ico").permitAll()
                 .requestMatchers("/actuator/health", "/actuator/health/**").permitAll()
+                .requestMatchers("/api/v1/me").authenticated()
                 .requestMatchers("/actuator/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.GET, "/api/v1/**")
-                    .hasAnyRole("ADMIN", "FLEET_MANAGER", "DISPATCHER", "ANALYST")
+                    .hasAnyRole("ADMIN", "FLEET_MANAGER", "DISPATCHER", "ANALYST", "MAINTENANCE_MANAGER")
                 .requestMatchers("/api/v1/**")
-                    .hasAnyRole("ADMIN", "FLEET_MANAGER")          // future writes
-                .anyRequest().authenticated())
-            .httpBasic(Customizer.withDefaults());
+                    .hasAnyRole("ADMIN", "FLEET_MANAGER")
+                .anyRequest().authenticated())       // EVERY page requires a session → login-first
+            .formLogin(form -> form
+                .loginPage("/login.html")            // our custom page
+                .loginProcessingUrl("/login")
+                .defaultSuccessUrl("/", true)
+                .failureUrl("/login.html?error")
+                .permitAll())
+            .logout(logout -> logout
+                .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "GET"))
+                .logoutSuccessUrl("/login.html?loggedOut")
+                .permitAll());
         return http.build();
     }
 
