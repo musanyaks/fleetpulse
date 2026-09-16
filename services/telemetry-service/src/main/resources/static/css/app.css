@@ -1,0 +1,47 @@
+:root{--bg:#f4f6fb;--panel:#fff;--line:#e6eaf2;--text:#1e293b;--muted:#64748b;
+--blue:#2563eb;--blue2:#3b82f6;--green:#10b981;--amber:#f59e0b;--red:#ef4444;--navy:#0d2b57}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font:14px/1.5 "Segoe UI",system-ui,sans-serif;display:flex;min-height:100vh}
+aside{width:212px;background:var(--navy);color:#cdd9ee;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;flex:none}
+.logo{display:flex;align-items:center;gap:10px;padding:20px 18px;font-size:17px;font-weight:700;color:#fff}
+.logo .sq{width:30px;height:30px;border-radius:8px;background:var(--blue2);display:grid;place-items:center;font-size:15px}
+nav{flex:1;padding:6px 10px;overflow-y:auto}
+nav a{display:flex;align-items:center;gap:11px;padding:10px 12px;margin:2px 0;border-radius:9px;color:#c3d2e8;text-decoration:none;font-size:13.5px}
+nav a .ic{width:18px;text-align:center}
+nav a:hover{background:rgba(255,255,255,.06);color:#fff}
+nav a.active{background:var(--blue2);color:#fff;font-weight:600}
+.health{margin:12px;padding:14px;background:rgba(255,255,255,.05);border-radius:12px;text-align:center}
+.health h4{font-size:12px;color:#9fb3d1;margin-bottom:8px}
+.ring{--p:100;--c:var(--green);width:64px;height:64px;border-radius:50%;margin:0 auto;background:conic-gradient(var(--c) calc(var(--p)*1%),rgba(255,255,255,.12) 0);display:grid;place-items:center}
+.ring>div{width:48px;height:48px;border-radius:50%;background:var(--navy);display:grid;place-items:center;font-size:14px;font-weight:700;color:#fff}
+.health .st{margin-top:6px;font-weight:600;color:#fff;font-size:12.5px}
+main{flex:1;min-width:0;padding:20px 24px;display:flex;flex-direction:column;gap:16px}
+.pagehead{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.pagehead h1{font-size:20px;font-weight:700}
+.spacer{flex:1}
+.cards{display:grid;gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.card>h3{font-size:13px;font-weight:700;padding:12px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}
+.pad{padding:14px 16px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;color:var(--muted);font-size:11.5px;text-transform:uppercase;letter-spacing:.5px;padding:9px 12px;border-bottom:1px solid var(--line);background:#fafbfe;position:sticky;top:0}
+td{padding:9px 12px;border-bottom:1px solid var(--line)}
+tbody tr:hover td{background:#f8fafc}
+.tblwrap{overflow:auto;max-height:calc(100vh - 230px)}
+.chip{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px}
+.chip.CRITICAL{background:#fee2e2;color:#991b1b}.chip.WARNING{background:#fef3c7;color:#92400e}.chip.INFO{background:#dbeafe;color:#1e40af}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+input,select{border:1px solid var(--line);border-radius:9px;padding:8px 12px;font:inherit;background:#fff;color:var(--text)}
+.btn{border:0;border-radius:9px;padding:9px 14px;font:inherit;font-weight:600;background:var(--blue);color:#fff;cursor:pointer}
+.btn:hover{filter:brightness(1.08)}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.kpi .label{color:var(--muted);font-size:12px}
+.kpi .value{font-size:22px;font-weight:700}
+.grid5{grid-template-columns:repeat(5,1fr)}.grid4{grid-template-columns:repeat(4,1fr)}.grid3{grid-template-columns:repeat(3,1fr)}.grid2{grid-template-columns:repeat(2,1fr)}
+.muted{color:var(--muted)}.small{font-size:12px}
+.banner{background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;border-radius:12px;padding:10px 14px;font-size:12.5px}
+.fring{--p:50;--c:var(--green);width:32px;height:32px;border-radius:50%;background:conic-gradient(var(--c) calc(var(--p)*1%),#e8edf5 0);display:grid;place-items:center;flex:none}
+.fring>div{width:23px;height:23px;border-radius:50%;background:#fff;display:grid;place-items:center;font-size:9px;font-weight:700}
+dialog{border:0;border-radius:14px;padding:0;max-width:440px;box-shadow:0 20px 60px rgba(2,6,23,.35)}
+dialog::backdrop{background:rgba(2,6,23,.5)}
+::-webkit-scrollbar{width:7px}::-webkit-scrollbar-thumb{background:#d3dae6;border-radius:4px}

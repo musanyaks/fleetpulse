@@ -1,0 +1,68 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Vehicles · FleetPulse</title><link rel="stylesheet" href="/css/app.css"/>
+<link rel="stylesheet" href="/css/thumb.css"/></head>
+<body data-page="vehicles">
+<div id="sidebar"></div>
+<main>
+  <div class="pagehead"><h1>Vehicles</h1><span class="spacer"></span>
+    <input id="q" placeholder="Search plate…"/>
+    <select id="f"><option value="">All statuses</option><option>MOVING</option><option>IDLE</option></select>
+  </div>
+  <div class="cards grid4" id="stats"></div>
+  <div class="card"><h3>Fleet Roster <span class="muted small" id="cnt"></span></h3>
+    <div class="tblwrap"><table><thead><tr>
+      <th>Plate</th><th>Make / Model</th><th>Status</th><th>Speed</th><th>Fuel</th><th>Engine</th><th>Limit</th><th>Registered</th><th></th>
+    </tr></thead><tbody id="rows"></tbody></table></div>
+  </div>
+</main>
+<dialog id="d"><div class="pad" id="dBody"></div>
+  <form method="dialog" style="padding:0 16px 14px"><button class="btn">Close</button></form></dialog>
+<script src="/js/app.js"></script>
+<script>
+const U=window.FleetUI; let vehicles=[], live=new Map(), alerts=[];
+const q=document.getElementById('q'), f=document.getElementById('f');
+async function load(){
+  try{
+    const [vp,lv,al]=await Promise.all([U.api('/api/v1/vehicles?size=200'),U.api('/api/v1/vehicles/live'),U.api('/api/v1/alerts/recent?limit=300')]);
+    vehicles=vp; alerts=al; live=new Map(lv.map(v=>[v.vehicleId,v]));
+    const moving=lv.filter(v=>v.status==='MOVING').length;
+    document.getElementById('stats').innerHTML=[
+      ['Total',vehicles.length],['Moving',moving],['Idle',lv.length-moving],
+      ['Alerts 60m',al.filter(a=>new Date(a.ts).getTime()>Date.now()-36e5).length]
+    ].map(([l,v])=>`<div class="kpi"><div class="label">${l}</div><div class="value">${v}</div></div>`).join('');
+    render();
+  }catch(e){document.getElementById('rows').innerHTML='<tr><td colspan="9" class="muted">API unreachable — sign in first.</td></tr>';}
+}
+function render(){
+  const s=q.value.toUpperCase(), st=f.value;
+  const rows=vehicles.filter(v=>{
+    const L=live.get(v.vehicleId)||{};
+    return (!s||v.vehicleId.includes(s)||(v.make||'').toLowerCase().includes(s.toLowerCase())||(v.model||'').toLowerCase().includes(s.toLowerCase()))&&(!st||L.status===st);
+  });
+  document.getElementById('cnt').textContent='— '+rows.length+' shown';
+  document.getElementById('rows').innerHTML=rows.map(v=>{
+    const L=live.get(v.vehicleId)||{}, fuel=L.fuelLevelPct;
+    const col=fuel==null?'#94a3b8':fuel<15?'var(--red)':fuel<35?'var(--amber)':'var(--green)';
+    return `<tr onclick="dlg('${U.esc(v.vehicleId)}')">
+      <td><b>${U.fmtPlate(v.vehicleId)}</b></td>
+      <td class="muted">${U.esc(v.make||'—')} ${U.esc(v.model||'')}</td>
+      <td>${L.status?`<span class="dot" style="background:${L.status==='MOVING'?'var(--green)':'var(--blue2)'}"></span> ${L.status}`:'<span class="muted">offline</span>'}</td>
+      <td>${U.fmt(L.speedKph)} km/h</td>
+      <td><span class="fring" style="--p:${fuel==null?0:fuel.toFixed(0)};--c:${col}"><div>${U.fmt(fuel)}%</div></span></td>
+      <td>${U.fmt(L.engineTempC)}°C</td>
+      <td>${U.fmt(v.speedLimitKph)} km/h</td>
+      <td class="muted small">${new Date(v.registeredAt).toLocaleDateString()}</td><td>›</td></tr>`;
+  }).join('')||'<tr><td colspan="9" class="muted">No matches</td></tr>';
+}
+function dlg(id){
+  const L=live.get(id)||{}, mine=alerts.filter(a=>a.vehicle_id===id).slice(0,8);
+  document.getElementById('dBody').innerHTML=`
+    <h1 style="font-size:18px;margin-bottom:8px">${U.fmtPlate(id)}</h1>
+    <p class="muted small">Status ${L.status||'offline'} · ${U.fmt(L.speedKph)} km/h · fuel ${U.fmt(L.fuelLevelPct)}% · engine ${U.fmt(L.engineTempC)}°C</p>
+    <p style="margin:8px 0"><a href="https://www.openstreetmap.org/?mlat=${L.latitude??0}&mlon=${L.longitude??0}#map=14/${L.latitude??0}/${L.longitude??0}" target="_blank">📍 Open last position on map</a></p>
+    <b class="small">Recent alerts</b>
+    ${mine.map(a=>`<p class="small" style="margin-top:6px"><span class="chip ${U.esc(a.severity)}">${U.esc(a.severity)}</span> ${U.esc(a.message)}</p>`).join('')||'<p class="muted small">None.</p>'}`;
+  document.getElementById('d').showModal();
+}
+q.oninput=render; f.onchange=render; load(); setInterval(load,3000);
+</script></body></html>

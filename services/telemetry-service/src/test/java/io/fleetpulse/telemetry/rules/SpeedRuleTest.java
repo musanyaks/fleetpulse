@@ -18,7 +18,7 @@ class SpeedRuleTest {
 
     private TelemetryMessage reading(double speed) {
         return new TelemetryMessage("KDA-482X", now, -1.28, 36.81, speed,
-                null, null, null, null, "ON");
+                null, null, null, null, "ON", "Isuzu", "FRR 90");
     }
 
     @Test

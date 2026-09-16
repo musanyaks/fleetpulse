@@ -1,0 +1,23 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Drivers · FleetPulse</title><link rel="stylesheet" href="/css/app.css"/></head>
+<body data-page="drivers">
+<div id="sidebar"></div>
+<main>
+  <div class="pagehead"><h1>Drivers</h1></div>
+  <div class="banner">Module on the roadmap — telemetry carries no driver identity yet. The vehicle-simulator and ingestion schema will gain a <code>driverId</code> field, and driver-service will own assignment + scoring.</div>
+  <div class="cards grid2">
+    <div class="card"><h3>Planned: Driver Scoring</h3><div class="pad">
+      <pre style="font-size:12px;background:#f8fafc;border:1px solid var(--line);border-radius:10px;padding:12px;overflow:auto">DriverScore = 100
+  − speedingPenalty
+  − harshBrakingPenalty     (deceleration &gt; threshold)
+  − harshAccelerationPenalty
+  − excessiveIdlingPenalty  (engine ON, speed = 0, &gt; N min)
+  − unauthorizedRoutePenalty</pre>
+      <p class="muted small">Computed per trip from <code>telemetry.raw</code>; published to <code>driver.events</code> and surfaced here.</p></div></div>
+    <div class="card"><h3>Data sources it will consume</h3><div class="pad muted small">
+      <p>• Kafka <code>telemetry.raw</code> (speed deltas → harsh events)</p>
+      <p>• Kafka <code>alerts</code> (per-driver attribution)</p>
+      <p>• PostgreSQL <code>drivers</code> + <code>assignments</code> tables (driver-service, Spring Data JPA)</p>
+      <p>• Geofence events for route compliance</p></div></div>
+  </div>
+</main></body></html>

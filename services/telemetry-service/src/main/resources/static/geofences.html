@@ -1,0 +1,20 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Geofences · FleetPulse</title><link rel="stylesheet" href="/css/app.css"/></head>
+<body data-page="geofences">
+<div id="sidebar"></div>
+<main>
+  <div class="pagehead"><h1>Geofences</h1></div>
+  <div class="banner">Module on the roadmap — geofence-service will store zones, evaluate every GPS point on <code>telemetry.raw</code>, and emit enter/exit/dwell events.</div>
+  <div class="cards grid2">
+    <div class="card"><h3>Planned zone types</h3><div class="pad muted small">
+      <p>• Depot / warehouse (arrival & departure notifications)</p>
+      <p>• Customer sites (auto trip milestones)</p>
+      <p>• Restricted zones (instant CRITICAL alert)</p>
+      <p>• Dwell limits (vehicle idle in zone &gt; N minutes)</p></div></div>
+    <div class="card"><h3>Evaluation design</h3><div class="pad muted small">
+      <p>• Point-in-polygon per reading, zones cached in-memory per vehicle partition</p>
+      <p>• Hysteresis (2 consecutive points inside/outside) to prevent flapping at boundaries</p>
+      <p>• Events to <code>vehicle.events</code>; map overlay rendered on this page + Overview</p>
+      <p>• Nairobi demo zones: Westlands depot, Industrial Area restricted, JKIA no-stop</p></div></div>
+  </div>
+</main></body></html>

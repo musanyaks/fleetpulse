@@ -1,0 +1,50 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Alerts · FleetPulse</title><link rel="stylesheet" href="/css/app.css"/></head>
+<body data-page="alerts">
+<div id="sidebar"></div>
+<main>
+  <div class="pagehead"><h1>Alerts</h1><span class="spacer"></span>
+    <select id="sev"><option value="">All severities</option><option>CRITICAL</option><option>WARNING</option><option>INFO</option></select>
+    <select id="typ"><option value="">All types</option></select>
+    <input id="q" placeholder="Search…"/>
+  </div>
+  <div class="cards grid4" id="stats"></div>
+  <div class="card"><h3>Alert Feed <span class="muted small" id="cnt"></span></h3>
+    <div class="tblwrap"><table><thead><tr><th>Time</th><th>Severity</th><th>Type</th><th>Vehicle</th><th>Message</th></tr></thead>
+    <tbody id="rows"></tbody></table></div>
+  </div>
+</main>
+<script src="/js/app.js"></script>
+<script>
+const U=window.FleetUI; let all=[];
+const sev=document.getElementById('sev'), typ=document.getElementById('typ'), q=document.getElementById('q');
+const ICON={ENGINE_OVERHEATING:'🔥',LOW_FUEL:'⛽',SPEEDING:'💨'};
+async function load(){
+  try{ all=await U.api('/api/v1/alerts/recent?limit=500'); buildTypes(); render(); }
+  catch(e){document.getElementById('rows').innerHTML='<tr><td colspan="5" class="muted">API unreachable — sign in first.</td></tr>';}
+}
+function buildTypes(){
+  if(typ.options.length>1) return;
+  [...new Set(all.map(a=>a.type))].sort().forEach(t=>{const o=document.createElement('option');o.value=t;o.textContent=t;typ.appendChild(o);});
+}
+function render(){
+  const hourAgo=Date.now()-36e5, recent=all.filter(a=>new Date(a.ts).getTime()>hourAgo);
+  const crit=all.filter(a=>a.severity==='CRITICAL').length;
+  document.getElementById('stats').innerHTML=[
+    ['Last 60 min',recent.length],['Critical (all)',crit],
+    ['Vehicles involved',new Set(all.map(a=>a.vehicle_id)).size],['Shown',count()]
+  ].map(([l,v])=>`<div class="kpi"><div class="label">${l}</div><div class="value">${v}</div></div>`).join('');
+  document.getElementById('cnt').textContent='— latest '+all.length;
+  const s=q.value.toUpperCase();
+  const rows=all.filter(a=>(!sev.value||a.severity===sev.value)&&(!typ.value||a.type===typ.value)
+    &&(!s||a.vehicle_id.includes(s)||a.message.toUpperCase().includes(s)));
+  document.getElementById('rows').innerHTML=rows.map(a=>`<tr>
+    <td class="muted small">${new Date(a.ts).toLocaleTimeString()}</td>
+    <td><span class="chip ${U.esc(a.severity)}">${U.esc(a.severity)}</span></td>
+    <td>${ICON[a.type]||'⚠️'} ${U.esc(a.type)}</td>
+    <td><b>${U.fmtPlate(a.vehicle_id)}</b></td>
+    <td>${U.esc(a.message)}</td></tr>`).join('')||'<tr><td colspan="5" class="muted">No alerts match.</td></tr>';
+}
+const count=()=>all.filter(a=>(!sev.value||a.severity===sev.value)&&(!typ.value||a.type===typ.value)).length;
+sev.onchange=render; typ.onchange=render; q.oninput=render; load(); setInterval(load,3000);
+</script></body></html>

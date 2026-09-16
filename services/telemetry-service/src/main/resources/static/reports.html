@@ -1,0 +1,44 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Reports · FleetPulse</title><link rel="stylesheet" href="/css/app.css"/></head>
+<body data-page="reports">
+<div id="sidebar"></div>
+<main>
+  <div class="pagehead"><h1>Reports & Exports</h1></div>
+  <div class="cards grid3">
+    <div class="card"><h3>🚚 Live Snapshot</h3><div class="pad">
+      <p class="muted small">Current status, speed, fuel, engine temp and position for every reporting vehicle.</p>
+      <p style="margin-top:10px"><button class="btn" onclick="expLive()">Download CSV</button></p></div></div>
+    <div class="card"><h3>🔔 Alert Log</h3><div class="pad">
+      <p class="muted small">Latest 500 alerts — severity, type, vehicle, message, timestamp.</p>
+      <p style="margin-top:10px"><button class="btn" onclick="expAlerts()">Download CSV</button></p></div></div>
+    <div class="card"><h3>📊 Per-Vehicle Summary</h3><div class="pad">
+      <p class="muted small">One row per vehicle: status, speed, fuel, engine temp.</p>
+      <p style="margin-top:10px"><button class="btn" onclick="expSummary()">Download CSV</button></p></div></div>
+  </div>
+  <div class="card"><h3>Coming with backend modules</h3><div class="pad muted small">
+    Scheduled email reports · fleet utilization & cost per km · driver scorecards · trip history exports (reporting-service on the roadmap).</div></div>
+  <p class="muted small" id="note"></p>
+</main>
+<script src="/js/app.js"></script>
+<script>
+const U=window.FleetUI;
+const csv=rows=>rows.map(r=>r.map(x=>`"${(x??'').toString().replace(/"/g,'""')}"`).join(',')).join('\n');
+const dl=(name,text)=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:'text/csv'}));a.download=name;a.click();
+  document.getElementById('note').textContent='Exported '+name+' at '+new Date().toLocaleTimeString();};
+async function expLive(){
+  const lv=await U.api('/api/v1/vehicles/live');
+  dl('fleet-live.csv',csv([['plate','status','speed_kph','fuel_pct','engine_c','lat','lon','last_seen'],
+    ...lv.map(v=>[U.fmtPlate(v.vehicleId),v.status,v.speedKph,v.fuelLevelPct,v.engineTempC,v.latitude,v.longitude,v.lastSeen])]));
+}
+async function expAlerts(){
+  const al=await U.api('/api/v1/alerts/recent?limit=500');
+  dl('fleet-alerts.csv',csv([['ts','severity','type','vehicle','message'],
+    ...al.map(a=>[a.ts,a.severity,a.type,U.fmtPlate(a.vehicle_id),a.message])]));
+}
+async function expSummary(){
+  const lv=await U.api('/api/v1/vehicles/live');
+  const by={}; lv.forEach(v=>by[v.vehicleId]=v);
+  dl('fleet-summary.csv',csv([['plate','status','speed_kph','fuel_pct','engine_c'],
+    ...Object.entries(by).map(([k,v])=>[U.fmtPlate(k),v.status,v.speedKph,v.fuelLevelPct,v.engineTempC])]));
+}
+</script></body></html>

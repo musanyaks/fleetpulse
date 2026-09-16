@@ -1,0 +1,11 @@
+Photo licensing
+===============
+class photos (heavy/medium/light/bus.jpg): Pexels License — free to use, no attribution required.
+  https://www.pexels.com/search/semi%20truck/      -> heavy.jpg   (tractor unit / articulated)
+  https://www.pexels.com/search/box%20truck/       -> medium.jpg  (rigid box truck)
+  https://www.pexels.com/search/pickup%20truck/    -> light.jpg   (small truck / pickup)
+  https://www.pexels.com/search/minibus/           -> bus.jpg     (van / matatu-style)
+
+per-vehicle overrides (optional): img/<PLATE>.jpg e.g. img/KDA482X.jpg
+  Use photos you have rights to (own fleet, or Wikimedia Commons CC images WITH attribution here).
+Manufacturer press photos must NOT be used without permission.

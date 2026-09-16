@@ -11,4 +11,13 @@
   </parent>
 
   <artifactId>common</artifactId>
+
+  <dependencies>
+    <!-- Spec API only — implementation (hibernate-validator) comes via
+         spring-boot-starter-validation in the services -->
+    <dependency>
+      <groupId>jakarta.validation</groupId>
+      <artifactId>jakarta.validation-api</artifactId>
+    </dependency>
+  </dependencies>
 </project>

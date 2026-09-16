@@ -88,7 +88,7 @@ public class TelemetryConsumer {
 
     private void process(TelemetryMessage m) {
         liveState.update(m);                                        // feeds the digital-twin seed
-        VehicleProfile profile = registry.profileFor(m.vehicleId());
+        VehicleProfile profile = registry.profileFor(m);
         for (TelemetryRule rule : rules) {
             rule.evaluate(m, profile)
                 .filter(a -> cooldown.tryAcquire(m.vehicleId() + ":" + a.type(), Duration.ofMinutes(5)))

@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>FleetPulse — Fleet Overview</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  :root{
+    --bg:#f4f6fb; --panel:#ffffff; --line:#e6eaf2; --text:#1e293b; --muted:#64748b;
+    --blue:#2563eb; --blue2:#3b82f6; --green:#10b981; --amber:#f59e0b; --red:#ef4444;
+    --navy:#0d2b57; --navy2:#123a75;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font:14px/1.5 "Segoe UI",system-ui,sans-serif;display:flex;min-height:100vh}
+  aside{width:212px;background:var(--navy);color:#cdd9ee;display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
+  .logo{display:flex;align-items:center;gap:10px;padding:20px 18px;font-size:17px;font-weight:700;color:#fff}
+  .logo .sq{width:30px;height:30px;border-radius:8px;background:var(--blue2);display:grid;place-items:center;font-size:15px}
+  nav{flex:1;padding:6px 10px;overflow-y:auto}
+  nav a{display:flex;align-items:center;gap:11px;padding:10px 12px;margin:2px 0;border-radius:9px;color:#c3d2e8;text-decoration:none;font-size:13.5px}
+  nav a .ic{width:18px;text-align:center}
+  nav a:hover{background:rgba(255,255,255,.06);color:#fff}
+  nav a.active{background:var(--blue2);color:#fff;font-weight:600}
+  .health{margin:12px;padding:16px;background:rgba(255,255,255,.05);border-radius:12px;text-align:center}
+  .health h4{font-size:12px;color:#9fb3d1;margin-bottom:10px;font-weight:600}
+  .ring{--p:84;--c:var(--green);width:74px;height:74px;border-radius:50%;margin:0 auto;
+        background:conic-gradient(var(--c) calc(var(--p)*1%), rgba(255,255,255,.12) 0);display:grid;place-items:center}
+  .ring>div{width:56px;height:56px;border-radius:50%;background:var(--navy);display:grid;place-items:center;font-size:16px;font-weight:700;color:#fff}
+  .health .st{margin-top:8px;font-weight:600;color:#fff;font-size:13px}
+  .health .sys{font-size:10.5px;color:#9fb3d1}
+  main{flex:1;min-width:0}
+  .topbar{display:flex;align-items:center;gap:16px;padding:16px 24px;background:var(--panel);border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .topbar h1{font-size:21px;font-weight:700}
+  .topbar .sub{color:var(--muted);font-size:12.5px;width:100%;margin-top:-8px}
+  .seg{display:flex;background:#eef2f9;border-radius:10px;padding:3px}
+  .seg button{border:0;background:transparent;padding:7px 16px;border-radius:8px;font-weight:600;color:var(--muted);cursor:pointer;font-size:13px}
+  .seg button.on{background:var(--blue);color:#fff}
+  .spacer{flex:1}
+  .bell{position:relative;font-size:18px;background:#eef2f9;border-radius:10px;padding:8px 12px;cursor:pointer}
+  .bell .badge{position:absolute;top:-6px;right:-6px;background:var(--red);color:#fff;font-size:10px;font-weight:700;border-radius:99px;padding:2px 6px;display:none}
+  .avatar{width:34px;height:34px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-weight:700;font-size:12px}
+  .conn{font-size:11px;font-weight:700;padding:4px 10px;border-radius:99px;border:1px solid}
+  .conn.live{color:var(--green);border-color:var(--green)}
+  .conn.down{color:var(--red);border-color:var(--red)}
+  .wrap{padding:18px 24px;display:flex;flex-direction:column;gap:16px}
+  .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
+  .kpi{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;gap:12px;align-items:center}
+  .kpi .bub{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font-size:19px;flex:none}
+  .kpi .label{color:var(--muted);font-size:12px}
+  .kpi .value{font-size:23px;font-weight:700;line-height:1.15}
+  .kpi .trend{font-size:11px;color:var(--green);font-weight:600}
+  .row{display:grid;gap:16px}
+  .row.map{grid-template-columns:2fr 1fr}
+  .row.bottom{grid-template-columns:1fr 1.4fr 1fr}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+  .card>h3{display:flex;align-items:center;gap:10px;font-size:13.5px;font-weight:700;padding:14px 16px;border-bottom:1px solid var(--line)}
+  .card>h3 .view{margin-left:auto;font-size:12px;color:var(--blue);font-weight:600;text-decoration:none;cursor:pointer}
+  .legend{margin-left:auto;display:flex;gap:14px;font-size:12px;color:var(--muted);font-weight:500}
+  .legend i{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px}
+  #map{height:400px}
+  #vlist{overflow-y:auto;max-height:366px}
+  .vrow{display:flex;align-items:center;gap:11px;padding:10px 16px;border-bottom:1px solid var(--line);cursor:pointer}
+  .vrow:hover{background:#f8fafc}
+  .thumb{width:40px;height:40px;border-radius:10px;background:#eef4ff;display:grid;place-items:center;flex:none;overflow:hidden}
+  .thumb img{width:100%;height:100%;object-fit:cover;border-radius:10px;display:block}
+  .vrow .vinfo{flex:1;min-width:0}
+  .vrow .id{font-weight:700;font-size:13.5px;letter-spacing:.4px;display:flex;align-items:center;gap:7px}
+  .vrow .st{font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .vrow .spd{display:flex;align-items:center;gap:5px;font-size:12.5px;font-weight:600;color:var(--text);flex:none}
+  .vrow .chev{color:#94a3b8;font-size:19px;line-height:1;flex:none}
+  .dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex:none}
+  .dot.moving{background:var(--green);box-shadow:0 0 5px rgba(16,185,129,.6)}
+  .dot.idle{background:var(--blue2)}
+  .dot.offline{background:#94a3b8}
+  .fring{--p:60;--c:var(--green);width:34px;height:34px;border-radius:50%;flex:none;
+        background:conic-gradient(var(--c) calc(var(--p)*1%), #e8edf5 0);display:grid;place-items:center}
+  .fring>div{width:25px;height:25px;border-radius:50%;background:#fff;display:grid;place-items:center;font-size:9.5px;font-weight:700}
+  #activity{padding:6px 0;overflow-y:auto;max-height:210px}
+  .ev{display:flex;gap:12px;padding:8px 16px;align-items:baseline}
+  .ev time{color:var(--muted);font-size:11.5px;width:48px;flex:none}
+  .ev .tx{font-size:13px}
+  .chip{margin-left:auto;font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:99px}
+  .chip.g{background:#d1fae5;color:#065f46}.chip.a{background:#fef3c7;color:#92400e}
+  #fuelChart{padding:10px 16px 4px}
+  .fuelHead{display:flex;align-items:baseline;gap:8px;padding:2px 16px 8px}
+  .fuelHead .big{font-size:22px;font-weight:700}
+  .fuelHead .up{color:var(--green);font-size:12px;font-weight:700}
+  #alerts{overflow-y:auto;max-height:210px}
+  .arow{display:flex;gap:10px;padding:9px 16px;border-bottom:1px solid var(--line);align-items:baseline}
+  .arow .ic{flex:none}
+  .sev{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;flex:none}
+  .sev.CRITICAL{background:#fee2e2;color:#991b1b}
+  .sev.WARNING{background:#fef3c7;color:#92400e}
+  .sev.INFO{background:#dbeafe;color:#1e40af}
+  .arow .msg{flex:1;font-size:12.8px}
+  .arow .who{font-weight:700;font-size:12px;letter-spacing:.3px}
+  .arow time{color:var(--muted);font-size:11px}
+  .act{padding:14px 16px;display:flex;gap:18px;align-items:center}
+  .donut{--p:78;--c:var(--green);width:86px;height:86px;border-radius:50%;flex:none;
+        background:conic-gradient(var(--c) calc(var(--p)*1%), var(--blue2) calc(var(--p)*1%) calc((var(--p) + 15)*1%), #e2e8f0 0);
+        display:grid;place-items:center}
+  .donut>div{width:62px;height:62px;border-radius:50%;background:#fff;display:grid;place-items:center;text-align:center}
+  .donut .n{font-size:17px;font-weight:700;line-height:1}
+  .donut .l{font-size:8.5px;color:var(--muted)}
+  .bars{flex:1;display:flex;flex-direction:column;gap:9px}
+  .bar .t{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
+  .bar .t b{color:var(--text)}
+  .bar .tr{height:7px;border-radius:99px;background:#eef2f9;margin-top:3px;overflow:hidden}
+  .bar .fl{height:100%;border-radius:99px}
+  ::-webkit-scrollbar{width:7px}::-webkit-scrollbar-thumb{background:#d3dae6;border-radius:4px}
+</style>
+</head>
+<body>
+
+<aside>
+  <div class="logo"><span class="sq">🛰️</span> FleetPulse</div>
+  <nav>
+    <a class="active" href="index.html"><span class="ic">🏠</span> Overview</a>
+    <a href="vehicles.html"><span class="ic">🚚</span> Vehicles</a>
+    <a href="trips.html"><span class="ic">🛣️</span> Trips</a>
+    <a href="drivers.html"><span class="ic">🧑‍✈️</span> Drivers</a>
+    <a href="maintenance.html"><span class="ic">🔧</span> Maintenance</a>
+    <a href="fuel.html"><span class="ic">⛽</span> Fuel</a>
+    <a href="alerts.html"><span class="ic">🔔</span> Alerts</a>
+    <a href="reports.html"><span class="ic">📄</span> Reports</a>
+    <a href="geofences.html"><span class="ic">🎯</span> Geofences</a>
+    <a href="settings.html"><span class="ic">⚙️</span> Settings</a>
+  </nav>
+  <div class="health">
+    <h4>Fleet Health</h4>
+    <div class="ring" id="hRing" style="--p:100;--c:var(--green)"><div id="hScore">–</div></div>
+    <div class="st" id="hLabel">Good</div>
+    <div class="sys">All systems operational</div>
+  </div>
+</aside>
+
+<main>
+  <div class="topbar">
+    <div><h1>Fleet Overview</h1></div>
+    <span class="sub" style="order:3">Real-time insights and operations</span>
+    <div class="seg">
+      <button class="on" data-loc="nbo">🏙️ Nairobi</button>
+      <button data-loc="msa">⚓ Mombasa</button>
+    </div>
+    <span class="spacer"></span>
+    <span class="conn down" id="conn">● CONNECTING</span>
+    <div class="bell" id="bell">🔔<span class="badge" id="bellBadge">0</span></div>
+    <div class="avatar">OP</div>
+  </div>
+
+  <div class="wrap">
+    <div class="kpis">
+      <div class="kpi"><div class="bub" style="background:#e8f0fe">🚚</div>
+        <div><div class="label">Total Vehicles</div><div class="value" id="kTotal">–</div><div class="trend">● live</div></div></div>
+      <div class="kpi"><div class="bub" style="background:#dcfce7">📈</div>
+        <div><div class="label">Moving Now</div><div class="value" id="kActive">–</div><div class="trend" id="kActivePct"></div></div></div>
+      <div class="kpi"><div class="bub" style="background:#ede9fe">🛫</div>
+        <div><div class="label">Departures (session)</div><div class="value" id="kTrips">–</div><div class="trend">idle → moving</div></div></div>
+      <div class="kpi"><div class="bub" style="background:#ffedd5">🛣️</div>
+        <div><div class="label">Distance Covered</div><div class="value" id="kDist">–</div><div class="trend">km since page load</div></div></div>
+      <div class="kpi"><div class="bub" style="background:#cffafe">⛽</div>
+        <div><div class="label">Avg Fuel Level</div><div class="value" id="kFuel">–</div><div class="trend">fleet average</div></div></div>
+    </div>
+
+    <div class="row map">
+      <div class="card">
+        <h3>Live Fleet Tracking
+          <span class="legend">
+            <span><i style="background:var(--green)"></i>Moving <b id="lgMove">0</b></span>
+            <span><i style="background:var(--blue2)"></i>Idle <b id="lgIdle">0</b></span>
+            <span><i style="background:#94a3b8"></i>Offline <b id="lgOff">0</b></span>
+          </span>
+        </h3>
+        <div id="map"></div>
+      </div>
+      <div class="card">
+        <h3>Vehicle Status <a class="view" href="vehicles.html">View all</a></h3>
+        <div id="vlist"></div>
+      </div>
+    </div>
+
+    <div class="row bottom">
+      <div class="card">
+        <h3>Trip Activity <a class="view" href="trips.html">View all</a></h3>
+        <div id="activity"><div class="ev"><span class="tx" style="color:var(--muted)">Watching for departures & stops…</span></div></div>
+      </div>
+      <div class="card">
+        <h3>Fuel Analytics <a class="view" href="fuel.html">Live</a></h3>
+        <div class="fuelHead"><span class="big" id="fAvg">–</span><span class="up" id="fTrend">▲ tracking</span></div>
+        <div id="fuelChart"><svg viewBox="0 0 300 70" width="100%" height="70" preserveAspectRatio="none">
+          <path id="fuelPath" fill="none" stroke="#2563eb" stroke-width="2"/></svg></div>
+      </div>
+      <div class="card">
+        <h3>Maintenance & Alerts <a class="view" href="alerts.html">View all</a></h3>
+        <div id="alerts"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Fleet Activity</h3>
+      <div class="act">
+        <div class="donut" id="aDonut" style="--p:60">
+          <div><div><div class="n" id="aPct">–</div><div class="l">Active</div></div></div>
+        </div>
+        <div class="bars">
+          <div class="bar"><div class="t"><span>Moving</span><b id="bMove">0%</b></div><div class="tr"><div class="fl" id="fMove" style="background:var(--green);width:0%"></div></div></div>
+          <div class="bar"><div class="t"><span>Idle</span><b id="bIdle">0%</b></div><div class="tr"><div class="fl" id="fIdle" style="background:var(--blue2);width:0%"></div></div></div>
+          <div class="bar"><div class="t"><span>Offline</span><b id="bOff">0%</b></div><div class="tr"><div class="fl" id="fOff" style="background:#94a3b8;width:0%"></div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+/* ---------- map ---------- */
+const LOC = { nbo:{c:[-1.286,36.817],z:11}, msa:{c:[-4.043,39.668],z:12} };
+const map = L.map('map').setView(LOC.nbo.c, LOC.nbo.z);
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+  {maxZoom:19, attribution:'&copy; OpenStreetMap contributors'}).addTo(map);
+document.querySelectorAll('.seg button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('.seg button').forEach(x => x.classList.remove('on'));
+  b.classList.add('on');
+  const l = LOC[b.dataset.loc]; map.setView(l.c, l.z);
+});
+
+/* ---------- vehicle photos (inlined — no external dependency) ---------- */
+const TRUCK_SVG = '<svg viewBox="0 0 24 24" width="22" height="22">'
+  + '<rect x="2" y="7" width="11" height="8" rx="1" fill="#3b82f6"/>'
+  + '<path d="M13 9h4.2c.5 0 .96.25 1.24.66L20.5 12.5V15H13V9Z" fill="#60a5fa"/>'
+  + '<circle cx="6" cy="16.8" r="1.8" fill="#1e293b"/>'
+  + '<circle cx="16.5" cy="16.8" r="1.8" fill="#1e293b"/></svg>';
+
+function vClass(make, model){
+  const m = `${make ?? ''} ${model ?? ''}`;
+  if(/Hiace|Coaster|Rosa|Matatu|Bus/i.test(m))            return 'bus';
+  if(/Canter|Dyna|ELF|Hino 300|NPR|NQR|Kuzer/i.test(m))   return 'light';
+  if(/FRR|FVR|Fighter|Hino 500|Croner|P280|FTS/i.test(m)) return 'medium';
+  return 'heavy';
+}
+/* photo chain: img/<PLATE>.jpg -> img/<class>.jpg -> SVG */
+function vThumb(v){
+  const cls = vClass(v.make, v.model);
+  return '<img src="img/' + encodeURIComponent(v.vehicleId) + '.jpg"'
+       + ' data-cls="' + cls + '" alt="' + (v.vehicleId || '') + '"'
+       + ' onerror="window.__thumbErr(this)">';
+}
+window.__thumbErr = function(img){
+  if(!img.dataset.step){
+    img.dataset.step = '2';
+    img.src = 'img/' + img.dataset.cls + '.jpg';
+  } else {
+    const s = document.createElement('span');
+    s.style.display = 'grid'; s.style.placeItems = 'center';
+    s.innerHTML = TRUCK_SVG;
+    img.replaceWith(s);
+  }
+};
+
+/* Kenyan reference cities for nearest-place lookup */
+const CITIES = [
+  ["Nairobi",-1.286,36.817], ["Thika",-1.039,37.090], ["Limuru",-1.112,36.640],
+  ["Machakos",-1.518,37.265], ["Naivasha",-0.717,36.433], ["Nakuru",-0.303,36.080],
+  ["Narok",-1.086,35.860], ["Nanyuki",0.017,37.070], ["Meru",0.047,37.645],
+  ["Eldoret",0.514,35.270], ["Kisumu",-0.091,34.768], ["Voi",-3.396,38.556],
+  ["Mombasa",-4.043,39.668], ["Malindi",-3.220,40.117], ["Garissa",-0.453,39.646]
+];
+function nearestCity(lat, lon){
+  let best = "Kenya", bd = Infinity;
+  for(const [n, la, lo] of CITIES){
+    const d = (la - lat) ** 2 + (lo - lon) ** 2;
+    if(d < bd){ bd = d; best = n; }
+  }
+  return best;
+}
+
+/* ---------- state ---------- */
+const markers = new Map(), trails = new Map(), lastSeen = new Map();
+const prevStatus = new Map();
+let boundsFit = false, departures = 0, distanceKm = 0;
+let knownVehicles = new Set();
+let fuelSamples = [];
+const $ = id => document.getElementById(id);
+const fmt = n => n == null ? '–' : Number(n).toFixed(0);
+const esc = s => (s ?? '').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+const fmtPlate = id => { const m = /^(K[A-Z]{2})(\d{3}[A-Z])$/.exec(id); return m ? m[1]+' '+m[2] : id; };
+const dist = (a,b,c,d) => { const R=6371,r=Math.PI/180,
+  dLa=(c-a)*r, dLo=(d-b)*r, h=Math.sin(dLa/2)**2+Math.cos(a*r)*Math.cos(c*r)*Math.sin(dLo/2)**2;
+  return 2*R*Math.asin(Math.sqrt(h)); };
+
+async function api(p){ const r = await fetch(p); if(!r.ok) throw new Error(r.status); return r.json(); }
+
+/* ---------- main render ---------- */
+function renderLive(list){
+  const now = Date.now();
+  list.forEach(v => { lastSeen.set(v.vehicleId, now); knownVehicles.add(v.vehicleId); });
+  const offlineCount = [...knownVehicles].filter(id =>
+        now - (lastSeen.get(id)||0) > 60_000 && !list.some(v=>v.vehicleId===id)).length;
+
+  const moving = list.filter(v => v.status === 'MOVING').length;
+  const idle = list.length - moving;
+  $('kTotal').textContent = list.length;
+  $('kActive').textContent = moving;
+  $('kActivePct').textContent = list.length ? Math.round(moving/list.length*100)+'% of fleet' : '';
+  $('kTrips').textContent = departures;
+  $('lgMove').textContent = moving; $('lgIdle').textContent = idle; $('lgOff').textContent = offlineCount;
+
+  const seen = new Set();
+  list.forEach(v => {
+    seen.add(v.vehicleId);
+    const ll = [v.latitude, v.longitude];
+    if(prevStatus.get(v.vehicleId) === 'IDLE' && v.status === 'MOVING'){
+      departures++; addEvent(`🟢 <b>${fmtPlate(v.vehicleId)}</b> departed`, 'g');
+    }
+    if(prevStatus.get(v.vehicleId) === 'MOVING' && v.status === 'IDLE'){
+      addEvent(`🟡 <b>${fmtPlate(v.vehicleId)}</b> stopped`, 'a');
+    }
+    prevStatus.set(v.vehicleId, v.status);
+
+    if(v.status === 'MOVING'){
+      const t = trails.get(v.vehicleId);
+      if(t && t.length){ distanceKm += dist(...t[t.length-1], ...ll); }
+    }
+    let tr = trails.get(v.vehicleId) || [];
+    tr.push(ll); if(tr.length > 40) tr.shift();
+    trails.set(v.vehicleId, tr);
+
+    let m = markers.get(v.vehicleId);
+    if(!m){
+      m = L.circleMarker(ll, {radius:7, weight:2, color:'#fff', fillOpacity:.95}).bindTooltip(fmtPlate(v.vehicleId)).addTo(map);
+      markers.set(v.vehicleId, m);
+      m._line = L.polyline(tr, {color:'#3b82f6', weight:3, opacity:.65}).addTo(map);
+    }
+    m.setLatLng(ll); m._line.setLatLngs(tr);
+    m.setStyle({fillColor: v.status==='MOVING' ? '#10b981' : '#3b82f6'});
+    m.setTooltipContent(`<b>${fmtPlate(v.vehicleId)}</b> · ${esc(v.make ?? '')} ${esc(v.model ?? '')}<br/>${fmt(v.speedKph)} km/h · fuel ${fmt(v.fuelLevelPct)}%`);
+  });
+  markers.forEach((m,id)=>{ if(!seen.has(id)){ map.removeLayer(m); map.removeLayer(m._line); markers.delete(id); } });
+  if(!boundsFit && list.length){ map.fitBounds(L.latLngBounds(list.map(v=>[v.latitude,v.longitude])).pad(0.25)); boundsFit=true; }
+  $('kDist').textContent = distanceKm >= 100 ? Math.round(distanceKm).toLocaleString() : distanceKm.toFixed(1);
+
+  const fuels = list.map(v=>v.fuelLevelPct).filter(x=>x!=null);
+  if(fuels.length){
+    const avg = fuels.reduce((a,b)=>a+b,0)/fuels.length;
+    $('kFuel').textContent = avg.toFixed(1)+'%';
+    $('fAvg').textContent = avg.toFixed(2)+'%';
+    fuelSamples.push(avg); if(fuelSamples.length>60) fuelSamples.shift();
+    const min=Math.min(...fuelSamples), max=Math.max(...fuelSamples), rng=(max-min)||1;
+    $('fuelPath').setAttribute('d', fuelSamples.map((s,i)=>{
+      const x=i/(fuelSamples.length-1||1)*300, y=62-(s-min)/rng*54+4;
+      return (i?'L':'M')+x.toFixed(1)+' '+y.toFixed(1);}).join(' '));
+  }
+
+  /* vehicle status — thumb · plate+dot / make·model · place · gauge · fuel ring · chevron */
+  $('vlist').innerHTML = [...list].sort((a,b)=>b.speedKph-a.speedKph).slice(0,8).map(v=>{
+    const f = v.fuelLevelPct==null?0:v.fuelLevelPct;
+    const col = f<15?'var(--red)':f<35?'var(--amber)':'var(--green)';
+    const place = nearestCity(v.latitude, v.longitude);
+    const mm = [v.make, v.model].filter(Boolean).join(' ') || '—';
+    return `<div class="vrow" onclick="focusVehicle('${esc(v.vehicleId)}')">
+      <span class="thumb">${vThumb(v)}</span>
+      <span class="vinfo">
+        <div class="id">${fmtPlate(v.vehicleId)} <span class="dot ${v.status.toLowerCase()}"></span></div>
+        <div class="st">${esc(mm)} · ${place}</div>
+      </span>
+      <span class="spd">${GAUGE_SVG} ${fmt(v.speedKph)} km/h</span>
+      <span class="fring" style="--p:${f.toFixed(0)};--c:${col}"><div>${f.toFixed(0)}%</div></span>
+      <span class="chev">›</span>
+    </div>`;}).join('') || '<div class="vrow"><span class="st" style="color:var(--muted)">Waiting for telemetry…</span></div>';
+
+  const total = list.length + offlineCount || 1;
+  const pMove = Math.round(moving/total*100), pIdle = Math.round(idle/total*100), pOff = 100-pMove-pIdle;
+  $('aDonut').style.setProperty('--p', pMove);
+  $('aPct').textContent = pMove+'%';
+  $('bMove').textContent = pMove+'%'; $('fMove').style.width = pMove+'%';
+  $('bIdle').textContent = pIdle+'%'; $('fIdle').style.width = pIdle+'%';
+  $('bOff').textContent  = pOff+'%';  $('fOff').style.width  = pOff+'%';
+
+  const alertPen = Math.min(40, alertsLast60*3), idlePen = Math.round(pIdle*0.15), offPen = Math.round(pOff*0.4);
+  const score = Math.max(40, 100-alertPen-idlePen-offPen);
+  $('hScore').textContent = score;
+  $('hRing').style.setProperty('--p', score);
+  $('hRing').style.setProperty('--c', score>=80?'var(--green)':score>=60?'var(--amber)':'var(--red)');
+  $('hLabel').textContent = score>=80?'Good':score>=60?'Watch':'Critical';
+}
+
+const GAUGE_SVG = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round">'
+  + '<circle cx="12" cy="12" r="9"/><path d="M12 12l3.5-3.5"/></svg>';
+
+const events = [];
+function addEvent(html, cls){
+  events.unshift({t:new Date(), html, cls});
+  if(events.length>30) events.pop();
+  $('activity').innerHTML = events.map(e=>`<div class="ev"><time>${e.t.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</time>
+     <span class="tx">${e.html}</span><span class="chip ${e.cls}">${e.cls==='g'?'In Transit':'Stopped'}</span></div>`).join('');
+}
+
+let alertsLast60 = 0;
+const TYPE_ICON = {ENGINE_OVERHEATING:'🔥', LOW_FUEL:'⛽', SPEEDING:'💨'};
+function renderAlerts(alerts){
+  const hourAgo = Date.now()-3600_000;
+  const recent = alerts.filter(a=>new Date(a.ts).getTime()>hourAgo);
+  alertsLast60 = recent.length;
+  const b = $('bellBadge'); b.textContent = recent.length; b.style.display = recent.length?'block':'none';
+  $('alerts').innerHTML = alerts.slice(0,20).map(a=>`<div class="arow">
+      <span class="ic">${TYPE_ICON[a.type]||'⚠️'}</span>
+      <span class="sev ${esc(a.severity)}">${esc(a.severity)}</span>
+      <span class="msg">${esc(a.message)}</span>
+      <span class="who">${fmtPlate(esc(a.vehicle_id))}</span>
+      <time>${new Date(a.ts).toLocaleTimeString()}</time></div>`).join('')
+      || '<div class="arow"><span class="msg" style="color:var(--muted)">No alerts yet.</span></div>';
+}
+
+function focusVehicle(id){ const m = markers.get(id); if(m){ map.setView(m.getLatLng(), 14); m.openTooltip(); } }
+
+/* ---------- poll loop — each section isolated so one failure never blanks the page ---------- */
+async function tick(){
+  let ok = true;
+  try{
+    const [live, alerts] = await Promise.all([
+      api('/api/v1/vehicles/live'),
+      api('/api/v1/alerts/recent?limit=100')]);
+    try{ renderLive(live); }catch(e){ ok = false; console.error('renderLive failed:', e); }
+    try{ renderAlerts(alerts); }catch(e){ ok = false; console.error('renderAlerts failed:', e); }
+  }catch(e){ ok = false; }
+  $('conn').textContent = ok ? '● LIVE' : '● OFFLINE';
+  $('conn').className = ok ? 'conn live' : 'conn down';
+}
+tick(); setInterval(tick, 2000);
+</script>
+</body>
+</html>

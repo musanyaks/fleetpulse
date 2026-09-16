@@ -1,0 +1,38 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Trips · FleetPulse</title><link rel="stylesheet" href="/css/app.css"/></head>
+<body data-page="trips">
+<div id="sidebar"></div>
+<main>
+  <div class="pagehead"><h1>Trip Activity</h1></div>
+  <div class="banner">Departures/stops detected live in this browser session. Persisted trip history (origin → destination, distance, duration) needs the trips module consuming <code>telemetry.raw</code> with a state machine — on the roadmap.</div>
+  <div class="cards grid3" id="stats"></div>
+  <div class="card"><h3>Session Timeline</h3><div id="feed" style="max-height:60vh;overflow-y:auto">
+    <div class="pad muted">Watching for departures & stops…</div></div></div>
+</main>
+<script src="/js/app.js"></script>
+<script>
+const U=window.FleetUI; const prev=new Map(); const events=[]; let deps=0,stops=0;
+async function load(){
+  try{
+    const lv=await U.api('/api/v1/vehicles/live');
+    lv.forEach(v=>{
+      const was=prev.get(v.vehicleId);
+      if(was==='IDLE'&&v.status==='MOVING'){deps++;add(`🟢 <b>${U.fmtPlate(v.vehicleId)}</b> departed`,'g','In Transit');}
+      if(was==='MOVING'&&v.status==='IDLE'){stops++;add(`🟡 <b>${U.fmtPlate(v.vehicleId)}</b> stopped`,'a','Stopped');}
+      prev.set(v.vehicleId,v.status);
+    });
+    const moving=[...prev.values()].filter(s=>s==='MOVING').length;
+    document.getElementById('stats').innerHTML=[
+      ['Departures',deps],['Stops',stops],['Moving now',moving]
+    ].map(([l,v])=>`<div class="kpi"><div class="label">${l}</div><div class="value">${v}</div></div>`).join('');
+  }catch(e){}
+}
+function add(html,cls,label){
+  events.unshift({t:new Date(),html,cls,label});
+  if(events.length>50)events.pop();
+  document.getElementById('feed').innerHTML=events.map(e=>`<div class="pad" style="border-bottom:1px solid var(--line);display:flex;gap:10px;align-items:baseline">
+    <time class="muted small">${e.t.toLocaleTimeString()}</time><span>${e.html}</span>
+    <span class="chip ${e.cls}" style="margin-left:auto">${e.label}</span></div>`).join('');
+}
+load(); setInterval(load,2000);
+</script></body></html>

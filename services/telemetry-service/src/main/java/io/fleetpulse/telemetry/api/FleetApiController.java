@@ -1,12 +1,12 @@
 package io.fleetpulse.telemetry.api;
 
+import io.fleetpulse.telemetry.domain.AlertJpaRepository;
+import io.fleetpulse.telemetry.domain.VehicleJpaRepository;
 import io.fleetpulse.telemetry.live.LiveVehicleState;
 import io.fleetpulse.telemetry.live.LiveVehicleStateService;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 import java.util.List;
@@ -17,11 +17,19 @@ import java.util.Map;
 public class FleetApiController {
 
     private final LiveVehicleStateService liveState;
-    private final JdbcTemplate jdbc;
+    private final AlertJpaRepository alerts;
+    private final VehicleJpaRepository vehicles;
+    private final AlertMapper alertMapper;
+    private final VehicleMapper vehicleMapper;
 
-    public FleetApiController(LiveVehicleStateService liveState, JdbcTemplate jdbc) {
+    public FleetApiController(LiveVehicleStateService liveState,
+                              AlertJpaRepository alerts, VehicleJpaRepository vehicles,
+                              AlertMapper alertMapper, VehicleMapper vehicleMapper) {
         this.liveState = liveState;
-        this.jdbc = jdbc;
+        this.alerts = alerts;
+        this.vehicles = vehicles;
+        this.alertMapper = alertMapper;
+        this.vehicleMapper = vehicleMapper;
     }
 
     @GetMapping("/vehicles/live")
@@ -34,11 +42,16 @@ public class FleetApiController {
         return liveState.summary();
     }
 
+    @GetMapping("/vehicles")
+    public List<VehicleDto> vehicles(@RequestParam(defaultValue = "0") int page,
+                                     @RequestParam(defaultValue = "50") int size) {
+        var pageable = PageRequest.of(page, Math.min(size, 200), Sort.by("vehicleId"));
+        return vehicleMapper.toDtoList(vehicles.findAll(pageable).getContent());
+    }
+
     @GetMapping("/alerts/recent")
-    public List<Map<String, Object>> recentAlerts(@RequestParam(defaultValue = "50") int limit) {
-        return jdbc.queryForList("""
-                SELECT vehicle_id, type, severity, observed_value, threshold, message, ts
-                FROM alerts ORDER BY ts DESC LIMIT ?
-                """, Math.min(limit, 500));
+    public List<AlertDto> recentAlerts(@RequestParam(defaultValue = "50") int limit) {
+        var pageable = PageRequest.of(0, Math.min(limit, 500));
+        return alertMapper.toDtoList(alerts.findAllByOrderByTsDesc(pageable));
     }
 }

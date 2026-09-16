@@ -1,0 +1,43 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Maintenance · FleetPulse</title><link rel="stylesheet" href="/css/app.css"/></head>
+<body data-page="maintenance">
+<div id="sidebar"></div>
+<main>
+  <div class="pagehead"><h1>Maintenance</h1></div>
+  <div class="banner">Rule-based view from the alert stream (overheating / low-fuel history). Predictive failure-probability models arrive with the ML maintenance module.</div>
+  <div class="cards grid3" id="stats"></div>
+  <div class="card"><h3>Vehicles Needing Attention</h3>
+    <div class="tblwrap"><table><thead><tr><th>Plate</th><th>Overheating</th><th>Low fuel</th><th>Last signal</th><th>Suggested action</th></tr></thead>
+    <tbody id="rows"></tbody></table></div></div>
+</main>
+<script src="/js/app.js"></script>
+<script>
+const U=window.FleetUI;
+async function load(){
+  try{
+    const [al,lv]=await Promise.all([U.api('/api/v1/alerts/recent?limit=500'),U.api('/api/v1/vehicles/live')]);
+    const lastSeen=new Map(lv.map(v=>[v.vehicleId,v.lastSeen]));
+    const m=new Map();
+    al.filter(a=>a.type==='ENGINE_OVERHEATING'||a.type==='LOW_FUEL').forEach(a=>{
+      const e=m.get(a.vehicle_id)||{heat:0,fuel:0,last:null,sev:'INFO'};
+      if(a.type==='ENGINE_OVERHEATING')e.heat++;else e.fuel++;
+      if(!e.last||new Date(a.ts)>new Date(e.last)){e.last=a.ts;e.sev=a.severity;e.type=a.type;}
+      m.set(a.vehicle_id,e);
+    });
+    const flagged=[...m.entries()].sort((a,b)=>(b[1].heat+b[1].fuel)-(a[1].heat+a[1].fuel));
+    document.getElementById('stats').innerHTML=[
+      ['Flagged vehicles',flagged.length],
+      ['Overheat events',al.filter(a=>a.type==='ENGINE_OVERHEATING').length],
+      ['Low fuel events',al.filter(a=>a.type==='LOW_FUEL').length]
+    ].map(([l,v])=>`<div class="kpi"><div class="label">${l}</div><div class="value">${v}</div></div>`).join('');
+    document.getElementById('rows').innerHTML=flagged.map(([id,e])=>{
+      const action=e.heat>=3?'Schedule engine inspection — repeated overheating':e.heat>0?'Inspect cooling system':'Refuel scheduled';
+      return `<tr><td><b>${U.fmtPlate(id)}</b></td>
+        <td>${e.heat?e.heat+' event(s)':'—'}</td><td>${e.fuel?e.fuel+' event(s)':'—'}</td>
+        <td class="muted small">${e.last?new Date(e.last).toLocaleString():'–'}</td>
+        <td><span class="chip ${U.esc(e.sev)}">${U.esc(e.sev)}</span> ${action}</td></tr>`;
+    }).join('')||'<tr><td colspan="5" class="muted">No maintenance signals — fleet healthy.</td></tr>';
+  }catch(e){}
+}
+load(); setInterval(load,5000);
+</script></body></html>

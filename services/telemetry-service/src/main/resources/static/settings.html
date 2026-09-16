@@ -1,0 +1,34 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Settings · FleetPulse</title><link rel="stylesheet" href="/css/app.css"/></head>
+<body data-page="settings">
+<div id="sidebar"></div>
+<main>
+  <div class="pagehead"><h1>System</h1></div>
+  <div class="card"><h3>Endpoint Health (checked from your browser)</h3>
+    <div class="tblwrap"><table><thead><tr><th>Target</th><th>Status</th><th>Latency</th></tr></thead><tbody id="pings"></tbody></table></div></div>
+  <div class="cards grid2">
+    <div class="card"><h3>Environment links</h3><div class="pad small">
+      <p>📊 Grafana — <a href="http://localhost:3000" target="_blank">localhost:3000</a> (admin/admin)</p>
+      <p>🗄️ TimescaleDB — localhost:5432 (fleetpulse/fleetpulse)</p>
+      <p>📡 MQTT broker — tcp://localhost:1883</p>
+      <p>🧵 Kafka (host) — localhost:9094 · (in-network) kafka:9092</p></div></div>
+    <div class="card"><h3>Security</h3><div class="pad small muted">
+      <p>HTTP Basic auth over the API (roles: ADMIN, FLEET_MANAGER, DISPATCHER, MAINTENANCE_MANAGER, ANALYST, DRIVER).</p>
+      <p style="margin-top:6px">Demo users: admin/admin123 · manager/manager123 · analyst/analyst123. JWT + DB-backed users = next security milestone.</p></div></div>
+  </div>
+</main>
+<script src="/js/app.js"></script>
+<script>
+const targets=[['Summary API','/api/v1/vehicles/summary'],['Live Vehicles API','/api/v1/vehicles/live'],
+  ['Alerts API','/api/v1/alerts/recent?limit=1'],['Actuator Health','/actuator/health']];
+async function ping(){
+  const rows=await Promise.all(targets.map(async([n,u])=>{
+    const t0=performance.now();
+    try{const r=await fetch(u);const ms=(performance.now()-t0).toFixed(0);
+      return `<tr><td>${n}</td><td><span class="chip g">${r.status} OK</span></td><td>${ms} ms</td></tr>`;}
+    catch(e){return `<tr><td>${n}</td><td><span class="chip CRITICAL">DOWN</span></td><td>–</td></tr>`;}
+  }));
+  document.getElementById('pings').innerHTML=rows.join('');
+}
+ping(); setInterval(ping,5000);
+</script></body></html>
