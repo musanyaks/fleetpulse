@@ -159,6 +159,7 @@ tbody tr:hover td{background:#f8fafc;cursor:pointer}
 <script>
 /* ================= helpers ================= */
 const $ = id => document.getElementById(id);
+const fmt = n => n == null ? '–' : Number(n).toFixed(0);
 const esc = s => (s ?? '').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
 const fmtPlate = id => { const m=/^(K[A-Z]{2})(\d{3}[A-Z])$/.exec(id||''); return m?m[1]+' '+m[2]:id||''; };
 const api = async p => { const r=await fetch(p); if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); };
@@ -364,11 +365,12 @@ function renderPanel(){
       <div class="note">Insurance / service history / VIN are not tracked yet — they arrive with the documents & maintenance modules. Next Service is derived from live odometer.</div>`;
     /* mini map */
     setTimeout(()=>{
-      if(!miniMap){
+      if(miniMap){ miniMap.remove(); miniMap=null; }
+        {
         miniMap=L.map('miniMap',{zoomControl:false,attributionControl:false}).setView([L.latitude??-1.286,L.longitude??36.817],11);
         L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(miniMap);
         miniMarker=L.circleMarker([L.latitude??-1.286,L.longitude??36.817],{radius:8,color:'#fff',weight:2,fillColor:'#10b981',fillOpacity:.95}).addTo(miniMap);
-      } else { miniMap.setView([L.latitude??-1.286,L.longitude??36.817],11); miniMarker.setLatLng([L.latitude??-1.286,L.longitude??36.817]); }
+      
       miniMap.invalidateSize();
     },50);
   }
@@ -379,11 +381,12 @@ function renderPanel(){
       <div class="prow"><span class="k">Corridor</span><b>${L.routeId&&routeLabels[L.routeId]?esc(routeLabels[L.routeId]):'—'}</b></div>`;
     setTimeout(()=>{
       const el=document.getElementById('bigMap'); if(!el) return;
-      if(!window._bigMap){
+      if(window._bigMap){ window._bigMap.remove(); window._bigMap=null; }
+      {
         window._bigMap=L.map('bigMap').setView([L.latitude??-1.286,L.longitude??36.817],12);
         L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(window._bigMap);
         window._bigMarker=L.circleMarker([L.latitude??-1.286,L.longitude??36.817],{radius:9,color:'#fff',weight:2,fillColor:'#10b981',fillOpacity:.95}).addTo(window._bigMap);
-      } else { window._bigMap.setView([L.latitude??-1.286,L.longitude??36.817],12); window._bigMarker.setLatLng([L.latitude??-1.286,L.longitude??36.817]); }
+      
       window._bigMap.invalidateSize();
     },50);
   }
