@@ -50,7 +50,7 @@
   .dropdown{position:absolute;top:calc(100% + 6px);right:0;background:#fff;border:1px solid var(--line);
         border-radius:12px;box-shadow:0 12px 32px rgba(2,6,23,.18);min-width:200px;z-index:1200;display:none;padding:6px}
   .dropdown.open{display:block}
-  .dd-item{padding:9px 12px;border-radius:8px;cursor:pointer;font-size:13px;display:flex;justify-content:space-between;align-items:center}
+  .dd-item{padding:9px 12px;border-radius:8px;cursor:pointer;font-size:13px}
   .dd-item:hover{background:#f8fafc}
   .dd-item.sel{color:var(--blue);font-weight:700;background:#eff6ff}
   .dd-sep{border-top:1px solid var(--line);margin:6px 4px}
@@ -71,9 +71,19 @@
   .card>h3 .view{margin-left:auto;font-size:12px;color:var(--blue);font-weight:600;text-decoration:none;cursor:pointer}
   .legend{margin-left:auto;display:flex;gap:14px;font-size:12px;color:var(--muted);font-weight:500}
   .legend i{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px}
-  #map{height:400px}
-  #map .leaflet-tile-pane{filter:saturate(.55) brightness(1.06) contrast(.92)}
-  .tmarker{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;border:2.5px solid #fff;box-shadow:0 2px 8px rgba(2,6,23,.35)}
+  #map{height:400px;background:#f8fafc}
+  /* near-white minimal cartography — the mockup basemap look */
+  #map .leaflet-tile-pane{filter:saturate(.22) brightness(1.22) contrast(.88)}
+  /* permanent city + country labels */
+  .citylabel{background:transparent;border:none;box-shadow:none;padding:0;font-weight:700;font-size:12px;
+        color:#334155;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 6px #fff}
+  .citylabel::before{display:none}
+  .countrylabel{background:transparent;border:none;box-shadow:none;padding:0;font-weight:800;font-size:26px;
+        color:#c3cdd9;letter-spacing:4px}
+  .countrylabel::before{display:none}
+  /* truck badge markers */
+  .tmarker{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;
+        border:2.5px solid #fff;box-shadow:0 2px 8px rgba(2,6,23,.35)}
   .tmarker svg{display:block}
   .wpt{width:11px;height:11px;border-radius:50%;background:#fff;border:2.5px solid #10b981;box-shadow:0 1px 4px rgba(2,6,23,.25)}
   #vlist{overflow-y:auto;max-height:366px}
@@ -275,9 +285,9 @@ let boundsFit=false, knownVehicles=new Set(), fuelSamples=[], alertsLast60=0, la
 function countOffline(){ const now=Date.now();
   return [...knownVehicles].filter(id=>now-(lastSeen.get(id)||0)>60_000).length; }
 
-/* ================= map ================= */
+/* ================= map — whole-country view ================= */
 const LOC = { nbo:{c:[-1.286,36.817],z:11}, msa:{c:[-4.043,39.668],z:12} };
-const map = L.map('map').setView(LOC.nbo.c, LOC.nbo.z);
+const map = L.map('map').setView([-0.7, 37.4], 7);
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
   {maxZoom:19, attribution:'&copy; OpenStreetMap contributors'}).addTo(map);
 document.querySelectorAll('.seg button').forEach(b => b.onclick = () => {
@@ -286,14 +296,79 @@ document.querySelectorAll('.seg button').forEach(b => b.onclick = () => {
   const l = LOC[b.dataset.loc]; map.setView(l.c, l.z);
 });
 
-/* ================= vehicle photo chain ================= */
+/* fullscreen control (mockup's expand button) */
+L.Control.FPFull = L.Control.extend({
+  onAdd(){ const d=L.DomUtil.create('div','leaflet-bar');
+    const a=L.DomUtil.create('a','',d); a.href='#'; a.innerHTML='⤢'; a.title='Fullscreen';
+    L.DomEvent.on(a,'click',e=>{ L.DomEvent.stop(e);
+      const el=document.getElementById('map');
+      if(!document.fullscreenElement) el.requestFullscreen(); else document.exitFullscreen();
+      setTimeout(()=>map.invalidateSize(),300); });
+    return d; }
+});
+new L.Control.FPFull({position:'topright'}).addTo(map);
+
+/* ================= highway corridors — colored lines + white waypoint circles ================= */
+const ROUTE_CATALOG = {
+  "NBO-MSA": [[-1.286,36.817],[-1.370,36.902],[-1.450,36.966],[-1.497,37.050],[-1.582,37.235],[-1.617,37.455],[-1.900,37.550],[-2.007,37.628],[-2.414,38.019],[-2.911,38.300],[-3.396,38.556],[-3.530,38.750],[-3.865,39.470],[-4.043,39.668]],
+  "NBO-KSM": [[-1.286,36.817],[-1.112,36.640],[-0.717,36.433],[-0.303,36.080],[-0.280,35.700],[-0.367,35.283],[-0.250,35.100],[-0.091,34.768]],
+  "NBO-ELD": [[-1.286,36.817],[-1.112,36.640],[-0.717,36.433],[-0.303,36.080],[-0.100,35.550],[0.150,35.420],[0.350,35.300],[0.514,35.270]],
+  "NBO-NKR": [[-1.286,36.817],[-1.112,36.640],[-0.900,36.550],[-0.717,36.433],[-0.520,36.320],[-0.303,36.080]],
+  "NBO-GSA": [[-1.286,36.817],[-1.233,37.100],[-1.000,37.500],[-0.700,38.300],[-0.453,39.646]]
+};
+const routeLabels = { "NBO-MSA":"Nairobi → Mombasa", "NBO-KSM":"Nairobi → Kisumu",
+  "NBO-ELD":"Nairobi → Eldoret", "NBO-NKR":"Nairobi → Nakuru", "NBO-GSA":"Nairobi → Garissa" };
+const ROUTE_COLORS = { "NBO-MSA":"#10b981", "NBO-KSM":"#3b82f6", "NBO-ELD":"#0ea5e9",
+  "NBO-NKR":"#14b8a6", "NBO-GSA":"#6366f1" };
+Object.entries(ROUTE_CATALOG).forEach(([id, pts]) => {
+  const c = ROUTE_COLORS[id] || '#3b82f6';
+  L.polyline(pts, {color:c, weight:4, opacity:.85})
+   .bindTooltip('🛣️ '+routeLabels[id], {sticky:true}).addTo(map);
+  pts.forEach(p => L.circleMarker(p, {radius:4.5, color:c, weight:2.5,
+        fillColor:'#fff', fillOpacity:1, interactive:false}).addTo(map));
+});
+
+/* ================= permanent city + country labels ================= */
+const CITIES = [
+  ["Nairobi",-1.286,36.817], ["Thika",-1.039,37.090], ["Limuru",-1.112,36.640],
+  ["Machakos",-1.518,37.265], ["Naivasha",-0.717,36.433], ["Nakuru",-0.303,36.080],
+  ["Nanyuki",0.017,37.070], ["Meru",0.047,37.645],
+  ["Eldoret",0.514,35.270], ["Kisumu",-0.091,34.768], ["Voi",-3.396,38.556],
+  ["Mombasa",-4.043,39.668], ["Malindi",-3.220,40.117], ["Garissa",-0.453,39.646]
+];
+CITIES.forEach(([n,la,lo]) => {
+  L.tooltip({permanent:true, direction:'right', className:'citylabel', offset:[8,0]})
+   .setContent(n).setLatLng([la,lo]).addTo(map);
+});
+L.tooltip({permanent:true, direction:'center', className:'countrylabel'})
+ .setContent('KENYA').setLatLng([-0.55, 37.85]).addTo(map);
+
+/* fit the whole corridor network like the mockup's country view */
+map.fitBounds(L.latLngBounds(Object.values(ROUTE_CATALOG).flat()).pad(0.06));
+
+function nearestCity(lat, lon){
+  let best="Kenya", bd=Infinity;
+  for(const [n,la,lo] of CITIES){ const d=(la-lat)**2+(lo-lon)**2; if(d<bd){bd=d;best=n;} }
+  return best;
+}
+
+/* ================= truck badge markers + stop waypoints ================= */
+const TRUCK_WHITE='<svg viewBox="0 0 24 24" width="15" height="15">'
+ +'<rect x="1.5" y="6.5" width="11" height="8" rx="1" fill="#fff"/>'
+ +'<path d="M12.5 8.5h4.4c.5 0 .96.25 1.24.66L20.5 12.5V15h-8V8.5Z" fill="#dbeafe"/>'
+ +'<circle cx="5.8" cy="16.6" r="1.9" fill="#fff"/><circle cx="16.4" cy="16.6" r="1.9" fill="#fff"/></svg>';
+function truckIcon(status){
+  const c = status==='MOVING' ? '#10b981' : '#3b82f6';
+  return L.divIcon({className:'', html:`<div class="tmarker" style="background:${c}">${TRUCK_WHITE}</div>`,
+                    iconSize:[30,30], iconAnchor:[15,15], tooltipAnchor:[0,-15]});
+}
+const GAUGE_SVG = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round">'
+  + '<circle cx="12" cy="12" r="9"/><path d="M12 12l3.5-3.5"/></svg>';
 const TRUCK_SVG = '<svg viewBox="0 0 24 24" width="22" height="22">'
   + '<rect x="2" y="7" width="11" height="8" rx="1" fill="#3b82f6"/>'
   + '<path d="M13 9h4.2c.5 0 .96.25 1.24.66L20.5 12.5V15H13V9Z" fill="#60a5fa"/>'
   + '<circle cx="6" cy="16.8" r="1.8" fill="#1e293b"/>'
   + '<circle cx="16.5" cy="16.8" r="1.8" fill="#1e293b"/></svg>';
-const GAUGE_SVG = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round">'
-  + '<circle cx="12" cy="12" r="9"/><path d="M12 12l3.5-3.5"/></svg>';
 function vClass(make, model){
   const m = `${make ?? ''} ${model ?? ''}`;
   if(/Hiace|Coaster|Rosa|Matatu|Bus/i.test(m))            return 'bus';
@@ -312,30 +387,6 @@ window.__thumbErr = function(img){
   else{ const s=document.createElement('span'); s.style.display='grid'; s.style.placeItems='center';
         s.innerHTML=TRUCK_SVG; img.replaceWith(s); }
 };
-
-/* ================= nearest Kenyan city ================= */
-const CITIES = [
-  ["Nairobi",-1.286,36.817], ["Thika",-1.039,37.090], ["Limuru",-1.112,36.640],
-  ["Machakos",-1.518,37.265], ["Naivasha",-0.717,36.433], ["Nakuru",-0.303,36.080],
-  ["Narok",-1.086,35.860], ["Nanyuki",0.017,37.070], ["Meru",0.047,37.645],
-  ["Eldoret",0.514,35.270], ["Kisumu",-0.091,34.768], ["Voi",-3.396,38.556],
-  ["Mombasa",-4.043,39.668], ["Malindi",-3.220,40.117], ["Garissa",-0.453,39.646]
-];
-function nearestCity(lat, lon){
-  let best="Kenya", bd=Infinity;
-  for(const [n,la,lo] of CITIES){ const d=(la-lat)**2+(lo-lon)**2; if(d<bd){bd=d;best=n;} }
-  return best;
-}
-/* ================= map markers: truck badges + stop waypoints ================= */
-const TRUCK_WHITE='<svg viewBox="0 0 24 24" width="15" height="15">'
- +'<rect x="1.5" y="6.5" width="11" height="8" rx="1" fill="#fff"/>'
- +'<path d="M12.5 8.5h4.4c.5 0 .96.25 1.24.66L20.5 12.5V15h-8V8.5Z" fill="#dbeafe"/>'
- +'<circle cx="5.8" cy="16.6" r="1.9" fill="#fff"/><circle cx="16.4" cy="16.6" r="1.9" fill="#fff"/></svg>';
-function truckIcon(status){
-  const c = status==='MOVING' ? '#10b981' : '#3b82f6';
-  return L.divIcon({className:'', html:`<div class="tmarker" style="background:${c}">${TRUCK_WHITE}</div>`,
-                    iconSize:[30,30], iconAnchor:[15,15], tooltipAnchor:[0,-15]});
-}
 const waypoints = L.layerGroup().addTo(map);
 const wpList = [];
 function addWaypoint(ll){
@@ -344,19 +395,6 @@ function addWaypoint(ll){
   if(wpList.length > 80) waypoints.removeLayer(wpList.shift());
   waypoints.addLayer(wpList[wpList.length-1]);
 }
-/* fullscreen control (mockup's expand button) */
-L.Control.Fullscreen = L.Control.extend({
-  onAdd(){ const d=L.DomUtil.create('div','leaflet-bar');
-    const a=L.DomUtil.create('a','',d); a.href='#'; a.innerHTML='⤢'; a.title='Fullscreen';
-    L.DomEvent.on(a,'click',e=>{ L.DomEvent.stop(e);
-      const el=document.getElementById('map');
-      if(!document.fullscreenElement) el.requestFullscreen(); else document.exitFullscreen();
-      setTimeout(()=>map.invalidateSize(),300); });
-    return d; }
-});
-new L.Control.Fullscreen({position:'topright'}).addTo(map);
-
-
 
 /* ================= date dropdown (local-timezone dates) ================= */
 let selectedDate = '';
@@ -418,24 +456,25 @@ function renderLive(list, offlineCount){
     seen.add(v.vehicleId);
     const ll=[v.latitude, v.longitude];
     if(prevStatus.get(v.vehicleId)==='IDLE' && v.status==='MOVING'){ addTrip('depart', v); }
-    if(prevStatus.get(v.vehicleId)==='MOVING' && v.status==='IDLE'){ addTrip('stop', v); } addWaypoint(ll);
+    if(prevStatus.get(v.vehicleId)==='MOVING' && v.status==='IDLE'){ addTrip('stop', v); addWaypoint(ll); }
     prevStatus.set(v.vehicleId, v.status);
 
     let tr=trails.get(v.vehicleId)||[]; tr.push(ll); if(tr.length>120)tr.shift(); trails.set(v.vehicleId,tr);
 
     let m=markers.get(v.vehicleId);
     if(!m){
-      m=L.circleMarker(ll,{radius:7,weight:2,color:'#fff',fillOpacity:.95}).bindTooltip(fmtPlate(v.vehicleId)).addTo(map);
+      m=L.marker(ll,{icon:truckIcon(v.status)}).bindTooltip(fmtPlate(v.vehicleId)).addTo(map);
       markers.set(v.vehicleId,m);
-      m._line=L.polyline(tr,{color:'#3b82f6',weight:3,opacity:.65}).addTo(map);
+      m._line=L.polyline(tr,{color:ROUTE_COLORS[v.routeId]||'#3b82f6',weight:3,opacity:.4}).addTo(map);
+      m._lastStatus=v.status;
     }
     m.setLatLng(ll); m._line.setLatLngs(tr);
-    m.setStyle({fillColor: v.status==='MOVING'?'#10b981':'#3b82f6'});
-    const drv=v.driverName?('👤 '+esc(v.driverName)+' · '):'';
+    if(m._lastStatus!==v.status){ m.setIcon(truckIcon(v.status)); m._lastStatus=v.status; }
+    const drv=(v.driverName?('👤 '+esc(v.driverName)+' · '):'')
+            +(v.routeId&&routeLabels[v.routeId]?(esc(routeLabels[v.routeId])+' · '):'');
     m.setTooltipContent(`<b>${fmtPlate(v.vehicleId)}</b> · ${esc(v.make??'')} ${esc(v.model??'')}<br/>${drv}${fmt(v.speedKph)} km/h · fuel ${fmt(v.fuelLevelPct)}%`);
   });
   markers.forEach((m,id)=>{ if(!seen.has(id)){ map.removeLayer(m); map.removeLayer(m._line); markers.delete(id); }});
-  if(!boundsFit&&list.length){ map.fitBounds(L.latLngBounds(list.map(v=>[v.latitude,v.longitude])).pad(0.25)); boundsFit=true; }
 
   const fuels=list.map(v=>v.fuelLevelPct).filter(x=>x!=null);
   if(fuels.length){
@@ -595,7 +634,6 @@ async function loadZones(){
 loadZones(); setInterval(loadZones, 60000);
 
 /* ================= poll loop — sections isolated ================= */
-window.__fpReady = false;
 async function tick(){
   let ok=true;
   try{
@@ -606,7 +644,6 @@ async function tick(){
     try{ renderLive(live, offlineCount); }catch(e){ ok=false; console.error('renderLive failed:', e); }
     try{ renderDriverActivity(live, offlineCount); }catch(e){ console.error('renderDriverActivity failed:', e); }
     try{ renderAlerts(alerts); }catch(e){ ok=false; console.error('renderAlerts failed:', e); }
-    window.__fpReady = true;
   }catch(e){ ok=false; }
   $('conn').textContent=ok?'● LIVE':'● OFFLINE';
   $('conn').className=ok?'conn live':'conn down';
