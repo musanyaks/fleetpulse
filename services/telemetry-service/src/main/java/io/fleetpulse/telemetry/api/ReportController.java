@@ -72,13 +72,13 @@ public class ReportController {
         """;
 
     private static final String DISTANCE_EXPR = """
-        COALESCE(round((sum(
+        COALESCE(round(((sum(
             6371000 * 2 * asin(sqrt(
                 power(sin(radians(latitude - prev_lat) / 2), 2) +
                 cos(radians(prev_lat)) * cos(radians(latitude)) *
                 power(sin(radians(longitude - prev_lon) / 2), 2)
             ))
-        ) FILTER (WHERE prev_lat IS NOT NULL AND speed_kph >= 1)) / 1000, 1), 0)
+        ) FILTER (WHERE prev_lat IS NOT NULL AND speed_kph >= 1)) / 1000))::numeric, 1), 0)
         """;
 
     /** 1. Fleet utilization: moving share of observed time, distance, speeds. */
@@ -95,7 +95,7 @@ public class ReportController {
                    round(100.0 * count(*) FILTER (WHERE p.speed_kph >= 1) / greatest(count(*), 1), 1)
                        AS utilization_pct,
                    %s AS distance_km,
-                   COALESCE(round(avg(p.speed_kph) FILTER (WHERE p.speed_kph >= 1)::numeric, 1), 0)
+                   COALESCE(round((avg(p.speed_kph) FILTER (WHERE p.speed_kph >= 1))::numeric, 1), 0)
                        AS avg_speed_kph,
                    round(max(p.speed_kph)::numeric, 1) AS max_speed_kph,
                    COALESCE(round(avg(p.engine_temp_c)::numeric, 1), 0) AS avg_engine_c
