@@ -20,6 +20,7 @@ services:
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       DB_HOST: timescaledb
+      REDIS_HOST: redis
     depends_on:
       kafka:
         condition: service_started

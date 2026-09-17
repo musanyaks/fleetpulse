@@ -532,7 +532,7 @@ function closeFull(){$('fullModal').classList.remove('open');}
  $('addBtn').onclick=()=>toast('Vehicle registration API arrives with the vehicle-service module',false);
  $('exportBtn').onclick=exportSelected;
 
-load(); setInterval(load,5000);
+const qp=new URLSearchParams(location.search);if(qp.get("q")){$("q").value=qp.get("q");}$1
 const autoSel=setInterval(()=>{if(vehicles.length&&!selected){selectVehicle(filtered[0]?.vehicleId||vehicles[0].vehicleId);clearInterval(autoSel);}},800);
 </script>
 </body>
