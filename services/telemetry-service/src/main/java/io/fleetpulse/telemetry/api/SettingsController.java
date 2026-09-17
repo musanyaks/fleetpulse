@@ -8,6 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
@@ -53,11 +54,50 @@ public class SettingsController {
         return mapper.toDto(entity);
     }
 
-    /**
-     * Edit vehicle attributes. Identity fields (plate, make, model) are immutable here —
-     * they define what the simulator broadcasts; full CRUD belongs to vehicle-service.
-     * Driver reassignment also lives there: the simulator owns the broadcast manifest.
-     */
+    /** Register a vehicle. It appears across the platform immediately (no telemetry yet —
+     *  it goes live when the simulator/registry starts broadcasting for it). */
+    @PostMapping("/vehicles")
+    @ResponseStatus(HttpStatus.CREATED)
+    public VehicleDto addVehicle(@RequestBody Map<String, String> body) {
+        String plate = body.getOrDefault("vehicleId", "").trim().toUpperCase();
+        String make  = trimOrNull(body.get("make"));
+        String model = trimOrNull(body.get("model"));
+        String yearS = trimOrNull(body.get("year"));
+        String vin   = trimOrNull(body.get("vin"));
+
+        if (!plate.matches("[A-Z]{3}\\d{3}[A-Z]"))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                "Registration must be a Kenyan plate: K + 2 letters + 3 digits + letter (e.g. KDA482X)");
+        if (vehicles.existsById(plate))
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "A vehicle with this registration already exists");
+
+        VehicleEntity v = VehicleEntity.builder()
+                .vehicleId(plate)
+                .plate(plate)
+                .make(make)
+                .model(model)
+                .speedLimitKph(100)
+                .registeredAt(Instant.now())
+                .build();
+        if (yearS != null) {
+            try {
+                int y = Integer.parseInt(yearS);
+                if (y < 1990 || y > 2100) throw new NumberFormatException();
+                v.setYear(y);
+            } catch (NumberFormatException e) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Year must be 1990-2100");
+            }
+        }
+        if (vin != null) {
+            if (vin.length() < 6 || vin.length() > 24)
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "VIN must be 6-24 characters");
+            v.setVin(vin);
+        }
+        return mapper.toDto(vehicles.save(v));
+    }
+
+    /** Edit vehicle attributes. Identity (plate, make, model) is immutable here —
+     *  the simulator broadcasts them; full CRUD belongs to vehicle-service. */
     @PutMapping("/vehicles/{vehicleId}")
     public VehicleDto updateVehicle(@PathVariable String vehicleId,
                                     @RequestBody Map<String, Object> body) {
@@ -69,7 +109,7 @@ public class SettingsController {
             if (!(lim instanceof Number n) || n.doubleValue() < 20 || n.doubleValue() > 200)
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "speedLimitKph must be 20-200");
             registry.updateSpeedLimit(vehicleId, n.doubleValue());
-            v.setSpeedLimitKph(n.doubleValue());   // keep entity in sync — flush would else revert it
+            v.setSpeedLimitKph(n.doubleValue());
         }
         if (body.containsKey("year")) {
             Object y = body.get("year");
@@ -92,5 +132,11 @@ public class SettingsController {
         }
         vehicles.save(v);
         return mapper.toDto(v);
+    }
+
+    private String trimOrNull(String s) {
+        if (s == null) return null;
+        s = s.trim();
+        return s.isEmpty() ? null : s;
     }
 }

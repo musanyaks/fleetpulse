@@ -22,7 +22,7 @@ nav a:hover{background:rgba(255,255,255,.06);color:#fff}
 nav a.active{background:var(--blue2);color:#fff;font-weight:600}
 main{flex:1;min-width:0;display:flex;flex-direction:column}
 .topbar{display:flex;align-items:center;gap:12px;padding:12px 24px;background:var(--panel);border-bottom:1px solid var(--line)}
-.gsearch{flex:1;max-width:480px;display:flex;align-items:center;gap:8px;background:#f1f5fb;border:1px solid var(--line);border-radius:10px;padding:8px 14px}
+.gsearch{flex:1;max-width:300px;display:flex;align-items:center;gap:8px;background:#f1f5fb;border:1px solid var(--line);border-radius:10px;padding:8px 14px}
 .gsearch input{border:0;background:transparent;outline:none;font:inherit;width:100%}
 .spacer{flex:1}
 .bell{position:relative;font-size:18px;background:#f1f5fb;border-radius:10px;padding:8px 12px;cursor:pointer;user-select:none}
@@ -146,6 +146,14 @@ tr.sel td{background:#eff6ff}
     .row.bottom{grid-template-columns:1fr}
     .cols{grid-template-columns:1fr}
   }
+
+  .vbell-menu{position:absolute;top:calc(100% + 6px);right:0;background:#fff;border:1px solid var(--line);
+    border-radius:12px;box-shadow:0 12px 32px rgba(2,6,23,.18);min-width:300px;z-index:1500;display:none}
+  .vbell-menu.open{display:block}
+  .vbell-head{padding:10px 12px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+  .vbell-item{display:block;padding:8px 12px;font-size:12.5px;color:var(--text);text-decoration:none;border-bottom:1px solid var(--line)}
+  .vbell-item:hover{background:#f8fafc}
+  .vbell-item .m{margin-top:2px;color:var(--muted);font-size:11px}
 </style>
 </head>
 <body>
@@ -174,7 +182,8 @@ tr.sel td{background:#eff6ff}
     <div class="gsearch">🔍<input id="gq" placeholder="Search vehicles, registration no, or driver..."/></div>
     <span style="flex:1"></span>
     <div style="position:relative">
-      <div id="bell" title="Notifications">🔔<span id="bellBadge" class="badge">0</span></div>
+      <div style="position:relative" id="bellWrap"><div id="bell" title="Notifications">🔔<span id="bellBadge" class="badge">0</span></div>
+<div class="vbell-menu" id="bellMenu"></div></div>
     </div>
     <button class="fbtn" onclick="document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()">⛶</button>
     <div class="tchipuser" id="userChip"><div class="upic" id="uInit">?</div>
@@ -260,6 +269,30 @@ tr.sel td{background:#eff6ff}
   </div>
 </main>
 </div>
+
+
+<div class="modal" id="addModal"><div class="box" style="max-width:520px">
+  <button class="x" onclick="closeAdd()">✕</button>
+  <h2>Add Vehicle</h2>
+  <div class="muted small" style="margin-bottom:12px">Registers the vehicle in the fleet roster. It shows as Inactive (no telemetry) until a device is installed and assigned.</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+    <div style="grid-column:1/-1"><label class="muted small">Registration (Kenyan plate, e.g. KDT914R) *</label>
+      <input id="aPlate" placeholder="KDT914R" maxlength="7" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit;text-transform:uppercase"/></div>
+    <div><label class="muted small">Make</label>
+      <input id="aMake" placeholder="Isuzu" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit"/></div>
+    <div><label class="muted small">Model</label>
+      <input id="aModel" placeholder="NQR" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit"/></div>
+    <div><label class="muted small">Year</label>
+      <input id="aYear" type="number" min="1990" max="2100" placeholder="2024" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit"/></div>
+    <div><label class="muted small">VIN (optional)</label>
+      <input id="aVin" placeholder="6-24 chars" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit"/></div>
+  </div>
+  <div style="display:flex;gap:10px;margin-top:14px">
+    <button class="btn" style="flex:1" id="aSave">Register Vehicle</button>
+    <button class="btn ghost" style="flex:1" onclick="closeAdd()">Cancel</button>
+  </div>
+  <div class="muted small" id="aMsg" style="margin-top:8px;min-height:16px"></div>
+</div></div>
 
 <div class="modal" id="fullModal"><div class="box">
   <button class="x" onclick="closeFull()">✕</button>
@@ -783,7 +816,73 @@ function renderChips(){
 
 /* calendar icon: native date input highlight only */
 const _docDate=document.getElementById("docDate");
+if(_docDate){
+  const wrap=_docDate.closest(".calwrap");
+  wrap.addEventListener("click",e=>{
+    e.stopPropagation();
+    try{ _docDate.showPicker(); }          /* opens the native picker on any click */
+    catch(err){ _docDate.focus(); }        /* older browsers: focus + keyboard */
+  });
+}
 if(_docDate){_docDate.addEventListener("change",()=>{_docDate.closest(".calwrap").classList.toggle("has-date",!!_docDate.value);});}
+
+/* ================= add vehicle (end-of-script override) ================= */
+function openAdd(){ $("addModal").classList.add("open"); $("aPlate").focus(); }
+function closeAdd(){ $("addModal").classList.remove("open"); }
+ $("addModal").addEventListener("click",e=>{ if(e.target===$("addModal")) closeAdd(); });
+ $("addBtn").onclick=openAdd;
+ $("aSave").onclick=async()=>{
+  const body={ vehicleId:$("aPlate").value.trim().toUpperCase(),
+               make:$("aMake").value.trim(), model:$("aModel").value.trim(),
+               year:$("aYear").value.trim(), vin:$("aVin").value.trim() };
+  const msg=$("aMsg");
+  try{
+    const r=await fetch('/api/v1/vehicles',{method:'POST',
+      headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)});
+    if(r.status===201){
+      const v=await r.json();
+      vehicles.push(v);
+      msg.style.color='var(--green)';
+      msg.textContent='✅ '+fmtPlate(v.vehicleId)+' registered — visible in roster as Inactive';
+      setTimeout(()=>{ closeAdd(); msg.textContent=''; load(); },900);
+    } else if(r.status===403){
+      msg.style.color='var(--red)'; msg.textContent='⛔ ADMIN or FLEET_MANAGER required';
+    } else if(r.status===409){
+      msg.style.color='var(--red)'; msg.textContent='❌ That registration already exists';
+    } else if(r.status===400){
+      const t=await r.text(); msg.style.color='var(--red)'; msg.textContent='❌ '+t.slice(0,140);
+    } else {
+      msg.style.color='var(--red)'; msg.textContent='❌ Failed ('+r.status+')';
+    }
+  }catch(e){ msg.style.color='var(--red)'; msg.textContent='❌ Network error'; }
+};
+
+/* ================= notifications bell (vehicles page) ================= */
+window.__vAlerts = window.__vAlerts || [];
+const _vb=$("bell"), _vbm=$("bellMenu");
+_vb.addEventListener("click",e=>{ e.stopPropagation(); renderVbell(); _vbm.classList.toggle("open"); });
+document.addEventListener("click",e=>{ if(_vbm && !_vbm.parentElement.contains(e.target)) _vbm.classList.remove("open"); });
+function renderVbell(){
+  const list=(window.__vAlerts||[]).slice(0,8);
+  _vbm.innerHTML=
+    '<div class="vbell-head"><b>Notifications</b>'+
+    '<a href="alerts.html" style="font-size:11.5px;color:var(--blue);text-decoration:none">View all</a></div>'+
+    (list.length? list.map(a=>
+      '<a class="vbell-item" href="alerts.html">'+
+      '<span class="sev '+esc(a.severity)+'">'+esc(a.severity)+'</span> '+esc(a.message)+
+      '<div class="m">'+fmtPlate(esc(a.vehicle_id))+' · '+new Date(a.ts).toLocaleTimeString()+'</div></a>').join('')
+    : '<div class="pad muted small">No alerts yet.</div>');
+}
+/* feed from the existing poll: patch load() by wrapping it */
+const _loadVehiclesPage=load;
+load=async function(){
+  const r=await _loadVehiclesPage.apply(this,arguments);
+  try{
+    const al=await fetch('/api/v1/alerts/recent?limit=30').then(x=>x.ok?x.json():[]);
+    window.__vAlerts=al;
+  }catch(e){}
+  return r;
+};
 </script>
 </body>
 </html>
