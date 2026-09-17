@@ -37,6 +37,8 @@ main{flex:1;min-width:0;display:flex;flex-direction:column}
 .pagehead h1{font-size:22px;font-weight:800}
 .btn{border:0;border-radius:9px;padding:9px 14px;font:inherit;font-weight:600;background:var(--blue);color:#fff;cursor:pointer}
 .btn.ghost{background:#fff;color:var(--text);border:1px solid var(--line)}
+  #addBtn,#exportBtn,#filterBtn{display:inline-flex;align-items:center;gap:7px}
+  #exportBtn:hover,#filterBtn:hover{border-color:var(--blue2);color:var(--blue)}
 .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
 .kpi{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;gap:12px;align-items:center}
 .kpi .bub{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:20px;flex:none}
@@ -155,9 +157,9 @@ tr.sel td{background:#eff6ff}
 
   <div class="content">
     <div class="pagehead"><span class="ic">🚚</span><div><h1>Vehicles</h1></div><span class="spacer"></span>
-      <button class="btn" id="addBtn">＋ Add Vehicle</button>
-      <button class="btn ghost" id="exportBtn">⬇ Export</button>
-      <button class="btn ghost" id="filterBtn">▽ Filter</button>
+      <button class="btn" id="addBtn"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add Vehicle</button>
+      <button class="btn ghost" id="exportBtn"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Export</button>
+      <button class="btn ghost" id="filterBtn"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg> Filter</button>
     </div>
 
     <div class="kpis" id="kpis"></div>
@@ -167,6 +169,17 @@ tr.sel td{background:#eff6ff}
       <select id="fType"><option value="">All Types</option><option>Truck</option><option>Bus</option><option>Pickup</option></select>
       <select id="fStatus"><option value="">All Status</option><option>Moving</option><option>Idle</option><option>Maintenance</option><option>Offline</option></select>
       <select id="fDriver"><option value="">All Drivers</option></select>
+      <div style="position:relative">
+        <button class="fbtn" id="calBtn" title="Service / documents due before date"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></button>
+        <div class="dropdown" id="calMenu" style="min-width:240px;padding:6px">
+          <div style="padding:6px 8px"><label class="muted small">Service / insurance / inspection due before</label>
+            <input type="date" id="calDate" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:7px 8px;font:inherit;margin-top:4px"/></div>
+          <div style="display:flex;gap:8px;padding:6px 8px">
+            <button class="btn" id="calApply" style="flex:1">Apply</button>
+            <button class="btn ghost" id="calClear" style="flex:1">Clear</button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="chips" id="chips"></div>
@@ -192,7 +205,7 @@ tr.sel td{background:#eff6ff}
     <div class="cols" id="cols">
       <div class="card">
         <div class="bulk" id="bulk"><b id="bulkN">0 selected</b>
-          <button class="btn" style="padding:6px 12px;font-size:12px" onclick="exportSelected()">⬇ Export selected</button>
+          <button class="btn" style="padding:6px 12px;font-size:12px" onclick="exportSelected()"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Export selected</button>
           <button class="btn ghost" style="padding:6px 12px;font-size:12px" onclick="clearSel()">Clear</button></div>
         <div class="tblwrap"><table>
           <thead><tr>
@@ -407,6 +420,7 @@ function applySort(){
            healthAsc:(a,b)=>healthOf(a.vehicleId)-healthOf(b.vehicleId),
            plate:(a,b)=>a.vehicleId.localeCompare(b.vehicleId)}[ADV.sort];
   if(s)filtered.sort(s);}
+const FILTER_ICON='<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>';
 function renderChips(){
   chipList=[];
   const q=$('q').value.trim();
@@ -422,7 +436,7 @@ function renderChips(){
   $('chips').innerHTML=chipList.map(([label,fn],i)=>`<span class="fchip">${esc(label)}<button onclick="chipList[${i}][1]()">✕</button></span>`).join('')
     +(chipList.length?'<span class="fchip clear" onclick="resetAllFilters()">✕ Clear all</span>':'')
     +(!chipList.length?'<span class="muted small">No filters active — use the toolbar or the Filter button.</span>':'');
-  $('filterBtn').innerHTML='▽ Filter'+(chipList.length?` <b>(${chipList.length})</b>`:'');}
+  $('filterBtn').innerHTML=FILTER_ICON+'Filter'+(chipList.length?` <b>(${chipList.length})</b>`:'');}
 function resetAllFilters(){
   $('q').value='';$('fType').value='';$('fStatus').value='';$('fDriver').value='';
   ADV.route='';ADV.fuelBelow='';ADV.healthBelow='';ADV.minSpeed='';ADV.sort='';
@@ -704,6 +718,66 @@ function closeFull(){$('fullModal').classList.remove('open');}
 const qp=new URLSearchParams(location.search);if(qp.get("q")){$("q").value=qp.get("q");}
 load(); setInterval(load, 5000);
 const autoSel=setInterval(()=>{if(vehicles.length&&!selected){selectVehicle(filtered[0]?.vehicleId||vehicles[0].vehicleId);clearInterval(autoSel);}},800);
+
+/* ================= calendar filter (end-of-script overrides — last declaration wins) ================= */
+ADV.dueBefore='';
+
+function advMatch(v, Lv){                       /* overrides earlier version */
+  if(ADV.route && Lv.routeId!==ADV.route) return false;
+  if(ADV.fuelBelow!=='' && (Lv.fuelLevelPct==null || Lv.fuelLevelPct>ADV.fuelBelow)) return false;
+  if(ADV.healthBelow!=='' && healthOf(v.vehicleId)>ADV.healthBelow) return false;
+  if(ADV.minSpeed!=='' && (Lv.speedKph==null || Lv.speedKph<ADV.minSpeed)) return false;
+  if(ADV.dueBefore!==''){
+    const due=[v.nextService, v.insuranceExpiry, v.inspectionExpiry].filter(Boolean);
+    if(!due.some(d=>d<=ADV.dueBefore)) return false;
+  }
+  return true;
+}
+
+function applyFilters(){                        /* overrides earlier version */
+  ADV.route=$("fRoute").value;
+  ADV.fuelBelow=$("fFuel").value===""?"":parseFloat($("fFuel").value);
+  ADV.healthBelow=$("fHealth").value===""?"":parseFloat($("fHealth").value);
+  ADV.minSpeed=$("fSpeed").value===""?"":parseFloat($("fSpeed").value);
+  ADV.sort=$("fSort").value;
+  $("fpanel").style.display="none"; page=0; render();
+}
+ $("fApply").onclick=applyFilters;
+ $("fReset").onclick=resetAllFilters;
+ $("filterBtn").onclick=()=>{const p=$("fpanel");p.style.display=p.style.display==="none"?"":"none";};
+
+function resetAllFilters(){                     /* overrides earlier version */
+  ADV.route='';ADV.fuelBelow='';ADV.healthBelow='';ADV.minSpeed='';ADV.sort='';ADV.dueBefore='';
+  const set=(id,v)=>{const el=document.getElementById(id); if(el) el.value=v;};
+  set("q","");set("fType","");set("fStatus","");set("fDriver","");
+  set("fRoute","");set("fFuel","");set("fHealth","");set("fSpeed","");set("fSort","");set("calDate","");
+  page=0; render();
+}
+
+function renderChips(){                         /* overrides earlier version */
+  window.__chips=[];
+  const q=$("q").value.trim();
+  if(q) __chips.push(["Search: "+q, ()=>{$("q").value="";page=0;render();}]);
+  if($("fType").value) __chips.push(["Type: "+$("fType").value, ()=>{$("fType").value="";page=0;render();}]);
+  if($("fStatus").value) __chips.push(["Status: "+$("fStatus").value, ()=>{$("fStatus").value="";page=0;render();}]);
+  if($("fDriver").value) __chips.push(["Driver: "+$("fDriver").value, ()=>{$("fDriver").value="";page=0;render();}]);
+  if(ADV.route) __chips.push(["Corridor: "+((window.routeLabels&&routeLabels[ADV.route])||ADV.route), ()=>{ADV.route="";$("fRoute").value="";page=0;render();}]);
+  if(ADV.fuelBelow!=="") __chips.push(["Fuel < "+ADV.fuelBelow+"%", ()=>{ADV.fuelBelow="";$("fFuel").value="";page=0;render();}]);
+  if(ADV.healthBelow!=="") __chips.push(["Health < "+ADV.healthBelow, ()=>{ADV.healthBelow="";$("fHealth").value="";page=0;render();}]);
+  if(ADV.minSpeed!=="") __chips.push(["Speed \u2265 "+ADV.minSpeed, ()=>{ADV.minSpeed="";$("fSpeed").value="";page=0;render();}]);
+  if(ADV.sort) __chips.push(["Sort: "+$("fSort").selectedOptions[0].textContent, ()=>{ADV.sort="";$("fSort").value="";page=0;render();}]);
+  if(ADV.dueBefore!=="") __chips.push(["Due before "+ADV.dueBefore, ()=>{ADV.dueBefore="";$("calDate").value="";page=0;render();}]);
+  $("chips").innerHTML=__chips.map((ch,i)=>'<span class="fchip">'+esc(ch[0])+'<button onclick="__chips['+i+'][1]()">\u2715</button></span>').join("")
+    +(__chips.length?'<span class="fchip clear" onclick="resetAllFilters()">\u2715 Clear all</span>':'')
+    +(!__chips.length?'<span class="muted small">No filters active.</span>':'');
+  $("filterBtn").innerHTML="<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>"+'Filter'+(__chips.length?" <b>("+__chips.length+")</b>":"");
+}
+
+/* calendar wiring */
+ $("calBtn").onclick=e=>{e.stopPropagation();$("calMenu").classList.toggle("open");};
+document.addEventListener("click",e=>{const w=$("calMenu")?$("calMenu").parentElement:null;if(w&&!w.contains(e.target))$("calMenu").classList.remove("open");});
+ $("calApply").onclick=()=>{ADV.dueBefore=$("calDate").value||"";$("calMenu").classList.remove("open");page=0;render();};
+ $("calClear").onclick=()=>{ADV.dueBefore="";$("calDate").value="";$("calMenu").classList.remove("open");page=0;render();};
 </script>
 </body>
 </html>
