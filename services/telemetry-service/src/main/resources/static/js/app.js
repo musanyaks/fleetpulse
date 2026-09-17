@@ -20,7 +20,6 @@
         <div class="st" id="hLabel">–</div>
         <div class="st" style="font-weight:400;font-size:10.5px;color:#9fb3d1">live from pipeline</div>
       </div>
-      <a href="/logout" style="display:flex;align-items:center;gap:8px;margin:0 12px 12px;padding:9px 12px;border-radius:9px;background:rgba(239,68,68,.12);color:#fca5a5;text-decoration:none;font-size:13px">⏻ Sign out</a>
       </aside>`;
   }
   document.addEventListener('DOMContentLoaded', () => {

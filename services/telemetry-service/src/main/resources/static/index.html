@@ -159,7 +159,6 @@
     <div class="st" id="hLabel">Good</div>
     <div class="sys">All systems operational</div>
   </div>
-  <a class="signout" href="/logout">⏻ Sign out</a>
 </aside>
 
 <main>
@@ -516,6 +515,34 @@ async function loadZones(){
   }catch(e){}
 }
 loadZones(); setInterval(loadZones, 60000);
+
+/* ---------- user avatar / session menu ---------- */
+(async function(){
+  const av=$('avatar'), menu=$('userMenu');
+  if(!av||!menu) return;
+
+  /* bind handlers FIRST so clicks work even while the session check is in flight */
+  av.onclick=e=>{ e.stopPropagation(); menu.classList.toggle('open'); };
+  document.addEventListener('click',e=>{ if(!menu.parentElement.contains(e.target)) menu.classList.remove('open'); });
+
+  /* session check — tolerant of the auth redirect (login HTML is not JSON) */
+  try{
+    const r=await fetch('/api/v1/me',{headers:{'Accept':'application/json'}});
+    const ct=r.headers.get('content-type')||'';
+    if(!r.ok || !ct.includes('application/json')) throw new Error('not signed in');
+    const me=await r.json();
+    const initials=me.username.split(/[\s_-]+/).map(w=>w[0]).slice(0,2).join('').toUpperCase();
+    av.innerHTML=initials;
+    av.title=me.username+' — '+me.roles.join(', ');
+    menu.innerHTML=`<div style="padding:10px 12px;border-bottom:1px solid var(--line)">
+        <b>${esc(me.username)}</b><br/>
+        <span class="muted small">${me.roles.map(esc).join(' · ')}</span></div>
+      <a href="/logout" style="display:block;padding:9px 12px;font-size:13px;color:var(--red);text-decoration:none">⏻ Sign out</a>`;
+  }catch(e){
+    av.title='Not signed in';
+    menu.innerHTML='<a href="/login.html" style="display:block;padding:9px 12px;font-size:13px;color:var(--text);text-decoration:none">Sign in</a>';
+  }
+})();
 
 /* ---------- poll loop ---------- */
 async function tick(){
