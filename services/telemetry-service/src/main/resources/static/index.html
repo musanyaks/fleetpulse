@@ -72,6 +72,10 @@
   .legend{margin-left:auto;display:flex;gap:14px;font-size:12px;color:var(--muted);font-weight:500}
   .legend i{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px}
   #map{height:400px}
+  #map .leaflet-tile-pane{filter:saturate(.55) brightness(1.06) contrast(.92)}
+  .tmarker{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;border:2.5px solid #fff;box-shadow:0 2px 8px rgba(2,6,23,.35)}
+  .tmarker svg{display:block}
+  .wpt{width:11px;height:11px;border-radius:50%;background:#fff;border:2.5px solid #10b981;box-shadow:0 1px 4px rgba(2,6,23,.25)}
   #vlist{overflow-y:auto;max-height:366px}
   .vrow{display:flex;align-items:center;gap:11px;padding:10px 16px;border-bottom:1px solid var(--line);cursor:pointer}
   .vrow:hover{background:#f8fafc}
@@ -322,6 +326,37 @@ function nearestCity(lat, lon){
   for(const [n,la,lo] of CITIES){ const d=(la-lat)**2+(lo-lon)**2; if(d<bd){bd=d;best=n;} }
   return best;
 }
+/* ================= map markers: truck badges + stop waypoints ================= */
+const TRUCK_WHITE='<svg viewBox="0 0 24 24" width="15" height="15">'
+ +'<rect x="1.5" y="6.5" width="11" height="8" rx="1" fill="#fff"/>'
+ +'<path d="M12.5 8.5h4.4c.5 0 .96.25 1.24.66L20.5 12.5V15h-8V8.5Z" fill="#dbeafe"/>'
+ +'<circle cx="5.8" cy="16.6" r="1.9" fill="#fff"/><circle cx="16.4" cy="16.6" r="1.9" fill="#fff"/></svg>';
+function truckIcon(status){
+  const c = status==='MOVING' ? '#10b981' : '#3b82f6';
+  return L.divIcon({className:'', html:`<div class="tmarker" style="background:${c}">${TRUCK_WHITE}</div>`,
+                    iconSize:[30,30], iconAnchor:[15,15], tooltipAnchor:[0,-15]});
+}
+const waypoints = L.layerGroup().addTo(map);
+const wpList = [];
+function addWaypoint(ll){
+  wpList.push(L.marker(ll, {icon: L.divIcon({className:'', html:'<div class="wpt"></div>',
+                iconSize:[15,15], iconAnchor:[7,7]})}));
+  if(wpList.length > 80) waypoints.removeLayer(wpList.shift());
+  waypoints.addLayer(wpList[wpList.length-1]);
+}
+/* fullscreen control (mockup's expand button) */
+L.Control.Fullscreen = L.Control.extend({
+  onAdd(){ const d=L.DomUtil.create('div','leaflet-bar');
+    const a=L.DomUtil.create('a','',d); a.href='#'; a.innerHTML='⤢'; a.title='Fullscreen';
+    L.DomEvent.on(a,'click',e=>{ L.DomEvent.stop(e);
+      const el=document.getElementById('map');
+      if(!document.fullscreenElement) el.requestFullscreen(); else document.exitFullscreen();
+      setTimeout(()=>map.invalidateSize(),300); });
+    return d; }
+});
+new L.Control.Fullscreen({position:'topright'}).addTo(map);
+
+
 
 /* ================= date dropdown (local-timezone dates) ================= */
 let selectedDate = '';
@@ -383,7 +418,7 @@ function renderLive(list, offlineCount){
     seen.add(v.vehicleId);
     const ll=[v.latitude, v.longitude];
     if(prevStatus.get(v.vehicleId)==='IDLE' && v.status==='MOVING'){ addTrip('depart', v); }
-    if(prevStatus.get(v.vehicleId)==='MOVING' && v.status==='IDLE'){ addTrip('stop', v); }
+    if(prevStatus.get(v.vehicleId)==='MOVING' && v.status==='IDLE'){ addTrip('stop', v); } addWaypoint(ll);
     prevStatus.set(v.vehicleId, v.status);
 
     let tr=trails.get(v.vehicleId)||[]; tr.push(ll); if(tr.length>40)tr.shift(); trails.set(v.vehicleId,tr);
