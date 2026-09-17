@@ -217,14 +217,14 @@ main{flex:1;min-width:0;display:flex;flex-direction:column}
         <div id="map"></div>
       </div>
       <div class="card">
-        <h3>Vehicle Status <a class="view" href="vehicles.html">View all</a></h3>
+        <h3>Vehicle Status <a class="view" href="vehicles.html">See all</a></h3>
         <div id="vlist"></div>
       </div>
     </div>
 
     <div class="row bottom">
       <div class="card">
-        <h3>Trip Lifecycle <a class="view" href="trips.html">View all</a></h3>
+        <h3>Trip Lifecycle <a class="view" href="trips.html">See all</a></h3>
         <div id="activity"><div class="pad muted small" style="padding:10px 16px">No trip events yet — waiting for departures & stops…</div></div>
       </div>
       <div class="card">
@@ -234,13 +234,13 @@ main{flex:1;min-width:0;display:flex;flex-direction:column}
           <path id="fuelPath" fill="none" stroke="#2563eb" stroke-width="2"/></svg></div>
       </div>
       <div class="card">
-        <h3>Maintenance & Alerts <a class="view" href="alerts.html">View all</a></h3>
+        <h3>Maintenance & Alerts <a class="view" href="alerts.html">See all</a></h3>
         <div id="alerts"></div>
       </div>
     </div>
 
     <div class="card">
-      <h3>Driver Activity <a class="view" href="drivers.html">View all</a></h3>
+      <h3>Driver Activity <a class="view" href="drivers.html">See all</a></h3>
       <div class="act">
         <div class="donut" id="aDonut" style="--p:0">
           <div><div><div class="n" id="aPct">–</div><div class="l">Active</div></div></div>
@@ -513,7 +513,7 @@ document.addEventListener('click',e=>{if(!bellMenu.parentElement.contains(e.targ
 function renderBell(){
   const list=(latestAlerts||[]).slice(0,8);
   bellMenu.innerHTML=`<div style="padding:10px 12px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center">
-      <b>Notifications</b><a href="alerts.html" style="font-size:11.5px;color:var(--blue);text-decoration:none">View all</a></div>`
+      <b>Notifications</b><a href="alerts.html" style="font-size:11.5px;color:var(--blue);text-decoration:none">See all</a></div>`
     +(list.length?list.map(a=>`<a href="alerts.html" style="display:block;padding:8px 12px;font-size:12.5px;color:var(--text);text-decoration:none;border-bottom:1px solid var(--line)">
         <span class="sev ${esc(a.severity)}">${esc(a.severity)}</span> ${esc(a.message)}
         <div class="muted small" style="margin-top:2px">${fmtPlate(esc(a.vehicle_id))} · ${new Date(a.ts).toLocaleTimeString()}</div></a>`).join('')

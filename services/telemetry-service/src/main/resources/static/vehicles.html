@@ -147,13 +147,20 @@ tr.sel td{background:#eff6ff}
     .cols{grid-template-columns:1fr}
   }
 
-  .vbell-menu{position:absolute;top:calc(100% + 6px);right:0;background:#fff;border:1px solid var(--line);
-    border-radius:12px;box-shadow:0 12px 32px rgba(2,6,23,.18);min-width:300px;z-index:1500;display:none}
+      .vbell-menu{position:absolute;top:calc(100% + 6px);right:0;background:#fff;border:1px solid var(--line);
+    border-radius:12px;box-shadow:0 12px 32px rgba(2,6,23,.18);min-width:310px;z-index:1500;display:none}
   .vbell-menu.open{display:block}
   .vbell-head{padding:10px 12px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
-  .vbell-item{display:block;padding:8px 12px;font-size:12.5px;color:var(--text);text-decoration:none;border-bottom:1px solid var(--line)}
+  .vbell-item{display:block;padding:9px 12px;font-size:12.5px;color:#1e293b;text-decoration:none;border-bottom:1px solid var(--line)}
   .vbell-item:hover{background:#f8fafc}
-  .vbell-item .m{margin-top:2px;color:var(--muted);font-size:11px}
+  .vbell-item .vm{margin-top:3px;color:#64748b;font-size:11px}
+  .vchip{display:inline-block;font-size:9.5px;font-weight:700;padding:1px 7px;border-radius:99px;margin-right:5px;vertical-align:1px}
+  .vchip.CRITICAL{background:#fee2e2;color:#991b1b}
+  .vchip.WARNING{background:#fef3c7;color:#92400e}
+  .vchip.INFO{background:#dbeafe;color:#1e40af}
+  .vbell-empty{padding:14px 12px;color:#64748b;font-size:12.5px}
+  .vbell-foot{display:block;padding:10px 12px;text-align:center;font-size:12px;font-weight:600;
+    color:#2563eb;text-decoration:none;background:#fafbfe}
 </style>
 </head>
 <body>
@@ -182,7 +189,7 @@ tr.sel td{background:#eff6ff}
     <div class="gsearch">🔍<input id="gq" placeholder="Search vehicles, registration no, or driver..."/></div>
     <span style="flex:1"></span>
     <div style="position:relative">
-      <div style="position:relative" id="bellWrap"><div id="bell" title="Notifications">🔔<span id="bellBadge" class="badge">0</span></div>
+      <div style="position:relative" id="bellWrap"><div id="bell" class="bell" title="Notifications">🔔<span id="bellBadge" class="badge">0</span></div>
 <div class="vbell-menu" id="bellMenu"></div></div>
     </div>
     <button class="fbtn" onclick="document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()">⛶</button>
@@ -857,32 +864,32 @@ function closeAdd(){ $("addModal").classList.remove("open"); }
   }catch(e){ msg.style.color='var(--red)'; msg.textContent='❌ Network error'; }
 };
 
-/* ================= notifications bell (vehicles page) ================= */
+
+
+/* ================= notifications bell (vehicles page) — v2 ================= */
 window.__vAlerts = window.__vAlerts || [];
-const _vb=$("bell"), _vbm=$("bellMenu");
+const _vb=document.getElementById("bell"), _vbm=document.getElementById("bellMenu");
 _vb.addEventListener("click",e=>{ e.stopPropagation(); renderVbell(); _vbm.classList.toggle("open"); });
 document.addEventListener("click",e=>{ if(_vbm && !_vbm.parentElement.contains(e.target)) _vbm.classList.remove("open"); });
+async function refreshVbell(){
+  try{
+    const r=await fetch('/api/v1/alerts/recent?limit=30');
+    window.__vAlerts = r.ok ? await r.json() : [];
+  }catch(e){ /* keep last known */ }
+}
 function renderVbell(){
   const list=(window.__vAlerts||[]).slice(0,8);
   _vbm.innerHTML=
-    '<div class="vbell-head"><b>Notifications</b>'+
-    '<a href="alerts.html" style="font-size:11.5px;color:var(--blue);text-decoration:none">View all</a></div>'+
+    '<div class="vbell-head"><b>Notifications</b></div>'+
     (list.length? list.map(a=>
       '<a class="vbell-item" href="alerts.html">'+
-      '<span class="sev '+esc(a.severity)+'">'+esc(a.severity)+'</span> '+esc(a.message)+
-      '<div class="m">'+fmtPlate(esc(a.vehicle_id))+' · '+new Date(a.ts).toLocaleTimeString()+'</div></a>').join('')
-    : '<div class="pad muted small">No alerts yet.</div>');
+      '<span class="vchip '+esc(a.severity)+'">'+esc(a.severity)+'</span>'+esc(a.message)+
+      '<div class="vm">'+fmtPlate(esc(a.vehicle_id))+' · '+new Date(a.ts).toLocaleTimeString()+'</div></a>').join('')+
+    '<a class="vbell-foot" href="alerts.html">See all</a>'
+    : '<div class="vbell-empty">No alerts in the latest window.</div>'+
+    '<a class="vbell-foot" href="alerts.html">See all</a>');
 }
-/* feed from the existing poll: patch load() by wrapping it */
-const _loadVehiclesPage=load;
-load=async function(){
-  const r=await _loadVehiclesPage.apply(this,arguments);
-  try{
-    const al=await fetch('/api/v1/alerts/recent?limit=30').then(x=>x.ok?x.json():[]);
-    window.__vAlerts=al;
-  }catch(e){}
-  return r;
-};
+refreshVbell(); setInterval(refreshVbell, 5000);
 </script>
 </body>
 </html>
