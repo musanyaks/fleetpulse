@@ -25,4 +25,15 @@ public class VehicleEntity {
 
     @Column(name = "registered_at", nullable = false)
     private Instant registeredAt;
+
+    private Integer year;
+    private String vin;
+    @Column(name = "last_service")
+    private String lastService;
+    @Column(name = "next_service")
+    private String nextService;
+    @Column(name = "insurance_expiry")
+    private String insuranceExpiry;
+    @Column(name = "inspection_expiry")
+    private String inspectionExpiry;
 }

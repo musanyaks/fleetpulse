@@ -19,5 +19,6 @@ public record TelemetryMessage(
         @Size(max = 40) String model,
         @Size(max = 24) String driverId,
         @Size(max = 60) String driverName,
-        @Size(max = 24) String routeId
+        @Size(max = 24) String routeId,
+        @DecimalMin("0.0") @DecimalMax("30.0") Double batteryVoltage
 ) {}

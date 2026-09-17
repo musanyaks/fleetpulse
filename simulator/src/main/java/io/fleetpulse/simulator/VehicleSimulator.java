@@ -115,6 +115,7 @@ public final class VehicleSimulator {
         json.put("driverId", driverId);
         json.put("driverName", driverName);
         json.put("routeId", route.id());
+        json.put("batteryVoltage", round((speed > 0 ? 26.8 : 24.3) + rnd.nextDouble() * 0.6, 1));
 
         MqttMessage message = new MqttMessage(mapper.writeValueAsBytes(json));
         message.setQos(0);

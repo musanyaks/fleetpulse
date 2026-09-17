@@ -7,12 +7,14 @@ import java.time.Instant;
 public record LiveVehicleState(
         String vehicleId, double latitude, double longitude, double speedKph,
         Double engineTempC, Double fuelLevelPct, String status, Instant lastSeen,
-        String make, String model, String driverId, String driverName, String routeId) {
+        String make, String model, String driverId, String driverName, String routeId,
+        Double rpm, Double batteryVoltage) {
 
     public static LiveVehicleState from(TelemetryMessage m) {
         return new LiveVehicleState(m.vehicleId(), m.latitude(), m.longitude(), m.speedKph(),
                 m.engineTempC(), m.fuelLevelPct(),
                 m.speedKph() < 1 ? "IDLE" : "MOVING", m.timestamp(),
-                m.make(), m.model(), m.driverId(), m.driverName(), m.routeId());
+                m.make(), m.model(), m.driverId(), m.driverName(), m.routeId(),
+                m.rpm(), m.batteryVoltage());
     }
 }
