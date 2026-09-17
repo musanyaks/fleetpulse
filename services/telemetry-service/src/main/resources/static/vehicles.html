@@ -86,7 +86,10 @@ tr.sel td{background:#eff6ff}
 .prow .k{color:var(--muted)}
 .pbar{width:80px;height:6px;border-radius:99px;background:#eef2f9;overflow:hidden;display:inline-block;vertical-align:middle}
 .pbar i{display:block;height:100%;border-radius:99px}
-#miniMap{height:165px;min-height:165px;border-radius:10px;overflow:hidden;margin:10px 0;position:relative;z-index:1}
+.tmarker{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;border:2.5px solid #fff;box-shadow:0 2px 8px rgba(2,6,23,.35)}
+  .tmarker svg{display:block}
+  .citylabel{background:transparent;border:none;box-shadow:none;padding:0;font-weight:700;font-size:12px;color:#334155;text-shadow:0 0 3px #fff,0 0 3px #fff}
+  #miniMap{height:165px;min-height:165px;border-radius:10px;overflow:hidden;margin:10px 0;position:relative;z-index:1}
 #bigMap{height:280px;min-height:280px;border-radius:10px;overflow:hidden;position:relative;z-index:1}
 .maint{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;margin-top:8px;font-size:12.3px}
 .note{background:#fffbeb;border:1px solid #fde68a;color:#92400e;border-radius:10px;padding:8px 10px;font-size:11.5px;margin-top:10px}
@@ -224,6 +227,14 @@ const CITIES=[["Nairobi",-1.286,36.817],["Thika",-1.039,37.090],["Limuru",-1.112
 function nearestCity(lat,lon){let b="En route",bd=Infinity;
   for(const[n,la,lo]of CITIES){const d=(la-lat)**2+(lo-lon)**2;if(d<bd){bd=d;b=n;}}return b;}
 const routeLabels={"NBO-MSA":"Nairobi → Mombasa","NBO-KSM":"Nairobi → Kisumu","NBO-ELD":"Nairobi → Eldoret","NBO-NKR":"Nairobi → Nakuru","NBO-GSA":"Nairobi → Garissa"};
+/* ================= truck badge marker for panel maps ================= */
+const BADGE_TRUCK='<svg viewBox="0 0 24 24" width="15" height="15"><rect x="1.5" y="6.5" width="11" height="8" rx="1" fill="#fff"/><path d="M12.5 8.5h4.4c.5 0 .96.25 1.24.66L20.5 12.5V15h-8V8.5Z" fill="#dbeafe"/><circle cx="5.8" cy="16.6" r="1.9" fill="#fff"/><circle cx="16.4" cy="16.6" r="1.9" fill="#fff"/></svg>';
+function truckBadgeIcon(status){
+  const c=(status==='Moving'||status==='MOVING')?'#10b981':'#3b82f6';
+  return L.divIcon({className:'',html:'<div class="tmarker" style="background:'+c+'">'+BADGE_TRUCK+'</div>',
+    iconSize:[30,30],iconAnchor:[15,15],tooltipAnchor:[0,-16]});
+}
+
 
 /* ================= state ================= */
 let vehicles=[],live=new Map(),alertsByVehicle=new Map(),yday=null;
@@ -238,9 +249,9 @@ function healthOf(id){const a=alertsByVehicle.get(id)||{oh:0,lf:0,crit:0};
   return Math.max(40,100-a.oh*8-a.lf*4-a.crit*5);}
 function hring(h){const c=h>=80?'var(--green)':h>=60?'var(--amber)':'var(--red)';
   return `<span class="hring" style="--p:${h};--c:${c}"><div>${h}</div></span>`;}
-function statusOf(id){const L=live.get(id);if(!L)return 'Offline';
+function statusOf(id){const Lv=live.get(id);if(!L)return 'Offline';
   if((alertsByVehicle.get(id)||{oh:0}).oh>=2)return 'Maintenance';
-  return L.status==='MOVING'?'Moving':'Idle';}
+  return Lv.status==='MOVING'?'Moving':'Idle';}
 
 /* ---------- session chip ---------- */
 (async()=>{try{
@@ -307,6 +318,8 @@ async function load(){
         if(Lv.latitude!=null){
           window._bigMap.setView([Lv.latitude,Lv.longitude],12);
           window._bigMarker.setLatLng([Lv.latitude,Lv.longitude]);
+        window._bigMarker.setIcon(truckBadgeIcon(Lv.status));
+        window._bigMarker.setTooltipContent(fmt(Lv.speedKph)+' km/h');
           const cl=$('coordLine'); if(cl)cl.textContent=Lv.latitude.toFixed(5)+', '+Lv.longitude.toFixed(5);
         }
       }
@@ -320,15 +333,15 @@ async function load(){
 function render(){
   const q=$('q').value.toUpperCase(),ft=$('fType').value,fs=$('fStatus').value,fd=$('fDriver').value;
   filtered=vehicles.filter(v=>{
-    const L=live.get(v.vehicleId)||{},st=statusOf(v.vehicleId),ty=vClass(v.make,v.model);
-    const hay=(v.vehicleId+' '+(v.make||'')+' '+(v.model||'')+' '+(L.driverName||'')).toUpperCase();
-    return(!q||hay.includes(q))&&(!ft||ty===ft)&&(!fs||st===fs)&&(!fd||L.driverName===fd);});
+    const Lv=live.get(v.vehicleId)||{},st=statusOf(v.vehicleId),ty=vClass(v.make,v.model);
+    const hay=(v.vehicleId+' '+(v.make||'')+' '+(v.model||'')+' '+(Lv.driverName||'')).toUpperCase();
+    return(!q||hay.includes(q))&&(!ft||ty===ft)&&(!fs||st===fs)&&(!fd||Lv.driverName===fd);});
   const pages=Math.max(1,Math.ceil(filtered.length/pageSize));
   if(page>=pages)page=pages-1;
   const slice=filtered.slice(page*pageSize,page*pageSize+pageSize);
   $('rows').innerHTML=slice.map(v=>{
-    const L=live.get(v.vehicleId)||{},st=statusOf(v.vehicleId),ty=vClass(v.make,v.model);
-    const f=L.fuelLevelPct,h=healthOf(v.vehicleId),drv=L.driverName;
+    const Lv=live.get(v.vehicleId)||{},st=statusOf(v.vehicleId),ty=vClass(v.make,v.model);
+    const f=Lv.fuelLevelPct,h=healthOf(v.vehicleId),drv=Lv.driverName;
     return `<tr class="${selection.has(v.vehicleId)?'sel':''}" onclick="selectVehicle('${esc(v.vehicleId)}')">
       <td onclick="event.stopPropagation()"><input type="checkbox" ${selection.has(v.vehicleId)?'checked':''} onchange="toggleOne('${esc(v.vehicleId)}',this.checked)"/></td>
       <td><span class="reg"><span class="thumb">${vThumb(v)}</span><span class="plate">${fmtPlate(v.vehicleId)}</span></span></td>
@@ -336,7 +349,7 @@ function render(){
       <td class="muted">${esc(v.make||'—')} ${esc(v.model||'')}</td>
       <td>${drv?`<span class="avatar">${esc(initials(drv))}</span>${esc(drv)}`:'<span class="muted">—</span>'}</td>
       <td><span class="schip ${st}">${st}</span></td>
-      <td>${st==='Moving'||st==='Idle'?fmt(L.speedKph)+' km/h':'–'}</td>
+      <td>${st==='Moving'||st==='Idle'?fmt(Lv.speedKph)+' km/h':'–'}</td>
       <td>${fbar(f)}</td><td>${hring(h)}</td>
       <td class="act" onclick="event.stopPropagation()">
         <button onclick="selectVehicle('${esc(v.vehicleId)}')">👁</button>
@@ -362,8 +375,8 @@ function exportSelected(){
   const ids=selection.size?[...selection]:filtered.map(v=>v.vehicleId);
   const csv=['plate,type,make_model,driver,status,speed_kph,fuel_pct,health',
     ...ids.map(id=>{const v=vehicles.find(x=>x.vehicleId===id),L=live.get(id)||{};
-      return [fmtPlate(id),vClass(v.make,v.model),`${v.make??''} ${v.model??''}`,L.driverName||'',
-        statusOf(id),L.speedKph??'',L.fuelLevelPct!=null?L.fuelLevelPct.toFixed(0):'',healthOf(id)]
+      return [fmtPlate(id),vClass(v.make,v.model),`${v.make??''} ${v.model??''}`,Lv.driverName||'',
+        statusOf(id),Lv.speedKph??'',Lv.fuelLevelPct!=null?Lv.fuelLevelPct.toFixed(0):'',healthOf(id)]
         .map(x=>`"${x}"`).join(',');})].join('\n');
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
   a.download='fleetpulse-vehicles.csv';a.click();toast('Exported '+ids.length+' vehicles',true);}
@@ -386,7 +399,7 @@ function renderPanel(){
   if(!selected)return;
   $('cols').classList.remove('full');$('panel').style.display='';
   const v=vehicles.find(x=>x.vehicleId===selected);if(!v)return;
-  const L=live.get(selected)||{};
+  const Lv=live.get(selected)||{};
   const st=statusOf(selected),ty=vClass(v.make,v.model);
   $('pThumb').innerHTML=vThumb(v);
   $('pPlate').textContent=fmtPlate(selected);
@@ -398,10 +411,10 @@ function renderPanel(){
   const b=$('pBody');
   if(activeTab==='overview'){
     b.innerHTML=`
-      <div class="prow"><span class="k">📍 Current Location</span><b id="ovLoc">${nearestCity(L.latitude,L.longitude)}, Kenya</b></div>
-      <div class="prow"><span class="k">⏱ Speed</span><b id="ovSpeed">${fmt(L.speedKph)} km/h</b></div>
-      <div class="prow"><span class="k">👤 Driver</span><b id="ovDriver">${esc(L.driverName||'—')}</b></div>
-      <div class="prow"><span class="k">🕒 Last Updated</span><b id="ovUpdated">${L.lastSeen?new Date(L.lastSeen).toLocaleString():'—'}</b></div>
+      <div class="prow"><span class="k">📍 Current Location</span><b id="ovLoc">${nearestCity(Lv.latitude,Lv.longitude)}, Kenya</b></div>
+      <div class="prow"><span class="k">⏱ Speed</span><b id="ovSpeed">${fmt(Lv.speedKph)} km/h</b></div>
+      <div class="prow"><span class="k">👤 Driver</span><b id="ovDriver">${esc(Lv.driverName||'—')}</b></div>
+      <div class="prow"><span class="k">🕒 Last Updated</span><b id="ovUpdated">${Lv.lastSeen?new Date(Lv.lastSeen).toLocaleString():'—'}</b></div>
       <div id="miniMap"></div>
       <b class="small">Vehicle Details</b>
       <div class="kv" style="margin:8px 0">
@@ -410,13 +423,13 @@ function renderPanel(){
         <span class="k">Year</span><span>${v.year??'—'}</span>
         <span class="k">VIN</span><span class="small">${esc(v.vin||'—')}</span>
         <span class="k">Type</span><span>${ty}</span>
-        <span class="k">Mileage</span><span id="ovMileage">${L.odometerKm?Math.round(L.odometerKm).toLocaleString()+' km':'—'}</span>
+        <span class="k">Mileage</span><span id="ovMileage">${Lv.odometerKm?Math.round(Lv.odometerKm).toLocaleString()+' km':'—'}</span>
       </div>
       <b class="small">Live gauges</b>
       <div style="margin:8px 0">
-        <div class="prow"><span class="k">⛽ Fuel Level</span><span><span class="pbar"><i id="ovFuelBar" style="width:${(L.fuelLevelPct??0).toFixed(0)}%;background:${fuelColor(L.fuelLevelPct)}"></i></span> <span id="ovFuelVal">${fmt(L.fuelLevelPct)}%</span></span></div>
-        <div class="prow"><span class="k">🌡 Engine Temp</span><span><span class="pbar"><i id="ovTempBar" style="width:${Math.max(0,Math.min(100,(((L.engineTempC??70)-60)/60*100))).toFixed(0)}%;background:${(L.engineTempC??0)>=105?'var(--red)':'var(--blue2)'}"></i></span> <span id="ovTempVal">${fmt(L.engineTempC)}°C</span></span></div>
-        <div class="prow"><span class="k">🔋 Battery Voltage</span><span><span class="pbar"><i id="ovBattBar" style="width:${Math.min(100,(((L.batteryVoltage??0)-20)/10*100)).toFixed(0)}%;background:var(--blue2)"></i></span> <span id="ovBattVal">${fmt(L.batteryVoltage)} V</span></span></div>
+        <div class="prow"><span class="k">⛽ Fuel Level</span><span><span class="pbar"><i id="ovFuelBar" style="width:${(Lv.fuelLevelPct??0).toFixed(0)}%;background:${fuelColor(Lv.fuelLevelPct)}"></i></span> <span id="ovFuelVal">${fmt(Lv.fuelLevelPct)}%</span></span></div>
+        <div class="prow"><span class="k">🌡 Engine Temp</span><span><span class="pbar"><i id="ovTempBar" style="width:${Math.max(0,Math.min(100,(((Lv.engineTempC??70)-60)/60*100))).toFixed(0)}%;background:${(Lv.engineTempC??0)>=105?'var(--red)':'var(--blue2)'}"></i></span> <span id="ovTempVal">${fmt(Lv.engineTempC)}°C</span></span></div>
+        <div class="prow"><span class="k">🔋 Battery Voltage</span><span><span class="pbar"><i id="ovBattBar" style="width:${Math.min(100,(((Lv.batteryVoltage??0)-20)/10*100)).toFixed(0)}%;background:var(--blue2)"></i></span> <span id="ovBattVal">${fmt(Lv.batteryVoltage)} V</span></span></div>
         <div class="prow"><span class="k">❤️ Health</span><span id="ovHealth">${hring(healthOf(selected))}</span></div>
       </div>
       <b class="small">Maintenance & Insurance</b>
@@ -428,46 +441,45 @@ function renderPanel(){
       </div>`;
     setTimeout(()=>{
       if(miniMap){miniMap.remove();miniMap=null;}
-      miniMap=L.map('miniMap',{zoomControl:false,attributionControl:false}).setView([L.latitude??-1.286,L.longitude??36.817],10);
+      miniMap=L.map('miniMap',{zoomControl:false,attributionControl:false}).setView([Lv.latitude??-1.286,Lv.longitude??36.817],10);
       L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(miniMap);
-      miniMarker=L.marker([L.latitude??-1.286,L.longitude??36.817]).addTo(miniMap)
-        .bindTooltip(fmt(L.speedKph)+' km/h',{permanent:true,direction:'top',offset:[0,-8],className:'citylabel'}).openTooltip();
+      miniMarker=L.marker([Lv.latitude??-1.286,Lv.longitude??36.817],{icon:truckBadgeIcon(Lv.status)}).addTo(miniMap)
+        .bindTooltip(fmt(Lv.speedKph)+' km/h',{permanent:true,direction:'top',offset:[0,-8],className:'citylabel'}).openTooltip();
       miniMap.invalidateSize();
     },50);
   }
   else if(activeTab==='location'){
     b.innerHTML=`<div id="bigMap"></div>
-      <div class="prow" style="margin-top:10px"><span class="k">Coordinates</span><b id="coordLine">${L.latitude!=null?L.latitude.toFixed(5)+', '+L.longitude.toFixed(5):'—'}</b></div>
-      <div class="prow"><span class="k">Nearest city</span><b>${nearestCity(L.latitude,L.longitude)}</b></div>
-      <div class="prow"><span class="k">Corridor</span><b>${L.routeId&&routeLabels[L.routeId]?esc(routeLabels[L.routeId]):'—'}</b></div>
+      <div class="prow" style="margin-top:10px"><span class="k">Coordinates</span><b id="coordLine">${Lv.latitude!=null?Lv.latitude.toFixed(5)+', '+Lv.longitude.toFixed(5):'—'}</b></div>
+      <div class="prow"><span class="k">Nearest city</span><b>${nearestCity(Lv.latitude,Lv.longitude)}</b></div>
+      <div class="prow"><span class="k">Corridor</span><b>${Lv.routeId&&routeLabels[Lv.routeId]?esc(routeLabels[Lv.routeId]):'—'}</b></div>
       <div class="note">Position refreshes every 5 s while this tab is open.</div>`;
     setTimeout(()=>{
       if(window._bigMap){window._bigMap.remove();window._bigMap=null;}
-      window._bigMap=L.map('bigMap').setView([L.latitude??-1.286,L.longitude??36.817],12);
+      window._bigMap=L.map('bigMap').setView([Lv.latitude??-1.286,Lv.longitude??36.817],12);
       L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(window._bigMap);
-      window._bigMarker=L.circleMarker([L.latitude??-1.286,L.longitude??36.817],
-        {radius:9,color:'#fff',weight:2,fillColor:'#10b981',fillOpacity:.95}).addTo(window._bigMap);
+      window._bigMarker=L.marker([Lv.latitude??-1.286,Lv.longitude??36.817],{icon:truckBadgeIcon(Lv.status)}).addTo(window._bigMap);
       window._bigMap.invalidateSize();
     },50);
   }
   else if(activeTab==='telemetry'){
     b.innerHTML=`
-      <div class="prow"><span class="k">⚡ Ignition</span><b>${esc(L.status==='MOVING'?'ON':(L.status==='IDLE'?'ON (idle)':'—'))}</b></div>
-      <div class="prow"><span class="k">⏱ Speed</span><b>${fmt(L.speedKph)} km/h</b></div>
-      <div class="prow"><span class="k">🔩 RPM</span><b>${fmt(L.rpm)}</b></div>
-      <div class="prow"><span class="k">🌡 Engine Temp</span><b>${fmt(L.engineTempC)} °C</b></div>
-      <div class="prow"><span class="k">🔋 Battery Voltage</span><b>${fmt(L.batteryVoltage)} V</b></div>
-      <div class="prow"><span class="k">⛽ Fuel Level</span><b>${fmt(L.fuelLevelPct)} %</b></div>
-      <div class="prow"><span class="k">🧭 Odometer</span><b>${L.odometerKm?Math.round(L.odometerKm).toLocaleString()+' km':'—'}</b></div>
-      <div class="prow"><span class="k">📡 Last packet</span><b>${L.lastSeen?new Date(L.lastSeen).toLocaleTimeString():'—'}</b></div>`;
+      <div class="prow"><span class="k">⚡ Ignition</span><b>${esc(Lv.status==='MOVING'?'ON':(Lv.status==='IDLE'?'ON (idle)':'—'))}</b></div>
+      <div class="prow"><span class="k">⏱ Speed</span><b>${fmt(Lv.speedKph)} km/h</b></div>
+      <div class="prow"><span class="k">🔩 RPM</span><b>${fmt(Lv.rpm)}</b></div>
+      <div class="prow"><span class="k">🌡 Engine Temp</span><b>${fmt(Lv.engineTempC)} °C</b></div>
+      <div class="prow"><span class="k">🔋 Battery Voltage</span><b>${fmt(Lv.batteryVoltage)} V</b></div>
+      <div class="prow"><span class="k">⛽ Fuel Level</span><b>${fmt(Lv.fuelLevelPct)} %</b></div>
+      <div class="prow"><span class="k">🧭 Odometer</span><b>${Lv.odometerKm?Math.round(Lv.odometerKm).toLocaleString()+' km':'—'}</b></div>
+      <div class="prow"><span class="k">📡 Last packet</span><b>${Lv.lastSeen?new Date(Lv.lastSeen).toLocaleTimeString():'—'}</b></div>`;
   }
   else if(activeTab==='trips'){
-    b.innerHTML=`<div class="prow"><span class="k">🛣️ Assigned corridor</span><b>${L.routeId&&routeLabels[L.routeId]?esc(routeLabels[L.routeId]):'—'}</b></div>
+    b.innerHTML=`<div class="prow"><span class="k">🛣️ Assigned corridor</span><b>${Lv.routeId&&routeLabels[Lv.routeId]?esc(routeLabels[Lv.routeId]):'—'}</b></div>
       <div class="prow"><span class="k">Current state</span><b>${st}</b></div>
       <div class="note">Per-vehicle trip history arrives with the trips module milestone.</div>`;
   }
   else if(activeTab==='fuel'){
-    b.innerHTML=`<div class="prow"><span class="k">⛽ Current level</span><b>${L.fuelLevelPct==null?'—':L.fuelLevelPct.toFixed(1)+' %'}</b></div>
+    b.innerHTML=`<div class="prow"><span class="k">⛽ Current level</span><b>${Lv.fuelLevelPct==null?'—':Lv.fuelLevelPct.toFixed(1)+' %'}</b></div>
       <div class="note">Percent-of-tank today; km/L efficiency requires tank capacity + refill detection (fuel-service milestone).</div>`;
   }
 }
@@ -475,41 +487,43 @@ function renderPanel(){
 /* live-value updates by id — map containers are NEVER touched here */
 function updateOverviewLive(){
   const v=vehicles.find(x=>x.vehicleId===selected);if(!v)return;
-  const L=live.get(selected)||{};
+  const Lv=live.get(selected)||{};
   const st=statusOf(selected);
   $('pStatus').innerHTML=`<span class="schip ${st}">${st}</span>`;
   const set=(id,val)=>{const el=$(id);if(el)el.textContent=val;};
-  set('ovLoc',nearestCity(L.latitude,L.longitude)+', Kenya');
-  set('ovSpeed',fmt(L.speedKph)+' km/h');
-  set('ovDriver',L.driverName||'—');
-  set('ovUpdated',L.lastSeen?new Date(L.lastSeen).toLocaleString():'—');
-  set('ovMileage',L.odometerKm?Math.round(L.odometerKm).toLocaleString()+' km':'—');
-  const fb=$('ovFuelBar');if(fb){fb.style.width=(L.fuelLevelPct??0).toFixed(0)+'%';fb.style.background=fuelColor(L.fuelLevelPct);}
-  set('ovFuelVal',fmt(L.fuelLevelPct)+'%');
-  const tb=$('ovTempBar');if(tb){tb.style.width=Math.max(0,Math.min(100,(((L.engineTempC??70)-60)/60*100))).toFixed(0)+'%';tb.style.background=(L.engineTempC??0)>=105?'var(--red)':'var(--blue2)';}
-  set('ovTempVal',fmt(L.engineTempC)+'°C');
-  const bb2=$('ovBattBar');if(bb2)bb2.style.width=Math.min(100,(((L.batteryVoltage??0)-20)/10*100)).toFixed(0)+'%';
-  set('ovBattVal',fmt(L.batteryVoltage)+' V');
+  set('ovLoc',nearestCity(Lv.latitude,Lv.longitude)+', Kenya');
+  set('ovSpeed',fmt(Lv.speedKph)+' km/h');
+  set('ovDriver',Lv.driverName||'—');
+  set('ovUpdated',Lv.lastSeen?new Date(Lv.lastSeen).toLocaleString():'—');
+  set('ovMileage',Lv.odometerKm?Math.round(Lv.odometerKm).toLocaleString()+' km':'—');
+  const fb=$('ovFuelBar');if(fb){fb.style.width=(Lv.fuelLevelPct??0).toFixed(0)+'%';fb.style.background=fuelColor(Lv.fuelLevelPct);}
+  set('ovFuelVal',fmt(Lv.fuelLevelPct)+'%');
+  const tb=$('ovTempBar');if(tb){tb.style.width=Math.max(0,Math.min(100,(((Lv.engineTempC??70)-60)/60*100))).toFixed(0)+'%';tb.style.background=(Lv.engineTempC??0)>=105?'var(--red)':'var(--blue2)';}
+  set('ovTempVal',fmt(Lv.engineTempC)+'°C');
+  const bb2=$('ovBattBar');if(bb2)bb2.style.width=Math.min(100,(((Lv.batteryVoltage??0)-20)/10*100)).toFixed(0)+'%';
+  set('ovBattVal',fmt(Lv.batteryVoltage)+' V');
   const oh=$('ovHealth');if(oh)oh.innerHTML=hring(healthOf(selected));
-  if(miniMap&&L.latitude!=null){
-    miniMap.setView([L.latitude,L.longitude],10);
-    miniMarker.setLatLng([L.latitude,L.longitude]);
-    miniMarker.setTooltipContent(fmt(L.speedKph)+' km/h');
+  if(miniMap&&Lv.latitude!=null){
+    miniMap.setView([Lv.latitude,Lv.longitude],10);
+    miniMarker.setLatLng([Lv.latitude,Lv.longitude]);
+    miniMarker.setIcon(truckBadgeIcon(Lv.status));
+    miniMarker.setTooltipContent(fmt(Lv.speedKph)+' km/h');
+    miniMarker.setTooltipContent(fmt(Lv.speedKph)+' km/h');
   }
 }
 
 /* ---------- full details modal ---------- */
 function openFull(id){ if(id)selected=id;
   const v=vehicles.find(x=>x.vehicleId===selected);if(!v)return;
-  const L=live.get(selected)||{},st=statusOf(selected);
+  const Lv=live.get(selected)||{},st=statusOf(selected);
   $('fmTitle').textContent=fmtPlate(selected)+' — '+(v.make??'')+' '+(v.model??'');
   $('fmSub').textContent=`${vClass(v.make,v.model)} · ${v.year??'—'} · VIN ${v.vin||'—'} · ${st}`;
   const cell=(k,val)=>`<div class="mcell"><div class="k">${k}</div><div class="v">${val}</div></div>`;
   $('fmGrid').innerHTML=
-    cell('Speed',fmt(L.speedKph)+' km/h')+cell('RPM',fmt(L.rpm))+cell('Engine',fmt(L.engineTempC)+' °C')+
-    cell('Fuel',fmt(L.fuelLevelPct)+' %')+cell('Battery',fmt(L.batteryVoltage)+' V')+
-    cell('Mileage',L.odometerKm?Math.round(L.odometerKm).toLocaleString()+' km':'—')+
-    cell('Driver',esc(L.driverName||'—'))+cell('Location',nearestCity(L.latitude,L.longitude))+
+    cell('Speed',fmt(Lv.speedKph)+' km/h')+cell('RPM',fmt(Lv.rpm))+cell('Engine',fmt(Lv.engineTempC)+' °C')+
+    cell('Fuel',fmt(Lv.fuelLevelPct)+' %')+cell('Battery',fmt(Lv.batteryVoltage)+' V')+
+    cell('Mileage',Lv.odometerKm?Math.round(Lv.odometerKm).toLocaleString()+' km':'—')+
+    cell('Driver',esc(Lv.driverName||'—'))+cell('Location',nearestCity(Lv.latitude,Lv.longitude))+
     cell('Health score',healthOf(selected));
   $('fmMaint').innerHTML=`<b class="small">Maintenance & Insurance</b>
     <div class="maint">
@@ -532,7 +546,7 @@ function closeFull(){$('fullModal').classList.remove('open');}
  $('addBtn').onclick=()=>toast('Vehicle registration API arrives with the vehicle-service module',false);
  $('exportBtn').onclick=exportSelected;
 
-const qp=new URLSearchParams(location.search);if(qp.get("q")){$("q").value=qp.get("q");}$1
+const qp=new URLSearchParams(location.search);if(qp.get("q")){$("q").value=qp.get("q");}load(); setInterval(load, 5000);
 const autoSel=setInterval(()=>{if(vehicles.length&&!selected){selectVehicle(filtered[0]?.vehicleId||vehicles[0].vehicleId);clearInterval(autoSel);}},800);
 </script>
 </body>
