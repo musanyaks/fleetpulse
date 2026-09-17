@@ -202,6 +202,28 @@ tr.sel td{background:#eff6ff}
   <div id="fmMaint" style="margin-top:14px"></div>
   <div class="note">VIN, service and insurance records are fleet manifest data (simulated). Live values are from the telemetry pipeline.</div>
 </div></div>
+<div class="modal" id="editModal"><div class="box" style="max-width:520px">
+  <button class="x" onclick="closeEdit()">✕</button>
+  <h2 id="emTitle">Edit vehicle</h2><div class="muted small" id="emSub"></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px">
+    <div><label class="muted small">Driver name</label><input id="eDriver" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit"/></div>
+    <div><label class="muted small">Driver ID</label><input id="eDriverId" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit"/></div>
+    <div><label class="muted small">Speed limit (km/h)</label><input id="eLimit" type="number" min="20" max="200" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit"/></div>
+    <div><label class="muted small">Year</label><input id="eYear" type="number" min="1990" max="2100" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit"/></div>
+    <div style="grid-column:1/-1"><label class="muted small">VIN</label><input id="eVin" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit"/></div>
+    <div><label class="muted small">Last service</label><input id="eLast" type="date" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit"/></div>
+    <div><label class="muted small">Next service</label><input id="eNext" type="date" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit"/></div>
+    <div><label class="muted small">Insurance expiry</label><input id="eIns" type="date" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit"/></div>
+    <div><label class="muted small">Inspection expiry</label><input id="eInsp" type="date" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit"/></div>
+  </div>
+  <div class="note">Driver assignment changes the dashboard record; the simulator keeps broadcasting its own manifest until reassigned there. Plate / make / model are immutable (vehicle identity).</div>
+  <div style="display:flex;gap:10px;margin-top:14px">
+    <button class="btn" style="flex:1" id="emSave">Save changes</button>
+    <button class="btn ghost" style="flex:1" onclick="closeEdit()">Cancel</button>
+  </div>
+  <div class="muted small" id="emMsg" style="margin-top:8px;min-height:16px"></div>
+</div></div>
+
 <div id="toast"></div>
 
 <script>
@@ -217,8 +239,14 @@ const toast=(m,ok=true)=>{const t=$('toast');t.textContent=m;
 function vClass(mk,mo){const m=`${mk??''} ${mo??''}`;
   if(/Hiace|Coaster|Rosa|Matatu|Bus/i.test(m))return 'Bus';
   if(/Hilux|Ranger|H1/i.test(m))return 'Pickup';return 'Truck';}
+function photoClass(mk,mo){const m=`${mk??''} ${mo??''}`;   /* photo file class: heavy/medium/light/bus */
+  if(/Hiace|Coaster|Rosa|Matatu|Bus/i.test(m))return 'bus';
+  if(/Canter|Dyna|ELF|Hino 300|NPR|NQR|Kuzer/i.test(m))return 'light';
+  if(/FRR|FVR|Fighter|Hino 500|Croner|P280|FTS/i.test(m))return 'medium';
+  return 'heavy';}
+
 const TRUCK_SVG='<svg viewBox="0 0 24 24" width="22" height="22"><rect x="2" y="7" width="11" height="8" rx="1" fill="#3b82f6"/><path d="M13 9h4.2c.5 0 .96.25 1.24.66L20.5 12.5V15H13V9Z" fill="#60a5fa"/><circle cx="6" cy="16.8" r="1.8" fill="#1e293b"/><circle cx="16.5" cy="16.8" r="1.8" fill="#1e293b"/></svg>';
-function vThumb(v){const c=vClass(v.make,v.model);
+function vThumb(v){const c=photoClass(v.make,v.model);
   return '<img src="img/'+encodeURIComponent(v.vehicleId)+'.jpg" data-cls="'+c+'" alt="" onerror="window.__thumbErr(this)">';}
 window.__thumbErr=function(img){if(!img.dataset.step){img.dataset.step='2';img.src='img/'+img.dataset.cls+'.jpg';}
   else{const s=document.createElement('span');s.style.display='grid';s.style.placeItems='center';s.innerHTML=TRUCK_SVG;img.replaceWith(s);}};
@@ -227,6 +255,15 @@ const CITIES=[["Nairobi",-1.286,36.817],["Thika",-1.039,37.090],["Limuru",-1.112
 function nearestCity(lat,lon){let b="En route",bd=Infinity;
   for(const[n,la,lo]of CITIES){const d=(la-lat)**2+(lo-lon)**2;if(d<bd){bd=d;b=n;}}return b;}
 const routeLabels={"NBO-MSA":"Nairobi → Mombasa","NBO-KSM":"Nairobi → Kisumu","NBO-ELD":"Nairobi → Eldoret","NBO-NKR":"Nairobi → Nakuru","NBO-GSA":"Nairobi → Garissa"};
+const ROUTE_CATALOG={
+ "NBO-MSA":[[-1.286,36.817],[-1.370,36.902],[-1.450,36.966],[-1.497,37.050],[-1.582,37.235],[-1.617,37.455],[-1.900,37.550],[-2.007,37.628],[-2.414,38.019],[-2.911,38.300],[-3.396,38.556],[-3.530,38.750],[-3.865,39.470],[-4.043,39.668]],
+ "NBO-KSM":[[-1.286,36.817],[-1.112,36.640],[-0.717,36.433],[-0.303,36.080],[-0.280,35.700],[-0.367,35.283],[-0.250,35.100],[-0.091,34.768]],
+ "NBO-ELD":[[-1.286,36.817],[-1.112,36.640],[-0.717,36.433],[-0.303,36.080],[-0.100,35.550],[0.150,35.420],[0.350,35.300],[0.514,35.270]],
+ "NBO-NKR":[[-1.286,36.817],[-1.112,36.640],[-0.900,36.550],[-0.717,36.433],[-0.520,36.320],[-0.303,36.080]],
+ "NBO-GSA":[[-1.286,36.817],[-1.233,37.100],[-1.000,37.500],[-0.700,38.300],[-0.453,39.646]]};
+const trails=new Map();
+function trailOf(id){let t=trails.get(id);if(!t){t=[];trails.set(id,t);}return t;}
+
 /* ================= truck badge marker for panel maps ================= */
 const BADGE_TRUCK='<svg viewBox="0 0 24 24" width="15" height="15"><rect x="1.5" y="6.5" width="11" height="8" rx="1" fill="#fff"/><path d="M12.5 8.5h4.4c.5 0 .96.25 1.24.66L20.5 12.5V15h-8V8.5Z" fill="#dbeafe"/><circle cx="5.8" cy="16.6" r="1.9" fill="#fff"/><circle cx="16.4" cy="16.6" r="1.9" fill="#fff"/></svg>';
 function truckBadgeIcon(status){
@@ -273,6 +310,9 @@ async function load(){
       api('/api/v1/vehicles/live'),
       api('/api/v1/alerts/recent?limit=500')]);
     vehicles=vp; live=new Map(lv.map(v=>[v.vehicleId,v]));
+    lv.forEach(v=>{const t=trailOf(v.vehicleId);const ll=[v.latitude,v.longitude];
+      const last=t[t.length-1];
+      if(!last||last[0]!==ll[0]||last[1]!==ll[1]){t.push(ll);if(t.length>150)t.shift();}});
     const dayAgo=Date.now()-864e5; alertsByVehicle=new Map();
     al.forEach(a=>{ if(new Date(a.ts).getTime()<dayAgo)return;
       const e=alertsByVehicle.get(a.vehicle_id)||{oh:0,lf:0,crit:0};
@@ -320,6 +360,7 @@ async function load(){
           window._bigMarker.setLatLng([Lv.latitude,Lv.longitude]);
         window._bigMarker.setIcon(truckBadgeIcon(Lv.status));
         window._bigMarker.setTooltipContent(fmt(Lv.speedKph)+' km/h');
+        if(window._bigTrail)window._bigTrail.setLatLngs(trailOf(selected));
           const cl=$('coordLine'); if(cl)cl.textContent=Lv.latitude.toFixed(5)+', '+Lv.longitude.toFixed(5);
         }
       }
@@ -353,7 +394,7 @@ function render(){
       <td>${fbar(f)}</td><td>${hring(h)}</td>
       <td class="act" onclick="event.stopPropagation()">
         <button onclick="selectVehicle('${esc(v.vehicleId)}')">👁</button>
-        <button onclick="toast('Editing arrives with vehicle-service',false)">✏️</button>
+        <button onclick="openEdit('&quot;onclick="toast('Editing arrives with vehicle-service',false)"quot;')">✏️</button>
         <button onclick="openFull('${esc(v.vehicleId)}')">⋯</button></td></tr>`;
   }).join('')||'<tr><td colspan="10" class="muted">No vehicles match the filters.</td></tr>';
   let pb='';for(let i=0;i<pages;i++)pb+=`<button class="${i===page?'on':''}" onclick="page=${i};render()">${i+1}</button>`;
@@ -440,11 +481,17 @@ function renderPanel(){
         <div><span class="muted">Inspection Expiry</span><br/><b>${esc(v.inspectionExpiry||'—')}</b></div>
       </div>`;
     setTimeout(()=>{
-      if(miniMap){miniMap.remove();miniMap=null;}
+      if(miniMap){miniMap.remove();miniMap=null;window._miniTrail=null;}
       miniMap=L.map('miniMap',{zoomControl:false,attributionControl:false}).setView([Lv.latitude??-1.286,Lv.longitude??36.817],10);
       L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(miniMap);
       miniMarker=L.marker([Lv.latitude??-1.286,Lv.longitude??36.817],{icon:truckBadgeIcon(Lv.status)}).addTo(miniMap)
         .bindTooltip(fmt(Lv.speedKph)+' km/h',{permanent:true,direction:'top',offset:[0,-8],className:'citylabel'}).openTooltip();
+      if(Lv.routeId&&ROUTE_CATALOG[Lv.routeId]){
+        L.polyline(ROUTE_CATALOG[Lv.routeId],{color:'#93c5fd',weight:5,opacity:.55}).addTo(miniMap);
+      }
+      const tr0=trailOf(selected);
+      window._miniTrail=(tr0.length>1)?L.polyline(tr0,{color:'#2563eb',weight:3.5,opacity:.85}).addTo(miniMap):null;
+      if(tr0.length>1)miniMap.fitBounds(L.latLngBounds(tr0).pad(0.35));
       miniMap.invalidateSize();
     },50);
   }
@@ -455,10 +502,16 @@ function renderPanel(){
       <div class="prow"><span class="k">Corridor</span><b>${Lv.routeId&&routeLabels[Lv.routeId]?esc(routeLabels[Lv.routeId]):'—'}</b></div>
       <div class="note">Position refreshes every 5 s while this tab is open.</div>`;
     setTimeout(()=>{
-      if(window._bigMap){window._bigMap.remove();window._bigMap=null;}
+      if(window._bigMap){window._bigMap.remove();window._bigMap=null;window._bigTrail=null;}
       window._bigMap=L.map('bigMap').setView([Lv.latitude??-1.286,Lv.longitude??36.817],12);
       L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(window._bigMap);
       window._bigMarker=L.marker([Lv.latitude??-1.286,Lv.longitude??36.817],{icon:truckBadgeIcon(Lv.status)}).addTo(window._bigMap);
+      if(Lv.routeId&&ROUTE_CATALOG[Lv.routeId]){
+        L.polyline(ROUTE_CATALOG[Lv.routeId],{color:'#93c5fd',weight:5,opacity:.55}).addTo(window._bigMap);
+      }
+      const tr1=trailOf(selected);
+      window._bigTrail=(tr1.length>1)?L.polyline(tr1,{color:'#2563eb',weight:3.5,opacity:.85}).addTo(window._bigMap):null;
+      if(tr1.length>1)window._bigMap.fitBounds(L.latLngBounds(tr1).pad(0.25));
       window._bigMap.invalidateSize();
     },50);
   }
@@ -508,6 +561,7 @@ function updateOverviewLive(){
     miniMarker.setLatLng([Lv.latitude,Lv.longitude]);
     miniMarker.setIcon(truckBadgeIcon(Lv.status));
     miniMarker.setTooltipContent(fmt(Lv.speedKph)+' km/h');
+    if(window._miniTrail)window._miniTrail.setLatLngs(trailOf(selected));
     miniMarker.setTooltipContent(fmt(Lv.speedKph)+' km/h');
   }
 }
@@ -548,6 +602,54 @@ function closeFull(){$('fullModal').classList.remove('open');}
 
 const qp=new URLSearchParams(location.search);if(qp.get("q")){$("q").value=qp.get("q");}load(); setInterval(load, 5000);
 const autoSel=setInterval(()=>{if(vehicles.length&&!selected){selectVehicle(filtered[0]?.vehicleId||vehicles[0].vehicleId);clearInterval(autoSel);}},800);
+
+/* ================= vehicle edit ================= */
+let editId=null, canWrite=false;
+(async()=>{try{
+  const r=await fetch('/api/v1/me',{headers:{'Accept':'application/json'}});
+  const ct=r.headers.get('content-type')||'';
+  if(r.ok&&ct.includes('application/json')){
+    const me=await r.json();
+    canWrite=me.roles.includes('ADMIN')||me.roles.includes('FLEET_MANAGER');
+  }
+}catch(e){}
+  document.querySelectorAll('#rows button[title="Edit"]').forEach(b=>{
+    b.style.opacity=canWrite?'1':'.35';b.title=canWrite?'Edit vehicle':'Read-only for your role';});})();
+function openEdit(id){
+  if(!canWrite){toast('Read-only for your role — ADMIN or FLEET_MANAGER required',false);return;}
+  editId=id;
+  const v=vehicles.find(x=>x.vehicleId===id);if(!v)return;
+  const L=live.get(id)||{};
+  $('emTitle').textContent='Edit '+fmtPlate(id);
+  $('emSub').textContent=(v.make??'')+' '+(v.model??'')+' — identity fields are immutable';
+  $('eDriver').value=L.driverName??'';$('eDriverId').value=L.driverId??'';
+  $('eLimit').value=v.speedLimitKph;$('eYear').value=v.year??'';
+  $('eVin').value=v.vin??'';$('eLast').value=v.lastService??'';
+  $('eNext').value=v.nextService??'';$('eIns').value=v.insuranceExpiry??'';
+  $('eInsp').value=v.inspectionExpiry??'';
+  $('emMsg').textContent='';$('editModal').classList.add('open');}
+function closeEdit(){$('editModal').classList.remove('open');}
+ $('editModal').onclick=e=>{if(e.target===$('editModal'))closeEdit();};
+ $('emSave').onclick=async()=>{
+  const body={};
+  const dn=$('eDriver').value.trim(),di=$('eDriverId').value.trim();
+  if(dn||di){body.driverName=dn;body.driverId=di;}
+  body.speedLimitKph=parseFloat($('eLimit').value);
+  if($('eYear').value)body.year=parseInt($('eYear').value);
+  body.vin=$('eVin').value.trim()||null;
+  for(const[id2,k]of[['eLast','lastService'],['eNext','nextService'],['eIns','insuranceExpiry'],['eInsp','inspectionExpiry']])
+    body[k]=$(id2).value||null;
+  try{
+    const r=await fetch('/api/v1/vehicles/'+editId,{method:'PUT',
+      headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    if(r.ok){const u=await r.json();
+      const i=vehicles.findIndex(x=>x.vehicleId===editId);if(i>=0)vehicles[i]=u;
+      toast('✅ '+fmtPlate(editId)+' updated',true);closeEdit();render();if(selected===editId)renderPanel(true);}
+    else if(r.status===403)toast('⛔ Server denied — ADMIN or FLEET_MANAGER required',false);
+    else if(r.status===400){const t=await r.text();toast('❌ '+t.slice(0,120),false);}
+    else toast('❌ Failed ('+r.status+')',false);
+  }catch(e){toast('❌ Network error',false);}
+};
 </script>
 </body>
 </html>
