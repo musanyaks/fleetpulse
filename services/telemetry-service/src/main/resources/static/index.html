@@ -421,7 +421,7 @@ function renderLive(list, offlineCount){
     if(prevStatus.get(v.vehicleId)==='MOVING' && v.status==='IDLE'){ addTrip('stop', v); } addWaypoint(ll);
     prevStatus.set(v.vehicleId, v.status);
 
-    let tr=trails.get(v.vehicleId)||[]; tr.push(ll); if(tr.length>40)tr.shift(); trails.set(v.vehicleId,tr);
+    let tr=trails.get(v.vehicleId)||[]; tr.push(ll); if(tr.length>120)tr.shift(); trails.set(v.vehicleId,tr);
 
     let m=markers.get(v.vehicleId);
     if(!m){

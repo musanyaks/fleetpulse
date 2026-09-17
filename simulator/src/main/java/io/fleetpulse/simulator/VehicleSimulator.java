@@ -9,44 +9,50 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Random;
 
+/**
+ * Vehicle driving along a Route corridor: position = interpolation over the
+ * waypoint list, advanced by distance each tick. Speed behaviour (cruising,
+ * red-light stops, speeding bursts, overheating) unchanged. Reaches the end
+ * of the corridor and drives back (ping-pong).
+ */
 public final class VehicleSimulator {
 
     private static final double TICK_SECONDS = 2.0;
-    private static final double KM_PER_DEG_LAT = 111.32;
 
     private final String vehicleId;
     private final String make;
     private final String model;
     private final String driverId;
     private final String driverName;
+    private final Route route;
     private final SimulatorProperties props;
     private final MqttAsyncClient client;
     private final Random rnd;
     private final ObjectMapper mapper = new ObjectMapper();
 
-    private double lat, lon, heading;
-    private double speed;         // km/h
-    private double engineTemp;    // °C
-    private double fuelLevel;     // %
-    private double odometer;      // km
+    private double speed = 0;          // km/h
+    private double engineTemp;
+    private double fuelLevel;
+    private double odometer;
+    private double distanceKm;         // position along the corridor
     private int speedingTicks;
     private int overheatTicks;
+    private boolean warmedUp = false;
 
     public VehicleSimulator(String vehicleId, String make, String model,
-                            String driverId, String driverName,
+                            String driverId, String driverName, Route route,
                             SimulatorProperties props, MqttAsyncClient client, Random rnd) {
         this.vehicleId = vehicleId;
         this.make = make;
         this.model = model;
         this.driverId = driverId;
         this.driverName = driverName;
+        this.route = route;
         this.props = props;
         this.client = client;
         this.rnd = rnd;
-        this.lat = props.baseLat() + (rnd.nextDouble() - 0.5) * 0.8;
-        this.lon = props.baseLon() + (rnd.nextDouble() - 0.5) * 0.8;
-        this.heading = rnd.nextDouble() * 360;
-        this.speed = 40 + rnd.nextDouble() * 40;
+        // start at a random point along the corridor, mid-route
+        this.distanceKm = rnd.nextDouble() * route.totalKm();
         this.engineTemp = 82 + rnd.nextDouble() * 8;
         this.fuelLevel = 35 + rnd.nextDouble() * 60;
         this.odometer = 10_000 + rnd.nextDouble() * 150_000;
@@ -56,7 +62,7 @@ public final class VehicleSimulator {
         try {
             stepBehaviour();
             double km = speed * TICK_SECONDS / 3600.0;
-            advancePosition(km);
+            advanceAlongRoute(km);
             fuelLevel = Math.max(0, fuelLevel - km * 0.09 * (1 + speed / 200));
             odometer += km;
             publish();
@@ -66,6 +72,11 @@ public final class VehicleSimulator {
     }
 
     private void stepBehaviour() {
+        if (!warmedUp) {                       // first tick: start moving from cruise speed
+            speed = 45 + rnd.nextDouble() * 45;
+            warmedUp = true;
+            return;
+        }
         if (speedingTicks == 0 && rnd.nextDouble() < 0.02) speedingTicks = 3 + rnd.nextInt(6);
         double target = speedingTicks > 0 ? 115 + rnd.nextDouble() * 45 : 45 + rnd.nextDouble() * 50;
         speed += Math.max(-12, Math.min(12, target - speed));
@@ -79,20 +90,20 @@ public final class VehicleSimulator {
         if (overheatTicks > 0) { engineTemp += 1.4; overheatTicks--; }
     }
 
-    private void advancePosition(double km) {
-        if (speed < 1) return;
-        heading = (heading + (rnd.nextDouble() - 0.5) * 20 + 360) % 360;
-        double rad = Math.toRadians(heading);
-        lat  += (km * Math.cos(rad)) / KM_PER_DEG_LAT;
-        lon  += (km * Math.sin(rad)) / (KM_PER_DEG_LAT * Math.cos(Math.toRadians(lat)));
+    private void advanceAlongRoute(double km) {
+        if (km <= 0) return;
+        distanceKm += km;
+        if (distanceKm >= route.totalKm()) distanceKm = 0;   // loop: reached destination, restart corridor
     }
 
     private void publish() throws Exception {
+        double[] ll = route.positionAtKm(distanceKm);
+
         ObjectNode json = mapper.createObjectNode();
         json.put("vehicleId", vehicleId);
         json.put("timestamp", Instant.now().truncatedTo(ChronoUnit.MILLIS).toString());
-        json.put("latitude", round(lat, 6));
-        json.put("longitude", round(lon, 6));
+        json.put("latitude", round(ll[0], 6));
+        json.put("longitude", round(ll[1], 6));
         json.put("speedKph", round(speed, 1));
         json.put("engineTempC", round(engineTemp, 1));
         json.put("fuelLevelPct", round(fuelLevel, 1));
@@ -103,6 +114,7 @@ public final class VehicleSimulator {
         json.put("model", model);
         json.put("driverId", driverId);
         json.put("driverName", driverName);
+        json.put("routeId", route.id());
 
         MqttMessage message = new MqttMessage(mapper.writeValueAsBytes(json));
         message.setQos(0);
