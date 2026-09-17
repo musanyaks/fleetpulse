@@ -71,15 +71,16 @@ public class ReportController {
         )
         """;
 
-    private static final String DISTANCE_EXPR = """
+        private static final String DISTANCE_EXPR = """
         COALESCE(round(((sum(
             6371000 * 2 * asin(sqrt(
                 power(sin(radians(latitude - prev_lat) / 2), 2) +
                 cos(radians(prev_lat)) * cos(radians(latitude)) *
                 power(sin(radians(longitude - prev_lon) / 2), 2)
             ))
-        ) FILTER (WHERE prev_lat IS NOT NULL AND speed_kph >= 1)) / 1000))::numeric, 1), 0)
+        ) FILTER (WHERE prev_lat IS NOT NULL AND speed_kph >= 1)) / 1000)::numeric, 1), 0)
         """;
+
 
     /** 1. Fleet utilization: moving share of observed time, distance, speeds. */
     @GetMapping("/utilization")

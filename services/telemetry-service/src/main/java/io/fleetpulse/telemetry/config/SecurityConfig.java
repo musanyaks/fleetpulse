@@ -3,6 +3,7 @@ package io.fleetpulse.telemetry.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -21,7 +22,7 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(AbstractHttpConfigurer::disable)   // MVP; production step: enable with cookie-backed token
+            .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/login.html", "/css/**", "/js/**", "/img/**", "/favicon.ico").permitAll()
                 .requestMatchers("/actuator/health", "/actuator/health/**").permitAll()
@@ -31,9 +32,9 @@ public class SecurityConfig {
                     .hasAnyRole("ADMIN", "FLEET_MANAGER", "DISPATCHER", "ANALYST", "MAINTENANCE_MANAGER")
                 .requestMatchers("/api/v1/**")
                     .hasAnyRole("ADMIN", "FLEET_MANAGER")
-                .anyRequest().authenticated())       // EVERY page requires a session → login-first
+                .anyRequest().authenticated())
             .formLogin(form -> form
-                .loginPage("/login.html")            // our custom page
+                .loginPage("/login.html")
                 .loginProcessingUrl("/login")
                 .defaultSuccessUrl("/", true)
                 .failureUrl("/login.html?error")
@@ -41,7 +42,8 @@ public class SecurityConfig {
             .logout(logout -> logout
                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "GET"))
                 .logoutSuccessUrl("/login.html?loggedOut")
-                .permitAll());
+                .permitAll())
+            .httpBasic(Customizer.withDefaults());   // API clients: curl -u works; browser keeps the form
         return http.build();
     }
 
