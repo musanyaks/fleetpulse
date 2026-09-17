@@ -1,20 +1,208 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Geofences · FleetPulse</title><link rel="stylesheet" href="/css/app.css"/></head>
-<body data-page="geofences">
-<div id="sidebar"></div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Geofences · FleetPulse</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root{--bg:#f4f6fb;--panel:#fff;--line:#e6eaf2;--text:#1e293b;--muted:#64748b;--blue:#2563eb;--blue2:#3b82f6;--green:#10b981;--amber:#f59e0b;--red:#ef4444;--navy:#0d2b57}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font:14px/1.5 "Segoe UI",system-ui,sans-serif;display:flex;min-height:100vh}
+aside{width:212px;background:var(--navy);color:#cdd9ee;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;flex:none}
+.logo{display:flex;align-items:center;gap:10px;padding:20px 18px;font-size:17px;font-weight:700;color:#fff}
+.logo .sq{width:30px;height:30px;border-radius:8px;background:var(--blue2);display:grid;place-items:center;font-size:15px}
+nav{flex:1;padding:6px 10px;overflow-y:auto}
+nav a{display:flex;align-items:center;gap:11px;padding:10px 12px;margin:2px 0;border-radius:9px;color:#c3d2e8;text-decoration:none;font-size:13.5px}
+nav a .ic{width:18px;text-align:center}
+nav a:hover{background:rgba(255,255,255,.06);color:#fff}
+nav a.active{background:var(--blue2);color:#fff;font-weight:600}
+.me{margin:0 12px 6px;padding:10px 12px;background:rgba(255,255,255,.05);border-radius:10px;font-size:12px}
+.me b{color:#fff}
+.signout{display:flex;align-items:center;gap:8px;margin:0 12px 12px;padding:9px 12px;border-radius:9px;background:rgba(239,68,68,.12);color:#fca5a5;text-decoration:none;font-size:13px}
+main{flex:1;min-width:0;padding:20px 24px;display:flex;flex-direction:column;gap:16px}
+.pagehead h1{font-size:20px;font-weight:700}
+.banner{background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;border-radius:12px;padding:10px 14px;font-size:12.5px}
+.cards{display:grid;gap:14px}
+.grid2{grid-template-columns:2fr 1fr}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.card>h3{font-size:13px;font-weight:700;padding:12px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}
+.pad{padding:14px 16px}
+#map{height:430px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;color:var(--muted);font-size:11.5px;text-transform:uppercase;letter-spacing:.5px;padding:8px 12px;border-bottom:1px solid var(--line);background:#fafbfe}
+td{padding:8px 12px;border-bottom:1px solid var(--line)}
+tbody tr:hover td{background:#f8fafc}
+.ztype{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px}
+.ztype.RESTRICTED,.ztype.DANGER{background:#fee2e2;color:#991b1b}
+.ztype.DEPOT{background:#dbeafe;color:#1e40af}
+.ztype.CUSTOMER{background:#d1fae5;color:#065f46}
+.sev{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px}
+.sev.CRITICAL{background:#fee2e2;color:#991b1b}.sev.WARNING{background:#fef3c7;color:#92400e}.sev.INFO{background:#dbeafe;color:#1e40af}
+input,select{border:1px solid var(--line);border-radius:9px;padding:8px 12px;font:inherit}
+.btn{border:0;border-radius:9px;padding:9px 14px;font:inherit;font-weight:600;background:var(--blue);color:#fff;cursor:pointer}
+.btn:disabled{opacity:.5;cursor:default}
+#feed{max-height:280px;overflow-y:auto}
+.ev{display:flex;gap:10px;padding:8px 16px;border-bottom:1px solid var(--line);align-items:baseline;font-size:12.8px}
+.ev time{color:var(--muted);font-size:11px;flex:none;width:70px}
+#form{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#form label{font-size:11px;color:var(--muted);display:block;margin-bottom:2px}
+#form .full{grid-column:1/-1}
+#msg{font-size:12px;margin-top:8px;min-height:16px}
+.muted{color:var(--muted)}.small{font-size:12px}
+</style>
+</head>
+<body>
+<aside>
+  <div class="logo"><span class="sq">🛰️</span> FleetPulse</div>
+  <nav>
+    <a href="index.html"><span class="ic">🏠</span> Overview</a>
+    <a href="vehicles.html"><span class="ic">🚚</span> Vehicles</a>
+    <a href="trips.html"><span class="ic">🛣️</span> Trips</a>
+    <a href="drivers.html"><span class="ic">🧑‍✈️</span> Drivers</a>
+    <a href="maintenance.html"><span class="ic">🔧</span> Maintenance</a>
+    <a href="fuel.html"><span class="ic">⛽</span> Fuel</a>
+    <a href="alerts.html"><span class="ic">🔔</span> Alerts</a>
+    <a href="reports.html"><span class="ic">📄</span> Reports</a>
+    <a class="active" href="geofences.html"><span class="ic">🎯</span> Geofences</a>
+    <a href="settings.html"><span class="ic">⚙️</span> Settings</a>
+  </nav>
+  <div class="me" id="me">checking session…</div>
+  <a class="signout" href="/logout">⏻ Sign out</a>
+</aside>
 <main>
   <div class="pagehead"><h1>Geofences</h1></div>
-  <div class="banner">Module on the roadmap — geofence-service will store zones, evaluate every GPS point on <code>telemetry.raw</code>, and emit enter/exit/dwell events.</div>
+  <div class="banner">Live evaluation on <code>telemetry.raw</code>: edge-triggered ENTER / EXIT events, one-shot DWELL after 10 min inside. RESTRICTED & DANGER entries raise CRITICAL alerts. Events need a vehicle to <b>cross a boundary</b> — if the feed is empty, widen a zone temporarily (see README demo tips).</div>
+
   <div class="cards grid2">
-    <div class="card"><h3>Planned zone types</h3><div class="pad muted small">
-      <p>• Depot / warehouse (arrival & departure notifications)</p>
-      <p>• Customer sites (auto trip milestones)</p>
-      <p>• Restricted zones (instant CRITICAL alert)</p>
-      <p>• Dwell limits (vehicle idle in zone &gt; N minutes)</p></div></div>
-    <div class="card"><h3>Evaluation design</h3><div class="pad muted small">
-      <p>• Point-in-polygon per reading, zones cached in-memory per vehicle partition</p>
-      <p>• Hysteresis (2 consecutive points inside/outside) to prevent flapping at boundaries</p>
-      <p>• Events to <code>vehicle.events</code>; map overlay rendered on this page + Overview</p>
-      <p>• Nairobi demo zones: Westlands depot, Industrial Area restricted, JKIA no-stop</p></div></div>
+    <div class="card">
+      <h3>Zone Map <span class="muted small" id="zcount"></span></h3>
+      <div id="map"></div>
+    </div>
+    <div class="card">
+      <h3>Add Zone <span class="muted small" id="formHint">(ADMIN / FLEET_MANAGER)</span></h3>
+      <div class="pad">
+        <div id="form">
+          <div class="full"><label>Name</label><input id="fName" placeholder="Nakuru Warehouse" style="width:100%"/></div>
+          <div><label>Type</label><select id="fType" style="width:100%">
+            <option>CUSTOMER</option><option>DEPOT</option><option>RESTRICTED</option><option>DANGER</option></select></div>
+          <div><label>Radius (m)</label><input id="fRad" type="number" value="1000" min="50" max="50000" style="width:100%"/></div>
+          <div><label>Latitude</label><input id="fLat" type="number" step="0.0001" value="-0.3031" style="width:100%"/></div>
+          <div><label>Longitude</label><input id="fLon" type="number" step="0.0001" value="36.0800" style="width:100%"/></div>
+          <div class="full"><button class="btn" id="fSave" style="width:100%">Create Zone</button><div id="msg"></div></div>
+        </div>
+        <p class="muted small" style="margin-top:10px">Tip: click the map to prefill coordinates.</p>
+      </div>
+    </div>
   </div>
-</main></body></html>
+
+  <div class="card">
+    <h3>Zones</h3>
+    <div style="overflow:auto"><table><thead><tr><th>Name</th><th>Type</th><th>Center</th><th>Radius</th><th>Vehicles inside (now)</th><th>Status</th></tr></thead>
+    <tbody id="zrows"><tr><td colspan="6" class="muted">Loading…</td></tr></tbody></table></div>
+  </div>
+
+  <div class="card">
+    <h3>Enter / Exit Events</h3>
+    <div id="feed"><div class="ev"><span class="muted">Loading…</span></div></div>
+  </div>
+</main>
+
+<script>
+const map = L.map('map').setView([-1.29, 36.85], 11);
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap contributors'}).addTo(map);
+const colors = {RESTRICTED:'#ef4444', DANGER:'#ef4444', DEPOT:'#2563eb', CUSTOMER:'#10b981'};
+const esc = s => (s ?? '').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+const fmtPlate = id => { const m = /^(K[A-Z]{2})(\d{3}[A-Z])$/.exec(id||''); return m ? m[1]+' '+m[2] : id||''; };
+const api = async p => { const r = await fetch(p); if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); };
+
+let zones = [], layers = new Map(), canWrite = false;
+
+/* session — drives the role-aware form */
+(async function(){
+  const me = document.getElementById('me');
+  try{
+    const r = await fetch('/api/v1/me',{headers:{'Accept':'application/json'}});
+    const ct = r.headers.get('content-type')||'';
+    if(!r.ok || !ct.includes('application/json')) throw new Error('HTTP '+r.status);
+    const u = await r.json();
+    me.innerHTML = 'signed in: <b>'+esc(u.username)+'</b><br/><span class="muted small">'+u.roles.map(esc).join(' · ')+'</span>';
+    canWrite = u.roles.includes('ADMIN') || u.roles.includes('FLEET_MANAGER');
+    if(!canWrite){
+      document.getElementById('fSave').disabled = true;
+      document.getElementById('formHint').textContent = '— read-only for your role';
+    }
+  }catch(e){
+    me.innerHTML = '<span style="color:#fca5a5">not signed in</span> — <a href="/login.html" style="color:#fff">sign in</a>';
+  }
+})();
+
+map.on('click', e => {
+  document.getElementById('fLat').value = e.latlng.lat.toFixed(4);
+  document.getElementById('fLon').value = e.latlng.lng.toFixed(4);
+});
+
+async function load(){
+  try{
+    zones = await api('/api/v1/geofences');
+    const live = await api('/api/v1/vehicles/live');
+    const events = await api('/api/v1/geofences/events');
+
+    document.getElementById('zcount').textContent = '— ' + zones.filter(z=>z.active).length + ' active';
+    const seen = new Set();
+    zones.filter(z=>z.active).forEach(z=>{
+      seen.add(z.id);
+      if(layers.has(z.id)){ layers.get(z.id).setLatLng([z.lat,z.lon]).setRadius(z.radiusM); }
+      else{
+        const circle = L.circle([z.lat,z.lon],{radius:z.radiusM,color:colors[z.type]||'#64748b',weight:2,dashArray:'6 4',fillOpacity:.1})
+          .bindTooltip(`🎯 ${esc(z.name)} (${esc(z.type)})`).addTo(map);
+        layers.set(z.id, circle);
+      }
+    });
+    layers.forEach((l,id)=>{ if(!seen.has(id)){ map.removeLayer(l); layers.delete(id); }});
+
+    const inside = {};
+    live.forEach(v => zones.forEach(z => {
+      if(!z.active || z.lat==null) return;
+      const d = Math.hypot((v.latitude - z.lat)*111320, (v.longitude - z.lon)*111320*Math.cos(z.lat*Math.PI/180));
+      if(d <= z.radiusM){ inside[z.id] = (inside[z.id]||0)+1; }
+    }));
+    document.getElementById('zrows').innerHTML = zones.map(z=>`<tr>
+      <td><b>${esc(z.name)}</b></td>
+      <td><span class="ztype ${esc(z.type)}">${esc(z.type)}</span></td>
+      <td class="muted small">${z.lat==null?'—':z.lat.toFixed(4)+', '+z.lon.toFixed(4)}</td>
+      <td>${Math.round(z.radiusM)} m</td>
+      <td>${inside[z.id]||0}</td>
+      <td>${z.active?'<span class="ztype CUSTOMER">ACTIVE</span>':'<span class="muted">off</span>'}</td></tr>`).join('');
+
+    document.getElementById('feed').innerHTML = events.map(e=>`<div class="ev">
+      <time>${new Date(e.ts).toLocaleTimeString()}</time>
+      <span class="sev ${esc(e.severity)}">${esc(e.severity)}</span>
+      <span><b>${fmtPlate(esc(e.vehicle_id))}</b> — ${esc(e.message)}</span></div>`).join('')
+      || '<div class="ev"><span class="muted">No geofence events yet — vehicles must cross a zone boundary.</span></div>';
+  }catch(e){
+    document.getElementById('zrows').innerHTML =
+      `<tr><td colspan="6" class="muted">Load failed: ${esc(e.message)} — if HTTP 401/302, your session was invalidated by a restart: sign in again.</td></tr>`;
+  }
+}
+
+document.getElementById('fSave').onclick = async () => {
+  const m = document.getElementById('msg');
+  try{
+    const r = await fetch('/api/v1/geofences', {method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({name:document.getElementById('fName').value,
+        type:document.getElementById('fType').value,
+        lat:parseFloat(document.getElementById('fLat').value),
+        lon:parseFloat(document.getElementById('fLon').value),
+        radiusM:parseFloat(document.getElementById('fRad').value)})});
+    if(r.status === 201){ m.textContent='✅ Zone created — evaluator picks it up within 60s'; m.style.color='var(--green)'; load(); }
+    else if(r.status === 401 || r.status === 403){ m.textContent='⛔ Not authorized — ADMIN or FLEET_MANAGER required'; m.style.color='var(--red)'; }
+    else { m.textContent='❌ Rejected (check name/radius)'; m.style.color='var(--red)'; }
+  }catch(e){ m.textContent='❌ Network error'; m.style.color='var(--red)'; }
+};
+
+load(); setInterval(load, 5000);
+</script>
+</body>
+</html>
