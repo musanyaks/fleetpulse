@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Vehicles · FleetPulse</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="/vendor/leaflet.css"/>
+<script src="/vendor/leaflet.js"></script>
 <style>
 :root{--bg:#f4f6fb;--panel:#fff;--line:#e6eaf2;--text:#1e293b;--muted:#64748b;--blue:#2563eb;--blue2:#3b82f6;--green:#10b981;--amber:#f59e0b;--red:#ef4444;--navy:#0d2b57}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -87,8 +87,8 @@ tr.sel td{background:#eff6ff}
 .prow .k{color:var(--muted)}
 .pbar{width:80px;height:6px;border-radius:99px;background:#eef2f9;overflow:hidden;display:inline-block;vertical-align:middle}
 .pbar i{display:block;height:100%;border-radius:99px}
-#miniMap,#bigMap{height:165px;border-radius:10px;overflow:hidden;margin:10px 0}
-#bigMap{height:280px}
+#miniMap{height:165px;min-height:165px;border-radius:10px;overflow:hidden;margin:10px 0;position:relative;z-index:1}
+#bigMap{height:280px;min-height:280px;border-radius:10px;overflow:hidden;position:relative;z-index:1}
 .maint{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;margin-top:8px;font-size:12.3px}
 .note{background:#fffbeb;border:1px solid #fde68a;color:#92400e;border-radius:10px;padding:8px 10px;font-size:11.5px;margin-top:10px}
 .muted{color:var(--muted)}.small{font-size:12px}
