@@ -1,44 +1,185 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Reports · FleetPulse</title><link rel="stylesheet" href="/css/app.css"/></head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Reports · FleetPulse</title>
+<style>
+:root{--bg:#f4f6fb;--panel:#fff;--line:#e6eaf2;--text:#1e293b;--muted:#64748b;--blue:#2563eb;--blue2:#3b82f6;--green:#10b981;--amber:#f59e0b;--red:#ef4444;--navy:#0d2b57}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font:14px/1.5 "Segoe UI",system-ui,sans-serif;display:flex;min-height:100vh}
+aside{width:212px;background:var(--navy);color:#cdd9ee;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;flex:none}
+.logo{display:flex;align-items:center;gap:10px;padding:20px 18px;font-size:17px;font-weight:700;color:#fff}
+.logo .sq{width:30px;height:30px;border-radius:8px;background:var(--blue2);display:grid;place-items:center;font-size:15px}
+nav{flex:1;padding:6px 10px;overflow-y:auto}
+nav a{display:flex;align-items:center;gap:11px;padding:10px 12px;margin:2px 0;border-radius:9px;color:#c3d2e8;text-decoration:none;font-size:13.5px}
+nav a .ic{width:18px;text-align:center}
+nav a:hover{background:rgba(255,255,255,.06);color:#fff}
+nav a.active{background:var(--blue2);color:#fff;font-weight:600}
+main{flex:1;min-width:0;padding:20px 24px;display:flex;flex-direction:column;gap:16px}
+.pagehead{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.pagehead h1{font-size:20px;font-weight:700}
+.spacer{flex:1}
+.controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 16px}
+.controls label{font-size:12px;color:var(--muted);font-weight:600}
+input[type=date]{border:1px solid var(--line);border-radius:9px;padding:7px 10px;font:inherit}
+.quick{display:flex;gap:6px}
+.quick button,.tabs button{border:1px solid var(--line);background:#fff;border-radius:9px;padding:7px 12px;font:inherit;font-size:12.5px;font-weight:600;color:var(--muted);cursor:pointer}
+.quick button:hover,.tabs button:hover{border-color:var(--blue2);color:var(--blue)}
+.tabs{display:flex;gap:8px;flex-wrap:wrap}
+.tabs button.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.card>h3{font-size:13px;font-weight:700;padding:12px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
+.card>h3 .sub{font-weight:400;color:var(--muted);font-size:11.5px}
+.card>h3 .btn{margin-left:auto;border:0;border-radius:8px;padding:6px 12px;font:inherit;font-size:12px;font-weight:600;background:var(--blue);color:#fff;cursor:pointer}
+.tblwrap{overflow:auto;max-height:60vh}
+table{width:100%;border-collapse:collapse;font-size:13px;white-space:nowrap}
+th{text-align:left;color:var(--muted);font-size:11.5px;text-transform:uppercase;letter-spacing:.5px;padding:9px 12px;border-bottom:1px solid var(--line);background:#fafbfe;position:sticky;top:0}
+td{padding:8px 12px;border-bottom:1px solid var(--line)}
+tbody tr:hover td{background:#f8fafc}
+.chip{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px}
+.chip.CRITICAL{background:#fee2e2;color:#991b1b}.chip.WARNING{background:#fef3c7;color:#92400e}.chip.INFO{background:#dbeafe;color:#1e40af}
+.score{font-weight:700}
+.score.good{color:var(--green)}.score.mid{color:var(--amber)}.score.bad{color:var(--red)}
+.muted{color:var(--muted)}.small{font-size:12px}
+.banner{background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;border-radius:12px;padding:10px 14px;font-size:12.5px}
+#toast{position:fixed;bottom:20px;right:20px;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;display:none;box-shadow:0 8px 24px rgba(2,6,23,.2);background:#d1fae5;color:#065f46}
+</style>
+</head>
 <body data-page="reports">
 <div id="sidebar"></div>
 <main>
-  <div class="pagehead"><h1>Reports & Exports</h1></div>
-  <div class="cards grid3">
-    <div class="card"><h3>🚚 Live Snapshot</h3><div class="pad">
-      <p class="muted small">Current status, speed, fuel, engine temp and position for every reporting vehicle.</p>
-      <p style="margin-top:10px"><button class="btn" onclick="expLive()">Download CSV</button></p></div></div>
-    <div class="card"><h3>🔔 Alert Log</h3><div class="pad">
-      <p class="muted small">Latest 500 alerts — severity, type, vehicle, message, timestamp.</p>
-      <p style="margin-top:10px"><button class="btn" onclick="expAlerts()">Download CSV</button></p></div></div>
-    <div class="card"><h3>📊 Per-Vehicle Summary</h3><div class="pad">
-      <p class="muted small">One row per vehicle: status, speed, fuel, engine temp.</p>
-      <p style="margin-top:10px"><button class="btn" onclick="expSummary()">Download CSV</button></p></div></div>
+  <div class="pagehead"><h1>Advanced Reports</h1><span class="spacer"></span>
+    <button class="btn" id="csvBtn" style="border:0;border-radius:8px;padding:7px 14px;font:inherit;font-weight:600;background:var(--blue);color:#fff;cursor:pointer">⬇ Export CSV</button></div>
+  <div class="banner">All reports are computed in TimescaleDB over stored history. Days are Nairobi calendar days (Africa/Nairobi). Fuel figures are percent-of-tank — liters need tank capacity + refill events (fuel-service milestone).</div>
+
+  <div class="controls">
+    <label>From</label><input type="date" id="from"/>
+    <label>To</label><input type="date" id="to"/>
+    <div class="quick">
+      <button data-q="today">Today</button>
+      <button data-q="7">Last 7 days</button>
+      <button data-q="30">Last 30 days</button>
+    </div>
   </div>
-  <div class="card"><h3>Coming with backend modules</h3><div class="pad muted small">
-    Scheduled email reports · fleet utilization & cost per km · driver scorecards · trip history exports (reporting-service on the roadmap).</div></div>
-  <p class="muted small" id="note"></p>
+
+  <div class="tabs" id="tabs">
+    <button data-r="utilization" class="on">📊 Fleet Utilization</button>
+    <button data-r="drivers">🧑‍✈️ Driver Performance</button>
+    <button data-r="fuel">⛽ Fuel Consumption</button>
+    <button data-r="violations">⚠️ Violations</button>
+    <button data-r="geofence">🎯 Geofence Activity</button>
+    <button data-r="daily">📅 Daily Summary</button>
+  </div>
+
+  <div class="card">
+    <h3><span id="rTitle">—</span> <span class="sub" id="rSub"></span>
+        <span class="muted small" style="margin-left:auto" id="rMeta"></span></h3>
+    <div class="tblwrap"><table><thead id="thead"></thead><tbody id="tbody">
+      <tr><td class="muted">Choose a report…</td></tr>
+    </tbody></table></div>
+  </div>
 </main>
+<div id="toast"></div>
+
 <script src="/js/app.js"></script>
 <script>
-const U=window.FleetUI;
-const csv=rows=>rows.map(r=>r.map(x=>`"${(x??'').toString().replace(/"/g,'""')}"`).join(',')).join('\n');
-const dl=(name,text)=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:'text/csv'}));a.download=name;a.click();
-  document.getElementById('note').textContent='Exported '+name+' at '+new Date().toLocaleTimeString();};
-async function expLive(){
-  const lv=await U.api('/api/v1/vehicles/live');
-  dl('fleet-live.csv',csv([['plate','status','speed_kph','fuel_pct','engine_c','lat','lon','last_seen'],
-    ...lv.map(v=>[U.fmtPlate(v.vehicleId),v.status,v.speedKph,v.fuelLevelPct,v.engineTempC,v.latitude,v.longitude,v.lastSeen])]));
+const U = window.FleetUI;
+const $ = id => document.getElementById(id);
+
+const localISO = d => d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const fmtNum = v => v==null ? '–'
+  : (typeof v === 'number' ? v.toLocaleString(undefined,{maximumFractionDigits:1}) : U.esc(String(v)));
+
+const REPORTS = {
+  utilization: { title:'📊 Fleet Utilization', from:'from', to:'to',
+    sub:'Moving share of observed time per vehicle (2 s sampling)',
+    cols:[['vehicle_id','Plate'],['vehicle','Vehicle'],['samples','Samples'],
+          ['utilization_pct','Utilization %'],['distance_km','Distance (km)'],
+          ['avg_speed_kph','Avg speed'],['max_speed_kph','Max speed'],['avg_engine_c','Avg eng °C']] },
+  drivers: { title:'🧑‍✈️ Driver Performance', sub:'Score = 100 − event penalties (range); current vehicle→driver assignment',
+    cols:[['driver','Driver'],['vehicles','Vehicles'],['distance_km','Distance (km)'],['score','Score'],
+          ['speeding','💨 Speeding'],['harsh_braking','🛑 Harsh brake'],['harsh_accel','🚀 Harsh accel'],['critical','Critical']] },
+  fuel: { title:'⛽ Fuel Consumption', sub:'Percent-of-tank units; km per fuel-% point',
+    cols:[['vehicle_id','Plate'],['vehicle','Vehicle'],['fuel_start_pct','Start %'],['fuel_end_pct','End %'],
+          ['fuel_used_pct','Used (pts)'],['distance_km','Distance (km)'],['km_per_fuel_pct','km / %'],['avg_fuel_pct','Avg %']] },
+  violations: { title:'⚠️ Violations', sub:'Alert events per vehicle, type and severity',
+    cols:[['vehicle_id','Plate'],['type','Type'],['severity','Severity'],['events','Events'],['max_observed','Max value']] },
+  geofence: { title:'🎯 Geofence Activity', sub:'Edge-triggered zone events per vehicle',
+    cols:[['vehicle_id','Plate'],['entries','Entries'],['exits','Exits'],['dwellings','Dwellings'],['total_events','Total']] },
+  daily: { title:'📅 Daily Summary', sub:'Fleet-wide aggregates per Nairobi day',
+    cols:[['day','Day'],['distance_km','Distance (km)'],['active_vehicles','Active vehicles'],['alerts','Alerts']] },
+};
+let current = 'utilization', currentRows = [], currentCols = [];
+
+const sevChip = (col, v) => col==='severity'
+  ? `<span class="chip ${U.esc(v)}">${U.esc(v)}</span>` : U.esc(v);
+const scoreCell = (col, v) => col==='score'
+  ? `<span class="score ${v>=80?'good':v>=60?'mid':'bad'}">${fmtNum(v)}</span>` : fmtNum(v);
+
+function cell(col, v){
+  if (v == null) return '–';
+  if (col === 'severity') return sevChip(col, v);
+  if (col === 'score') return scoreCell(col, v);
+  if (col === 'vehicle_id') return `<b>${U.esc(U.fmtPlate(v))}</b>`;
+  return fmtNum(v);
 }
-async function expAlerts(){
-  const al=await U.api('/api/v1/alerts/recent?limit=500');
-  dl('fleet-alerts.csv',csv([['ts','severity','type','vehicle','message'],
-    ...al.map(a=>[a.ts,a.severity,a.type,U.fmtPlate(a.vehicle_id),a.message])]));
+
+async function load(){
+  const rep = REPORTS[current];
+  $('rTitle').textContent = rep.title;
+  $('rSub').textContent = rep.sub;
+  $('rMeta').textContent = $('from').value+' → '+$('to').value;
+  $('thead').innerHTML = '<tr>'+rep.cols.map(([,l])=>`<th>${U.esc(l)}</th>`).join('')+'</tr>';
+  $('tbody').innerHTML = '<tr><td class="muted">Computing…</td></tr>';
+  try{
+    const q = `from=${$('from').value}&to=${$('to').value}`;
+    const data = await U.api(`/api/v1/reports/${current}?${q}`);
+    currentRows = data.rows; currentCols = rep.cols;
+    $('rMeta').textContent = `${data.from} → ${data.to} · ${data.rows.length} row(s)`;
+    $('tbody').innerHTML = data.rows.length
+      ? data.rows.map(r => '<tr>'+rep.cols.map(([k])=>`<td>${cell(k, r[k])}</td>`).join('')+'</tr>').join('')
+      : '<tr><td class="muted">No data in this range — try a wider range or check the simulator is running.</td></tr>';
+  }catch(e){
+    currentRows = [];
+    $('tbody').innerHTML = `<tr><td class="muted">Load failed: ${U.esc(e.message)} — if HTTP 401, sign in first.</td></tr>`;
+  }
 }
-async function expSummary(){
-  const lv=await U.api('/api/v1/vehicles/live');
-  const by={}; lv.forEach(v=>by[v.vehicleId]=v);
-  dl('fleet-summary.csv',csv([['plate','status','speed_kph','fuel_pct','engine_c'],
-    ...Object.entries(by).map(([k,v])=>[U.fmtPlate(k),v.status,v.speedKph,v.fuelLevelPct,v.engineTempC])]));
+
+/* CSV of the current report */
+ $('csvBtn').onclick = () => {
+  if(!currentRows.length){ return toast('Nothing to export', false); }
+  const csv = [currentCols.map(([,l])=>`"${l}"`).join(','),
+    ...currentRows.map(r=>currentCols.map(([k])=>{
+      const v = r[k]; return `"${(v??'').toString().replace(/"/g,'""')}"`;}).join(','))].join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download=`fleetpulse-${current}-${$('from').value}_to_${$('to').value}.csv`; a.click();
+  toast('Exported '+a.download, true);
+};
+function toast(msg, ok){ const t=$('toast'); t.textContent=msg;
+  t.style.background=ok?'#d1fae5':'#fee2e2'; t.style.color=ok?'#065f46':'#991b1b';
+  t.style.display='block'; setTimeout(()=>t.style.display='none',2500); }
+
+/* tabs */
+document.querySelectorAll('#tabs button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('#tabs button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); current = b.dataset.r; load();
+});
+
+/* range controls */
+function setRange(days){
+  const to = new Date(), from = new Date(); from.setDate(from.getDate()-days);
+  $('to').value = localISO(to); $('from').value = localISO(days===0?to:from); load();
 }
-</script></body></html>
+document.querySelectorAll('.quick button').forEach(b => b.onclick = () => setRange(+b.dataset.q));
+ $('from').onchange = load; $('to').onchange = load;
+
+/* defaults: last 7 days, then initial load */
+(function init(){
+  const to = new Date(), from = new Date(); from.setDate(from.getDate()-6);
+  $('to').value = localISO(to); $('from').value = localISO(from);
+  load();
+})();
+</script>
+</body>
+</html>
