@@ -394,7 +394,7 @@ function render(){
       <td>${fbar(f)}</td><td>${hring(h)}</td>
       <td class="act" onclick="event.stopPropagation()">
         <button onclick="selectVehicle('${esc(v.vehicleId)}')">👁</button>
-        <button onclick="openEdit('&quot;onclick="toast('Editing arrives with vehicle-service',false)"quot;')">✏️</button>
+        <button onclick="openEdit('${esc(v.vehicleId)}')">✏️</button>
         <button onclick="openFull('${esc(v.vehicleId)}')">⋯</button></td></tr>`;
   }).join('')||'<tr><td colspan="10" class="muted">No vehicles match the filters.</td></tr>';
   let pb='';for(let i=0;i<pages;i++)pb+=`<button class="${i===page?'on':''}" onclick="page=${i};render()">${i+1}</button>`;

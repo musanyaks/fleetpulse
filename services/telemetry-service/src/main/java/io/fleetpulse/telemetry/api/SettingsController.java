@@ -25,7 +25,6 @@ public class SettingsController {
         this.mapper = mapper;
     }
 
-    /** Session card on the Settings page — username + roles of the caller. */
     @GetMapping("/me")
     public Map<String, Object> me(Authentication auth) {
         return Map.of(
@@ -40,7 +39,6 @@ public class SettingsController {
         return mapper.toDtoList(vehicles.findAll());
     }
 
-    /** Non-GET under /api/v1/** → ADMIN / FLEET_MANAGER only (SecurityConfig). */
     @PutMapping("/settings/speed-limits/{vehicleId}")
     public VehicleDto setSpeedLimit(@PathVariable String vehicleId,
                                     @RequestBody Map<String, Double> body) {
@@ -50,47 +48,46 @@ public class SettingsController {
         }
         VehicleEntity entity = vehicles.findById(vehicleId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Unknown vehicle"));
-        registry.updateSpeedLimit(vehicleId, limit);   // persists + refreshes rule-engine cache
+        registry.updateSpeedLimit(vehicleId, limit);
         entity.setSpeedLimitKph(limit);
         return mapper.toDto(entity);
     }
-    /** Edit vehicle attributes. Identity fields (plate, make, model) are immutable here - */
-    /** they define what the simulator broadcasts; full CRUD belongs to vehicle-service. */
+
+    /**
+     * Edit vehicle attributes. Identity fields (plate, make, model) are immutable here —
+     * they define what the simulator broadcasts; full CRUD belongs to vehicle-service.
+     * Driver reassignment also lives there: the simulator owns the broadcast manifest.
+     */
     @PutMapping("/vehicles/{vehicleId}")
     public VehicleDto updateVehicle(@PathVariable String vehicleId,
-                                   @RequestBody Map<String, Object> body) {
+                                    @RequestBody Map<String, Object> body) {
         VehicleEntity v = vehicles.findById(vehicleId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Unknown vehicle"));
-        if (body.containsKey("driverId") || body.containsKey("driverName")) {
-            String dId  = (String) body.get("driverId");
-            String dName = (String) body.get("driverName");
-            if (dId != null ^ dName != null)
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "driverId and driverName must be set together");
-        }
+
         if (body.containsKey("speedLimitKph")) {
             Object lim = body.get("speedLimitKph");
-            double d = ((Number) lim).doubleValue();
-            if (d < 20 || d > 200) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "speedLimitKph must be 20-200");
-            registry.updateSpeedLimit(vehicleId, d);
+            if (!(lim instanceof Number n) || n.doubleValue() < 20 || n.doubleValue() > 200)
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "speedLimitKph must be 20-200");
+            registry.updateSpeedLimit(vehicleId, n.doubleValue());
+            v.setSpeedLimitKph(n.doubleValue());   // keep entity in sync — flush would else revert it
         }
         if (body.containsKey("year")) {
             Object y = body.get("year");
-            int yr = ((Number) y).intValue();
-            if (yr < 1990 || yr > 2100) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "year out of range");
-            v.setYear(yr);
+            if (!(y instanceof Number n) || n.intValue() < 1990 || n.intValue() > 2100)
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "year out of range");
+            v.setYear(n.intValue());
         }
         for (String f : List.of("vin", "lastService", "nextService", "insuranceExpiry", "inspectionExpiry")) {
-            if (body.containsKey(f)) {
-                Object val = body.get(f);
-                String s = val == null ? null : val.toString().trim();
-                if (s != null && s.isEmpty()) s = null;
-                switch (f) {
-                    case "vin" -> v.setVin(s);
-                    case "lastService" -> v.setLastService(s);
-                    case "nextService" -> v.setNextService(s);
-                    case "insuranceExpiry" -> v.setInsuranceExpiry(s);
-                    case "inspectionExpiry" -> v.setInspectionExpiry(s);
-                }
+            if (!body.containsKey(f)) continue;
+            Object val = body.get(f);
+            String s = val == null ? null : val.toString().trim();
+            if (s != null && s.isEmpty()) s = null;
+            switch (f) {
+                case "vin" -> v.setVin(s);
+                case "lastService" -> v.setLastService(s);
+                case "nextService" -> v.setNextService(s);
+                case "insuranceExpiry" -> v.setInsuranceExpiry(s);
+                case "inspectionExpiry" -> v.setInspectionExpiry(s);
             }
         }
         vehicles.save(v);
