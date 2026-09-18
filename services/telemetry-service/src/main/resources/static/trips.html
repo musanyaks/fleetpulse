@@ -87,6 +87,20 @@ tr.sel td{background:#eff6ff}
 #toast{position:fixed;bottom:20px;right:20px;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;display:none;box-shadow:0 8px 24px rgba(2,6,23,.2);background:#d1fae5;color:#065f46;z-index:3000}
 @media (max-width:1280px){.grid{grid-template-columns:1fr 1fr}.col3{grid-column:1/-1}}
 @media (max-width:900px){.grid{grid-template-columns:1fr}}
+  .calwrap{position:relative;display:inline-flex;align-items:center;justify-content:center;
+    width:36px;height:36px;border:1px solid var(--line);border-radius:9px;background:#f1f5fb;
+    color:var(--muted);cursor:pointer;flex:none}
+  .calwrap:hover{border-color:var(--blue2);color:var(--blue)}
+  .calwrap svg{position:absolute;pointer-events:none;z-index:1}
+  .calwrap input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;border:0;padding:0}
+  .calwrap.has-date{background:#eff6ff;border-color:#93c5fd;color:var(--blue)}
+  .fbtn{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;
+    border:1px solid var(--line);border-radius:9px;background:#f1f5fb;color:var(--muted);cursor:pointer;flex:none}
+  .fbtn:hover{border-color:var(--blue2);color:var(--blue)}
+  .dropdown{position:absolute;top:calc(100% + 6px);right:0;background:#fff;border:1px solid var(--line);
+    border-radius:12px;box-shadow:0 12px 32px rgba(2,6,23,.18);min-width:240px;z-index:1500;display:none;padding:4px}
+  .dropdown.open{display:block}
+  .toolbar select{flex:0 1 auto}
 </style>
 </head>
 <body>
@@ -136,9 +150,30 @@ tr.sel td{background:#eff6ff}
           <button data-f="Cancelled">Cancelled <span id="cCanc"></span></button>
         </div>
         <div class="toolbar">
-          <input id="q" placeholder="🔍 Search by trip ID, vehicle, driver or destination…"/>
-          <select id="fRoute"><option value="">All corridors</option></select>
+          <input id="q" placeholder="Search by trip ID, vehicle, driver or destination..."/>
+          <select id="fStatus"><option value="">All Status</option><option>In Transit</option><option>Pending</option></select>
+          <select id="fVeh"><option value="">All Vehicles</option></select>
           <select id="fDrv"><option value="">All Drivers</option></select>
+          <div style="position:relative">
+            <button class="fbtn" id="advBtn" title="More filters"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg></button>
+            <div class="dropdown" id="advMenu">
+              <div style="padding:8px 10px"><label class="muted small">Corridor</label>
+                <select id="fRoute" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:7px 8px;font:inherit">
+                  <option value="">All corridors</option>
+                  <option value="NBO-MSA">Nairobi - Mombasa</option>
+                  <option value="NBO-KSM">Nairobi - Kisumu</option>
+                  <option value="NBO-ELD">Nairobi - Eldoret</option>
+                  <option value="NBO-NKR">Nairobi - Nakuru</option>
+                  <option value="NBO-GSA">Nairobi - Garissa</option>
+                </select></div>
+              <div style="padding:8px 10px"><label class="muted small">Documents due before</label>
+                <input type="date" id="calDate" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:7px 8px;font:inherit"/></div>
+              <div style="display:flex;gap:8px;padding:8px 10px">
+                <button class="btn" id="advApply" style="flex:1">Apply</button>
+                <button class="btn ghost" id="advClear" style="flex:1">Reset</button>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="tblwrap"><table>
           <thead><tr><th>Trip ID</th><th>Vehicle</th><th>Driver</th><th>Origin → Destination</th>
@@ -266,7 +301,8 @@ function projectOnRoute(rid,lat,lon){
 
 /* ================= state ================= */
 let live=[],vehicles=new Map(),trips=[],selId=null,tabF='',page=0,pageSize=10;
-let alertsByVehicle=new Map(),yday=null,today=null;
+let alertsByVehicle=new Map(),yday=null,today=null,dueBefore='';
+let docsByVehicle=new Map();
 const BADGE='<svg viewBox="0 0 24 24" width="13" height="13"><rect x="1.5" y="6.5" width="11" height="8" rx="1" fill="#fff"/><path d="M12.5 8.5h4.4c.5 0 .96.25 1.24.66L20.5 12.5V15h-8V8.5Z" fill="#dbeafe"/><circle cx="5.8" cy="16.6" r="1.7" fill="#fff"/><circle cx="16.4" cy="16.6" r="1.7" fill="#fff"/></svg>';
 function badgeIcon(st){const c=st==='MOVING'?'#10b981':'#f59e0b';
   return L.divIcon({className:'',html:'<div class="tmarker" style="background:'+c+'">'+BADGE+'</div>',iconSize:[26,26],iconAnchor:[13,13]});}
@@ -360,9 +396,10 @@ async function load(){
 /* ================= table ================= */
 function render(){
   const q=$('q').value.toUpperCase(),fr=$('fRoute').value,fd=$('fDrv').value;
+  const docsDue=v=>dueBefore===''||(docsByVehicle.get(v.vehicleId)||[]).some(d=>d<=dueBefore);
   let rows=trips.filter(t=>{
     const hay=(t.tid+' '+t.v.vehicleId+' '+(t.v.driverName||'')+' '+(t.rid?routeLabels[t.rid]:'')).toUpperCase();
-    return(!tabF||t.status===tabF)&&(!fr||t.rid===fr)&&(!fd||t.v.driverName===fd)&&(!q||hay.includes(q));});
+    return(!tabF||t.status===tabF)&&(!fr||t.rid===fr)&&(!fd||t.v.driverName===fd)&&(!q||hay.includes(q))&&docsDue(t.v);});
   const pages=Math.max(1,Math.ceil(rows.length/pageSize));
   if(page>=pages)page=pages-1;
   const slice=rows.slice(page*pageSize,page*pageSize+pageSize);
@@ -431,7 +468,7 @@ function renderDetail(){
     const sc=done?'<span class="stopchip done">Passed</span>':next?'<span class="stopchip next">Ahead</span>':'<span class="stopchip now">Near / At</span>';
     rows+=`<div class="stoprow"><span class="nm">WP${i} ${citySt}</span>
       <span class="tm">${fmt(C.cum[i])} km</span>
-      <span class="tm">${i>0?'+fmt(C.cum[i]-C.cum[i-1])+' km':'—'}</span>${sc}</div>`;});
+      <span class="tm">${i>0?'+'+fmt(C.cum[i]-C.cum[i-1])+' km':'—'}</span>${sc}</div>`;});
   $('stops').innerHTML=rows;
 }
 
@@ -453,8 +490,57 @@ document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>{
   $('fDrv').innerHTML='<option value="">All Drivers</option>'+ds.map(d=>`<option>${esc(d)}</option>`).join('');
 }catch(e){}})();
 
+const _cd=document.getElementById("calDate");
+if(_cd){_cd.addEventListener("change",()=>{
+  dueBefore=_cd.value||"";
+  const w=_cd.closest(".calwrap"); if(w) w.classList.toggle("has-date",!!_cd.value);
+  page=0;render();});}
+
 load();setInterval(load,5000);
 const autoSel=setInterval(()=>{if(trips.length&&!selId){selectTrip(trips[0].tid);clearInterval(autoSel);}},800);
+
+/* ================= toolbar overrides (mockup parity) ================= */
+function render(){                                    /* overrides earlier version */
+  const fv=$("fVeh");
+  const cur=fv.value;
+  const plates=[...new Set(trips.map(t=>t.v.vehicleId))].sort();
+  const opt='<option value="">All Vehicles</option>'+
+    plates.map(p=>'<option'+(p===cur?' selected':'')+'>'+fmtPlate(p)+'</option>').join('');
+  if(fv.innerHTML!==opt)fv.innerHTML=opt;
+
+  const q=$("q").value.toUpperCase();
+  const st=$("fStatus").value, ve=fv.value, fr=$("fRoute").value, fd=$("fDrv").value;
+  let rows=trips.filter(t=>{
+    const hay=(t.tid+" "+t.v.vehicleId+" "+(t.v.driverName||"")+" "+(t.rid?routeLabels[t.rid]:"")).toUpperCase();
+    return(!tabF||t.status===tabF)&&(!st||t.status===st)&&(!ve||t.v.vehicleId===ve)&&
+          (!fr||t.rid===fr)&&(!fd||t.v.driverName===fd)&&(!q||hay.includes(q))&&docsDue(t.v);});
+  const pages=Math.max(1,Math.ceil(rows.length/pageSize));
+  if(page>=pages)page=pages-1;
+  const slice=rows.slice(page*pageSize,page*pageSize+pageSize);
+  $("rows").innerHTML=slice.map(t=>`<tr class="${selId===t.tid?'sel':''}" onclick="selectTrip('${t.tid}')">
+    <td><b>${t.tid}</b><div class="muted small">${new Date(t.v.lastSeen).toLocaleDateString()}</div></td>
+    <td><span class="plate">${fmtPlate(t.v.vehicleId)}</span><div class="muted small">${esc(t.v.make??'')} ${esc(t.v.model??'')}</div></td>
+    <td>${esc(t.v.driverName||'-')}</td>
+    <td>${t.rid?esc(routeLabels[t.rid]):'-'}<div class="muted small">${t.totalKm?fmt(t.totalKm)+' km':''}</div></td>
+    <td><span class="schip ${t.status.replace(' ','')||'Offline'}">${t.status}</span></td>
+    <td>${t.progress!=null?`<span class="pbar"><i style="width:${t.progress}%"></i></span>${t.progress}%`:'-'}</td>
+    <td>${t.status==='In Transit'?fmtDur(t.etaH):'-'}</td></tr>`).join('')
+    ||(tabF==='Completed'||tabF==='Cancelled'
+      ?`<tr><td colspan="7" class="muted">No ${tabF.toLowerCase()} trips - completion/cancellation detection arrives with the trips module.</td></tr>`
+      :'<tr><td colspan="7" class="muted">No trips match.</td></tr>');
+  let pb='';for(let i=0;i<pages;i++)pb+=`<button class="${i===page?'on':''}" onclick="page=${i};render()">${i+1}</button>`;
+  $("pager").innerHTML=`<span>Showing ${rows.length?page*pageSize+1:0}-${Math.min((page+1)*pageSize,rows.length)} of ${rows.length} trips</span>
+    <span style="flex:1"></span><button ${page===0?'disabled':''} onclick="page--;render()">‹</button>${pb}
+    <button ${page>=pages-1?'disabled':''} onclick="page++;render()">›</button>
+    <select style="border:1px solid var(--line);border-radius:8px;padding:4px 8px;font:inherit" onchange="pageSize=+this.value;page=0;render()">
+    ${[10,25,50].map(n=>`<option ${n===pageSize?'selected':''}>${n}</option>`).join('')}</select>`;
+}
+
+ $("advBtn").onclick=e=>{e.stopPropagation();$("advMenu").classList.toggle("open");};
+document.addEventListener("click",e=>{const w=$("advMenu");if(w&&!w.parentElement.contains(e.target))w.classList.remove("open");});
+ $("advApply").onclick=()=>{$("advMenu").classList.remove("open");page=0;render();};
+ $("advClear").onclick=()=>{ADV.dueBefore="";$("fRoute").value="";$("calDate").value="";page=0;render();};
+
 </script>
 </body>
 </html>
