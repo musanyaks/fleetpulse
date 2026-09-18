@@ -135,6 +135,12 @@ tr.sel td{background:#eff6ff}
   .eic.red,.eic.red2{color:#dc2626}
   .eic.gray{color:#64748b}
   .bigcity{font-size:15px;font-weight:800;color:#0f172a}
+  .ftstop{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:6px;padding:7px 10px;
+    border-bottom:1px solid var(--line);font-size:12.5px;align-items:center}
+  .ftstop.hdr{font-weight:700;color:var(--muted);font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;
+    background:#fafbfe;position:sticky;top:0}
+  .ftstop .tm{color:var(--muted)}
+  .tsmooth{transition:transform 4.8s linear}
 </style>
 </head>
 <body>
@@ -325,6 +331,48 @@ tr.sel td{background:#eff6ff}
     <div class="muted small" id="tMsg" style="margin-top:8px;min-height:16px"></div>
   </div>
 </div>
+<div class="modal" id="fullTripModal" style="position:fixed;inset:0;background:rgba(2,6,23,.55);display:none;place-items:center;z-index:2600">
+  <div style="background:#fff;border-radius:16px;max-width:680px;width:94%;max-height:88vh;overflow-y:auto;padding:22px 24px;position:relative">
+    <button onclick="closeFullTrip()" style="position:absolute;top:14px;right:16px;border:0;background:none;font-size:18px;cursor:pointer;color:var(--muted)">✕</button>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
+      <div style="width:44px;height:44px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-weight:700;font-size:13px" id="ftInit">–</div>
+      <div><div style="display:flex;gap:8px;align-items:center"><b id="ftTid" style="font-size:18px">–</b><span id="ftStatus"></span></div>
+      <div class="muted small" id="ftSub">–</div></div>
+    </div>
+    <div class="locblock" style="margin:10px 0">
+      <div class="locrow"><span class="lpin">📍</span>
+        <div><div class="lcity" id="ftFrom">–</div><div class="lsub" id="ftDep">Departed (est.) –</div></div></div>
+      <div class="locline" style="height:20px"></div>
+      <div class="locrow"><span class="lpin green">🏁</span>
+        <div><div class="lcity" id="ftTo">–</div><div class="lsub" id="ftEtaWhen">ETA –</div></div></div>
+    </div>
+    <div style="margin:10px 0">
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted)">
+        <span>Trip progress</span><b id="ftPct" style="color:var(--text)">–</b></div>
+      <div class="pbar" style="width:100%;margin-top:4px"><i id="ftBar" style="width:0%"></i></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center;margin:12px 0">
+      <div style="border:1px solid var(--line);border-radius:10px;padding:8px 4px"><div class="muted small" style="font-size:10.5px">Distance</div><b id="ftDist">–</b></div>
+      <div style="border:1px solid var(--line);border-radius:10px;padding:8px 4px"><div class="muted small" style="font-size:10.5px">Remaining</div><b id="ftRem">–</b></div>
+      <div style="border:1px solid var(--line);border-radius:10px;padding:8px 4px"><div class="muted small" style="font-size:10.5px">Speed now</div><b id="ftSpd">–</b></div>
+      <div style="border:1px solid var(--line);border-radius:10px;padding:8px 4px"><div class="muted small" style="font-size:10.5px">RPM</div><b id="ftRpm">–</b></div>
+    </div>
+    <b class="small">Schedule (estimated)</b>
+    <div style="overflow:auto;max-height:200px;margin:6px 0" id="ftStops"></div>
+    <b class="small">Driver events (24h)</b>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center;margin:6px 0 10px">
+      <div style="border:1px solid var(--line);border-radius:10px;padding:6px 4px"><div class="muted small" style="font-size:10.5px">💨 Speeding</div><b id="ftEvS">0</b></div>
+      <div style="border:1px solid var(--line);border-radius:10px;padding:6px 4px"><div class="muted small" style="font-size:10.5px">🛑 Braking</div><b id="ftEvB">0</b></div>
+      <div style="border:1px solid var(--line);border-radius:10px;padding:6px 4px"><div class="muted small" style="font-size:10.5px">🚀 Accel</div><b id="ftEvA">0</b></div>
+      <div style="border:1px solid var(--line);border-radius:10px;padding:6px 4px"><div class="muted small" style="font-size:10.5px">🎯 Geofence</div><b id="ftEvG">0</b></div>
+    </div>
+    <div class="note">Live values are from the telemetry pipeline; schedule times are speed-derived estimates. Persisted trip logs, actual stop timestamps and replay arrive with the trips module.</div>
+    <div style="display:flex;gap:10px;margin-top:12px">
+      <button class="btn" style="flex:1" onclick="window.print()">🖨 Print</button>
+      <button class="btn ghost" style="flex:1" onclick="closeFullTrip()">Close</button>
+    </div>
+  </div>
+</div>
 <div id="toast"></div>
 
 <script>
@@ -376,14 +424,24 @@ let live=[],trips=[],selId=null,tabF='',page=0,pageSize=10;
 let alertsByVehicle=new Map(),docsByVehicle=new Map(),yday=null,today=null,dueBefore='';
 let viewMode='map';
 const markers=new Map();
-const BADGE='<svg viewBox="0 0 24 24" width="13" height="13"><rect x="1.5" y="6.5" width="11" height="8" rx="1" fill="#fff"/><path d="M12.5 8.5h4.4c.5 0 .96.25 1.24.66L20.5 12.5V15h-8V8.5Z" fill="#dbeafe"/><circle cx="5.8" cy="16.6" r="1.7" fill="#fff"/><circle cx="16.4" cy="16.6" r="1.7" fill="#fff"/></svg>';
+function badgeSVG(c){return '<svg viewBox="0 0 24 24" width="16" height="16">'
++'<rect x="0.5" y="7.5" width="2" height="3.5" rx="0.8" fill="#fff"/>'
++'<rect x="21.5" y="7.5" width="2" height="3.5" rx="0.8" fill="#fff"/>'
++'<rect x="3" y="3.5" width="18" height="12.5" rx="2.5" fill="#fff"/>'
++'<rect x="5.2" y="5.8" width="13.6" height="4.6" rx="1.2" fill="'+c+'"/>'
++'<rect x="4" y="14" width="16" height="2.6" rx="1.1" fill="#fff"/>'
++'<rect x="5.5" y="17.6" width="4.2" height="2.6" rx="1.1" fill="#fff"/>'
++'<rect x="14.3" y="17.6" width="4.2" height="2.6" rx="1.1" fill="#fff"/></svg>';
+}
 function badgeIcon(st){const c=st==='MOVING'?'#10b981':(st==='IDLE'?'#3b82f6':'#ef4444');
-  return L.divIcon({className:'',html:'<div class="tmarker" style="background:'+c+'">'+BADGE+'</div>',iconSize:[30,30],iconAnchor:[15,15],tooltipAnchor:[0,-16]});}
+  return L.divIcon({className:'tsmooth',html:'<div class="tmarker" style="background:'+c+'">'+badgeSVG(c)+'</div>',iconSize:[30,30],iconAnchor:[15,15],tooltipAnchor:[0,-16]});}
 
 /* ================= map ================= */
 const map=L.map('map',{zoomControl:false}).setView([-0.9,36.9],7);
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap'}).addTo(map);
 L.control.zoom({position:'bottomleft'}).addTo(map);
+map.on('zoomstart',()=>document.querySelectorAll('.tsmooth').forEach(e=>e.style.transition='none'));
+map.on('zoomend',()=>setTimeout(()=>document.querySelectorAll('.tsmooth').forEach(e=>e.style.transition=''),80));
 const LayersCtl=L.Control.extend({onAdd(){const d=L.DomUtil.create('div','leaflet-bar');
   const a=L.DomUtil.create('a','',d);a.href='#';a.title='Toggle map style';
   a.innerHTML="<svg viewBox='0 0 24 24' width='14' height='14' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polygon points='12 2 2 7 12 12 22 7 12 2'/><polyline points='2 17 12 22 22 17'/><polyline points='2 12 12 17 22 12'/></svg>";
@@ -609,7 +667,7 @@ document.addEventListener('click',e=>{const w=$('advMenu');if(w&&!w.parentElemen
  $('advClear').onclick=()=>{ADV.route='';ADV.dueBefore='';$('fRoute').value='';$('calDate').value='';page=0;render();};
  $('refreshBtn').onclick=()=>{load();toast('Refreshed',true);};
  $('newTripBtn').onclick=()=>toast('Trip dispatch belongs to the trips module - trips are derived live from telemetry',false);
- $('tdFull').onclick=()=>toast('Full trip history (stops, timeline, replay) arrives with the trips module',false);
+ $('tdFull').onclick=openFullTrip;
 document.querySelectorAll('#mapTabBar button').forEach(b=>b.onclick=()=>{
   viewMode=b.dataset.v;
   document.querySelectorAll('#mapTabBar button').forEach(x=>x.classList.toggle('on',x===b));
@@ -756,6 +814,57 @@ function renderDispatchStrip(){
 /* fold dispatch strip refresh into render: wrap it once */
 const _renderDispatched=render;
 render=function(){ _renderDispatched.apply(this,arguments); try{renderDispatchStrip();}catch(e){} };
+
+/* ================= View Full Trip Details (end-of-script) ================= */
+function openFullTrip(){
+  const t=trips.find(x=>x.tid===selId);
+  if(!t){ toast("Select a trip first",false); return; }
+  const v=t.v, st=t.status;
+  $("ftInit").textContent=initials(v.driverName);
+  $("ftTid").textContent=t.tid;
+  $("ftStatus").innerHTML='<span class="schip '+(st.replace(" ","")||"Offline")+'">'+st+'</span>';
+  $("ftSub").textContent=fmtPlate(v.vehicleId)+" · "+(v.make||"")+" "+(v.model||"")+" · "+(v.driverName||"-")+" ("+(v.driverId||"-")+")";
+  $("ftFrom").textContent=t.rid?routeLabels[t.rid].split(" - ")[0]:"-";
+  $("ftTo").textContent=t.rid?routeLabels[t.rid].split(" - ")[1]:"-";
+  $("ftBar").style.width=(t.progress||0)+"%";
+  $("ftPct").textContent=t.progress!=null?t.progress+"%":"-";
+  $("ftDist").textContent=t.totalKm?fmt(t.totalKm)+" km":"-";
+  $("ftRem").textContent=t.remaining!=null?fmt(t.remaining)+" km":"-";
+  $("ftSpd").textContent=fmt(v.speedKph)+" km/h";
+  $("ftRpm").textContent=fmt(v.rpm);
+  /* schedule */
+  const sched=$("ftStops");
+  const C=t.rid?CORRIDOR[t.rid]:null;
+  if(!C){ sched.innerHTML='<div class="ftstop"><span class="muted">No corridor assigned.</span></div>'; }
+  else{
+    const proj=projectOnRoute(t.rid,v.latitude,v.longitude);
+    const traveled=proj?proj.traveled:0;
+    const avg=(v.speedKph>5?v.speedKph:45);
+    const startMs=Date.now()-(traveled/avg)*3600e3;
+    const stops=ROUTE_STOPS[t.rid]||[];
+    let rows='<div class="ftstop hdr"><span>Stop</span><span>Arrival</span><span>Departure</span><span>Status</span></div>';
+    C.pts.forEach((p,i)=>{
+      const km=C.cum[i];
+      const arrMs=startMs+(km/avg)*3600e3, depMs=arrMs+5*60e3;
+      const done=km<=traveled-1, next=km>traveled+1;
+      const nm=((stops[i])||("Waypoint "+i))+(i===0?" (Start)":i===C.pts.length-1?" (Destination)":"");
+      const ft=ms=>new Date(ms).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
+      const sc=done?'<span class="stopchip done">Completed</span>'
+              :next?'<span class="stopchip next">Pending</span>'
+              :'<span class="stopchip now">In Progress</span>';
+      rows+='<div class="ftstop"><span><b>'+esc(nm)+'</b></span>'+
+        '<span class="tm">'+((done||!next)?ft(arrMs):'-')+'</span>'+
+        '<span class="tm">'+(done?ft(depMs):(i===0?ft(depMs):'-'))+'</span>'+sc+'</div>';});
+    sched.innerHTML=rows;
+  }
+  /* events */
+  const e=alertsByVehicle.get(v.vehicleId)||{spd:0,brk:0,acc:0,geo:0};
+  $("ftEvS").textContent=e.spd;$("ftEvB").textContent=e.brk;
+  $("ftEvA").textContent=e.acc;$("ftEvG").textContent=e.geo;
+  $("fullTripModal").style.display="grid";
+}
+function closeFullTrip(){ $("fullTripModal").style.display="none"; }
+ $("fullTripModal").addEventListener("click",e=>{ if(e.target.id==="fullTripModal") closeFullTrip(); });
 </script>
 </body>
 </html>
