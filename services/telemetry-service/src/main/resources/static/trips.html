@@ -134,6 +134,7 @@ tr.sel td{background:#eff6ff}
   .eic.blue{color:#2563eb}
   .eic.red,.eic.red2{color:#dc2626}
   .eic.gray{color:#64748b}
+  .bigcity{font-size:15px;font-weight:800;color:#0f172a}
 </style>
 </head>
 <body>
@@ -229,8 +230,9 @@ tr.sel td{background:#eff6ff}
               <div id="map"></div>
               <div class="mlegend">
                 <div><i style="background:var(--green)"></i> Moving</div>
-                <div><i style="background:var(--amber)"></i> Idle</div>
-                <div><i style="background:#93c5fd"></i> Route</div>
+                <div><i style="background:var(--blue2)"></i> Idle</div>
+                <div><i style="background:var(--red)"></i> Offline</div>
+                <div><span style="display:inline-block;width:16px;height:0;border-top:3px solid #2563eb;margin-right:5px;vertical-align:middle"></span> Route</div>
               </div>
             </div>
           </div>
@@ -350,18 +352,24 @@ let alertsByVehicle=new Map(),docsByVehicle=new Map(),yday=null,today=null,dueBe
 let viewMode='map';
 const markers=new Map();
 const BADGE='<svg viewBox="0 0 24 24" width="13" height="13"><rect x="1.5" y="6.5" width="11" height="8" rx="1" fill="#fff"/><path d="M12.5 8.5h4.4c.5 0 .96.25 1.24.66L20.5 12.5V15h-8V8.5Z" fill="#dbeafe"/><circle cx="5.8" cy="16.6" r="1.7" fill="#fff"/><circle cx="16.4" cy="16.6" r="1.7" fill="#fff"/></svg>';
-function badgeIcon(st){const c=st==='MOVING'?'#10b981':'#f59e0b';
-  return L.divIcon({className:'',html:'<div class="tmarker" style="background:'+c+'">'+BADGE+'</div>',iconSize:[26,26],iconAnchor:[13,13]});}
+function badgeIcon(st){const c=st==='MOVING'?'#10b981':(st==='IDLE'?'#3b82f6':'#ef4444');
+  return L.divIcon({className:'',html:'<div class="tmarker" style="background:'+c+'">'+BADGE+'</div>',iconSize:[30,30],iconAnchor:[15,15],tooltipAnchor:[0,-16]});}
 
 /* ================= map ================= */
-const map=L.map('map').setView([-0.9,36.9],7);
+const map=L.map('map',{zoomControl:false}).setView([-0.9,36.9],7);
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap'}).addTo(map);
+L.control.zoom({position:'bottomleft'}).addTo(map);
+const LayersCtl=L.Control.extend({onAdd(){const d=L.DomUtil.create('div','leaflet-bar');
+  const a=L.DomUtil.create('a','',d);a.href='#';a.title='Toggle map style';
+  a.innerHTML="<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>";
+  L.DomEvent.on(a,'click',e=>{L.DomEvent.stop(e);
+    const p=document.querySelector('#map .leaflet-tile-pane');
+    p.style.filter=p.style.filter?'':'saturate(.5) brightness(1.1)';});
+  return d;}});
+new LayersCtl({position:'bottomleft'}).addTo(map);
 const routeLines={};
 for(const[id,pts]of Object.entries(ROUTE_CATALOG)){
-  routeLines[id]=L.polyline(pts,{color:'#93c5fd',weight:4,opacity:.6}).bindTooltip('Corridor: '+routeLabels[id]).addTo(map);
-  const p=pts[0],q=pts[pts.length-1];
-  L.tooltip({permanent:true,direction:'right',className:'citylabel',offset:[6,0]}).setContent(routeLabels[id].split(' - ')[0]).setLatLng(p).addTo(map);
-  L.tooltip({permanent:true,direction:'right',className:'citylabel',offset:[6,0]}).setContent(routeLabels[id].split(' - ')[1]).setLatLng(q).addTo(map);
+  routeLines[id]=L.polyline(pts,{color:'#2563eb',weight:5,opacity:.9}).bindTooltip('Corridor: '+routeLabels[id]).addTo(map);
 }
 function highlightRoute(rid){
   for(const[id,ln]of Object.entries(routeLines))
@@ -620,6 +628,19 @@ const ROUTE_STOPS={
  "NBO-ELD":["Nairobi","Limuru","Naivasha","Nakuru","Salgaa","Timboroa","Burnt Forest","Eldoret"],
  "NBO-NKR":["Nairobi","Limuru","Kimende","Naivasha","Kikopey","Nakuru"],
  "NBO-GSA":["Nairobi","Matuu","Mwingi","Bura","Garissa"]};
+/* photo-style: white waypoint circles + named city labels */
+Object.entries(ROUTE_CATALOG).forEach(([id,pts])=>{
+  const stops=ROUTE_STOPS[id]||[];
+  pts.forEach((p,i)=>{
+    L.circleMarker(p,{radius:5,color:'#334155',weight:2,fillColor:'#fff',fillOpacity:1,interactive:false}).addTo(map);
+    const nm=stops[i];
+    if(nm){
+      const big=(i===0||i===pts.length-1);
+      L.tooltip({permanent:true,direction:'right',className:'citylabel'+(nm==='Nairobi'?' bigcity':''),offset:[8,0]})
+        .setContent(nm).setLatLng(p).addTo(map);
+    }
+  });
+});
 function renderStopsPhoto(){
   const t=trips.find(x=>x.tid===selId);if(!t)return;
   const C=t.rid?CORRIDOR[t.rid]:null;
