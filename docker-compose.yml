@@ -26,6 +26,8 @@ services:
         condition: service_started
       timescaledb:
         condition: service_healthy
+      redis:
+        condition: service_started
 
   simulator:
     build:
