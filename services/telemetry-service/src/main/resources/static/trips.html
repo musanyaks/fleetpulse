@@ -141,6 +141,18 @@ tr.sel td{background:#eff6ff}
     background:#fafbfe;position:sticky;top:0}
   .ftstop .tm{color:var(--muted)}
   .tsmooth{transition:transform 4.8s linear}
+  .tbell{position:relative;font-size:18px;background:#f1f5fb;border-radius:10px;padding:8px 12px;
+    text-decoration:none;cursor:pointer}
+  .tbadge{position:absolute;top:-6px;right:-6px;background:var(--red);color:#fff;font-size:10px;
+    font-weight:700;border-radius:99px;padding:2px 6px}
+  .tchipuser{display:flex;align-items:center;gap:9px;cursor:pointer}
+  .upic{width:34px;height:34px;border-radius:50%;background:var(--navy);color:#fff;
+    display:grid;place-items:center;font-size:11px;font-weight:700}
+  .uname{font-weight:700;font-size:13px;color:var(--text)}
+  .urole{font-size:11px;color:var(--muted)}
+  .datechip{font-size:12.5px;font-weight:600;color:var(--text);background:var(--panel);
+    border:1px solid var(--line);border-radius:9px;padding:8px 14px;white-space:nowrap}
+  .pagehead .spacer{flex:1}
 </style>
 </head>
 <body>
@@ -166,16 +178,21 @@ tr.sel td{background:#eff6ff}
 </aside>
 <main>
   <div class="topbar">
-    <div class="gsearch">🔍<input id="gq" placeholder="Search trips, vehicles, drivers, destinations..."/></div>
+    <div class="gsearch">&#128269;<input id="gq" placeholder="Search trips, vehicles, drivers, locations..."/></div>
     <span class="spacer"></span>
-    <span class="conn down" id="conn">● CONNECTING</span>
-    <button class="btn ghost" id="refreshBtn">⟳ Refresh</button>
-    <button class="btn" id="newTripBtn">＋ New Trip</button>
+    <a href="alerts.html" class="tbell" title="Alerts">&#128276;<span class="tbadge" id="topBell" style="display:none">0</span></a>
+    <button class="fbtn" id="fsBtn" title="Fullscreen">&#9004;</button>
+    <div class="tchipuser" id="userChip"><div class="upic" id="uInit">?</div>
+      <div><div class="uname" id="uName">Sign in</div><div class="urole" id="uRole">-</div></div></div>
   </div>
-
   <div class="content">
     <div class="pagehead"><span class="ic">🛣️</span>
       <div><h1>Trips</h1><div class="sub">Track and manage all your fleet trips in real-time</div></div>
+      <span class="spacer"></span>
+      <span class="conn down" id="conn">&#9679; CONNECTING</span>
+      <div class="datechip">&#128197; <span id="dateRange">-</span></div>
+      <button class="btn ghost" id="refreshBtn">&#10227; Refresh</button>
+      <button class="btn" id="newTripBtn">&#43; New Trip</button>
     </div>
 
     <div class="kpis" id="kpis"></div>
@@ -493,8 +510,7 @@ async function load(){
 
     const transit=trips.filter(t=>t.status==='In Transit').length;
     const pend=trips.filter(t=>t.status==='Pending').length;
-    const dT=yday?'<span class="trend '+(today.departures>=yday.departures?'up':'down')+'">'
-      +(today.departures>=yday.departures?'\u2191':'\u2193')+' '+Math.abs(today.departures-yday.departures)+' vs yesterday</span>':'<span class="trend">live</span>';
+    const dT=(yday&&yday.departures)?(function(){var d=today.departures-yday.departures,p=Math.round(Math.abs(d)/yday.departures*100);return '<span class="trend '+(d>=0?'up':'down')+'">'+(d>=0?'\u2191':'\u2193')+' '+p+'% vs yesterday</span>';})():'<span class="trend">live</span>';
     $('kpis').innerHTML=[
       ['\ud83d\udd17','#e8f0fe','Trips Today',today.departures,dT],
       ['\u2705','#dcfce7','Completed','0','<span class="trend">arrivals need trips module</span>'],
@@ -865,6 +881,31 @@ function openFullTrip(){
 }
 function closeFullTrip(){ $("fullTripModal").style.display="none"; }
  $("fullTripModal").addEventListener("click",e=>{ if(e.target.id==="fullTripModal") closeFullTrip(); });
+
+/* ================= header session / date / bell (end-of-script) ================= */
+(function(){try{
+  var r=fetch('/api/v1/me',{headers:{'Accept':'application/json'}});
+  r.then(function(res){
+    var ct=res.headers.get('content-type')||'';
+    if(!res.ok||ct.indexOf('application/json')<0)throw 0;
+    return res.json();
+  }).then(function(me){
+    var ini=(me.username||'?').split(' ').map(function(w){return w[0];}).slice(0,2).join('').toUpperCase();
+    $("uInit").textContent=ini;$("uName").textContent=me.username;
+    $("uRole").textContent=me.roles.join(', ');
+  }).catch(function(){$("userChip").onclick=function(){location.href='/login.html';};});
+}catch(e){}})();
+(function(){var d=new Date().toLocaleDateString([],{day:'numeric',month:'short',year:'numeric'});
+  var el=$("dateRange"); if(el) el.textContent=d+' \u2013 '+d;})();
+function refreshTopBell(){
+  fetch('/api/v1/alerts/recent?limit=100').then(function(r){return r.ok?r.json():[];})
+  .then(function(al){
+    var n=al.filter(function(a){return new Date(a.ts).getTime()>Date.now()-36e5;}).length;
+    var b=$("topBell"); b.textContent=n; b.style.display=n?'block':'none';
+  }).catch(function(){});
+}
+refreshTopBell(); setInterval(refreshTopBell,5000);
+ $("fsBtn").onclick=function(){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();};
 </script>
 </body>
 </html>
