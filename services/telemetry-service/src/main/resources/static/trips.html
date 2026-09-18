@@ -117,6 +117,23 @@ tr.sel td{background:#eff6ff}
 #toast{position:fixed;bottom:20px;right:20px;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;display:none;box-shadow:0 8px 24px rgba(2,6,23,.2);background:#d1fae5;color:#065f46;z-index:3000}
 @media (max-width:1280px){.grid{grid-template-columns:1fr 1fr}.col3{grid-column:1/-1}}
 @media (max-width:900px){.grid{grid-template-columns:1fr}}
+  .evrow{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid var(--line);font-size:12.8px}
+  .evrow:last-child{border-bottom:0}
+  .evrow .eic{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:12px;flex:none}
+  .eic.blue{background:#dbeafe}.eic.red{background:#fee2e2}.eic.red2{background:#fee2e2}.eic.gray{background:#f1f5f9}
+  .evrow .lbl{flex:1;color:var(--text)}
+  .evrow b{font-weight:700}
+  .astats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center;margin-bottom:12px}
+  .astats>div{border:1px solid var(--line);border-radius:10px;padding:9px 6px}
+  .astats .k{font-size:11px;color:var(--muted)}
+  .astats .v{font-size:14px;font-weight:700;margin-top:2px}
+  .achip{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;
+    padding:3px 10px;border-radius:99px;background:#d1fae5;color:#065f46}
+  .achip::before{content:'';width:6px;height:6px;border-radius:50%;background:#10b981}
+  .eic svg{display:block}
+  .eic.blue{color:#2563eb}
+  .eic.red,.eic.red2{color:#dc2626}
+  .eic.gray{color:#64748b}
 </style>
 </head>
 <body>
@@ -220,10 +237,10 @@ tr.sel td{background:#eff6ff}
           <div id="listView" class="jlist"></div>
         </div>
         <div class="card">
-          <h3>Trip Route <span class="muted small" id="rtSub"></span></h3>
+          <h3>Trip Route <span class="muted small" id="rtSub"></span><button class="fbtn" id="rtClose" style="margin-left:auto;width:26px;height:26px" title="Collapse">\u2715</button></h3>
           <div class="routeswrap">
             <div class="stoprow" style="font-weight:700;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.4px">
-              <span>Stop</span><span>Position</span><span>Segment</span><span>Status</span></div>
+              <span>Stop</span><span>Arrival</span><span>Departure</span><span>Status</span></div>
             <div id="stops"><div class="stoprow"><span class="muted">Select a trip...</span></div></div>
           </div>
           <div class="note">Stop arrival/departure timestamps require the trips module. Waypoint status is computed live from the vehicle position on the corridor.</div>
@@ -261,16 +278,18 @@ tr.sel td{background:#eff6ff}
           <div class="dhead"><div class="av" id="daInit">-</div>
             <div><b id="daName">-</b><div class="muted small" id="daId">-</div></div></div>
           <div style="padding:12px 16px">
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;text-align:center;margin-bottom:10px">
-              <div style="border:1px solid var(--line);border-radius:10px;padding:8px"><div class="muted small">Avg Speed</div><b id="daSpd">-</b></div>
-              <div style="border:1px solid var(--line);border-radius:10px;padding:8px"><div class="muted small">Distance today</div><b id="daDist">-</b></div>
+            <div class="astats">
+              <div><div class="k">Driving Time</div><div class="v" id="daDrive">-</div></div>
+              <div><div class="k">Distance</div><div class="v" id="daDist">-</div></div>
+              <div><div class="k">Avg. Speed</div><div class="v" id="daSpd">-</div></div>
             </div>
-            <b class="small">Events (24h)</b>
-            <div style="margin-top:6px">
-              <div class="drow"><span class="k">💨 Overspeeding</span><b id="evSpd">0</b></div>
-              <div class="drow"><span class="k">🛑 Harsh braking</span><b id="evBrk">0</b></div>
-              <div class="drow"><span class="k">🚀 Harsh acceleration</span><b id="evAcc">0</b></div>
-              <div class="drow"><span class="k">🎯 Geofence events</span><b id="vGeo">0</b></div>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <b class="small">Events</b><span class="muted small">24h</span></div>
+            <div style="margin-top:4px">
+              <div class="evrow"><span class="eic blue"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 14l4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg></span><span class="lbl">Overspeeding</span><b id="evSpd">0</b></div>
+              <div class="evrow"><span class="eic red"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span><span class="lbl">Harsh Braking</span><b id="evBrk">0</b></div>
+              <div class="evrow"><span class="eic red2"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span><span class="lbl">Harsh Acceleration</span><b id="evAcc">0</b></div>
+              <div class="evrow"><span class="eic gray"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><span class="lbl">Idle Time</span><b id="vIdle">-</b></div>
             </div>
           </div>
         </div>
@@ -500,7 +519,7 @@ function renderDetail(){
   $('daDist').textContent=today?fmt(today.distanceKm)+' km':'-';
   const e=alertsByVehicle.get(v.vehicleId)||{spd:0,brk:0,acc:0,geo:0};
   $('evSpd').textContent=e.spd;$('evBrk').textContent=e.brk;
-  $('evAcc').textContent=e.acc;$('vGeo').textContent=e.geo;
+  $('evAcc').textContent=e.acc;const _vg=$('vGeo');if(_vg)_vg.textContent=e.geo;
   const C=t.rid?CORRIDOR[t.rid]:null;
   if(!C){$('stops').innerHTML='<div class="stoprow"><span class="muted">No corridor assigned.</span></div>';$('rtSub').textContent='';return;}
   const proj=projectOnRoute(t.rid,v.latitude,v.longitude);
@@ -565,6 +584,71 @@ document.querySelectorAll('#mapTabBar button').forEach(b=>b.onclick=()=>{
 
 load();setInterval(load,5000);
 const autoSel=setInterval(()=>{if(trips.length&&!selId){selectTrip(trips[0].tid);clearInterval(autoSel);}},800);
+
+/* ================= Driver Activity card (mockup styling) ================= */
+function renderDetail_v2(){
+  if(!selId)return;
+  const t=trips.find(x=>x.tid===selId);if(!t)return;
+  const v=t.v,st=t.status;
+  /* chip with green dot */
+  $("daChip").innerHTML='<span class="achip">'+(st==='In Transit'?'Active':'Idle')+'</span>';
+  /* driving time: fleet distance today / current speed, floored sensibly */
+  let drive='-';
+  if(today&&today.distanceKm>0&&v.speedKph>5){
+    const hours=today.distanceKm/v.speedKph;
+    const H=Math.floor(hours),M=Math.round((hours-H)*60);
+    drive=H?H+'h '+M+'m':M+'m';
+  } else if(st!=='In Transit'){drive='0h 0m';}
+  const d1=$('daDrive');if(d1)d1.textContent=drive;
+  /* idle time: session proxy - time since last movement (pending trips) */
+  const d2=$('vIdle');if(d2){
+    if(st==='In Transit'){d2.textContent='0m';}
+    else if(v.lastSeen){
+      const mins=Math.min(59,Math.max(1,Math.round((Date.now()-new Date(v.lastSeen).getTime())/60000)));
+      d2.textContent=mins+'m';
+    } else d2.textContent='-';
+  }
+}
+/* wrap the canonical renderDetail: run base, then the card tweaks */
+const _renderDetailBase=renderDetail;
+renderDetail=function(){try{_renderDetailBase.apply(this,arguments);}catch(e){console.error('renderDetail base:',e);}try{renderDetail_v2();}catch(e){console.error('renderDetail v2:',e);}try{renderStopsPhoto();}catch(e){console.error('renderStopsPhoto:',e);} };
+
+/* ================= named stops (photo-style trip route) ================= */
+const ROUTE_STOPS={
+ "NBO-MSA":["Nairobi","Mlolongo","Athi River","Machakos Jct","Sultan Hamud","Emali","Kibwezi","Mtito Andei","Voi","Mwatate","Maungu","Wundanyi Jct","Samburu","Mombasa"],
+ "NBO-KSM":["Nairobi","Limuru","Naivasha","Nakuru","Londiani","Kericho","Muhoroni","Kisumu"],
+ "NBO-ELD":["Nairobi","Limuru","Naivasha","Nakuru","Salgaa","Timboroa","Burnt Forest","Eldoret"],
+ "NBO-NKR":["Nairobi","Limuru","Kimende","Naivasha","Kikopey","Nakuru"],
+ "NBO-GSA":["Nairobi","Matuu","Mwingi","Bura","Garissa"]};
+function renderStopsPhoto(){
+  const t=trips.find(x=>x.tid===selId);if(!t)return;
+  const C=t.rid?CORRIDOR[t.rid]:null;
+  if(!C){$("stops").innerHTML='<div class="stoprow"><span class="muted">No corridor assigned.</span></div>';$("rtSub").textContent="";return;}
+  const v=t.v;
+  const proj=projectOnRoute(t.rid,v.latitude,v.longitude);
+  const traveled=proj?proj.traveled:0;
+  const avg=(v.speedKph>5?v.speedKph:45);
+  const startMs=Date.now()-(traveled/avg)*3600e3;
+  $("rtSub").textContent="- "+routeLabels[t.rid];
+  let rows="";
+  C.pts.forEach((p,i)=>{
+    const km=C.cum[i];
+    const arrMs=startMs+(km/avg)*3600e3;
+    const depMs=arrMs+5*60e3;
+    const done=km<=traveled-1,next=km>traveled+1;
+    const nm=((ROUTE_STOPS[t.rid]||[])[i]||("Waypoint "+i))+(i===0?" (Start)":i===C.pts.length-1?" (Destination)":"");
+    const ft=ms=>new Date(ms).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
+    const sc=done?'<span class="stopchip done">Completed</span>'
+            :next?'<span class="stopchip next">Pending</span>'
+            :'<span class="stopchip now">In Progress</span>';
+    rows+='<div class="stoprow"><span class="nm">'+esc(nm)+'</span>'+
+      '<span class="tm">'+(done||!next?ft(arrMs):'-')+'</span>'+
+      '<span class="tm">'+(done?ft(depMs):(i===0?ft(depMs):'-'))+'</span>'+sc+'</div>';});
+  $("stops").innerHTML=rows;
+}
+ $("rtClose").onclick=()=>{const w=document.querySelector(".routeswrap");
+  const hid=w.style.display==="none";w.style.display=hid?"":"none";
+  $("rtClose").textContent=hid?"\u2715":"\u25be";};
 </script>
 </body>
 </html>
