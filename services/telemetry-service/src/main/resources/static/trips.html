@@ -46,7 +46,11 @@ main{flex:1;min-width:0;display:flex;flex-direction:column}
 .tabs button.on{color:var(--blue);border-bottom-color:var(--blue)}
 .toolbar{display:flex;gap:8px;padding:10px 12px;border-bottom:1px solid var(--line);flex-wrap:wrap}
 .toolbar input,.toolbar select{border:1px solid var(--line);border-radius:9px;padding:7px 10px;font:inherit;background:#fff}
-.toolbar input{flex:1;min-width:160px}
+.toolbar input{flex:1;min-width:150px}
+.fbtn{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border:1px solid var(--line);border-radius:9px;background:#f1f5fb;color:var(--muted);cursor:pointer;flex:none}
+.fbtn:hover{border-color:var(--blue2);color:var(--blue)}
+.dropdown{position:absolute;top:calc(100% + 6px);right:0;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 32px rgba(2,6,23,.18);min-width:250px;z-index:1500;display:none;padding:4px}
+.dropdown.open{display:block}
 .tblwrap{overflow:auto;max-height:52vh}
 table{width:100%;border-collapse:collapse;font-size:12.5px;white-space:nowrap}
 th{text-align:left;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.4px;padding:8px 10px;border-bottom:1px solid var(--line);background:#fafbfe;position:sticky;top:0}
@@ -55,11 +59,10 @@ tbody tr:hover td{background:#f8fafc;cursor:pointer}
 tr.sel td{background:#eff6ff}
 .plate{font-weight:700;letter-spacing:.3px}
 .schip{font-size:10px;font-weight:700;padding:2px 9px;border-radius:99px}
-.schip.InTransit{background:#d1fae5;color:#065f46}.schip.Pending{background:#fef3c7;color:#92400e}
-.schip.Offline{background:#f1f5f9;color:#64748b}.schip.Completed{background:#dbeafe;color:#1e40af}
+.schip.InTransit{background:#d1fae5;color:#065f46}.schip.Pending{background:#fef3c7;color:#92400e}.schip.Offline{background:#f1f5f9;color:#64748b}
 .pbar{width:70px;height:6px;border-radius:99px;background:#eef2f9;overflow:hidden;display:inline-block;vertical-align:middle;margin-right:6px}
 .pbar i{display:block;height:100%;border-radius:99px;background:var(--green)}
-.pager{display:flex;align-items:center;gap:8px;padding:10px 14px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
+.pager{display:flex;align-items:center;gap:8px;padding:10px 14px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);flex-wrap:wrap}
 .pager button{border:1px solid var(--line);background:#fff;border-radius:8px;min-width:28px;padding:4px 8px;font:inherit;font-size:12px;cursor:pointer}
 .pager button.on{background:var(--blue);border-color:var(--blue);color:#fff}
 .pager button:disabled{opacity:.4;cursor:default}
@@ -71,6 +74,26 @@ tr.sel td{background:#eff6ff}
 .mlegend i{width:9px;height:9px;border-radius:50%}
 .tmarker{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;border:2.5px solid #fff;box-shadow:0 2px 8px rgba(2,6,23,.35)}
 .tmarker svg{display:block}
+.mtabs{display:flex;gap:4px;padding:10px 12px;border-bottom:1px solid var(--line)}
+.mtabs button{border:0;background:transparent;padding:8px 12px;font:inherit;font-size:12.5px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent}
+.mtabs button.on{color:var(--blue);border-bottom-color:var(--blue)}
+#mapView{position:relative}
+.jlist{display:none;padding:8px 0;max-height:340px;overflow-y:auto}
+.jlist.show{display:block}
+.jstop{display:flex;gap:12px;padding:8px 16px;align-items:flex-start}
+.jstop .rail{width:14px;display:flex;flex-direction:column;align-items:center;flex:none}
+.jstop .jdot{width:11px;height:11px;border-radius:50%;border:3px solid #93c5fd;background:#fff}
+.jstop.done .jdot{border-color:var(--green)}
+.jstop.now .jdot{border-color:var(--blue)}
+.jstop .ln{flex:1;border-left:2px dashed var(--line);min-height:24px;margin-top:2px}
+.jstop:last-child .ln{display:none}
+.jstop .tx{flex:1}
+.jstop .nm{font-weight:700;font-size:12.8px}
+.jstop .sub{font-size:11.5px;color:var(--muted)}
+.jstop .st{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px}
+.jstop .st.done{background:#d1fae5;color:#065f46}
+.jstop .st.now{background:#dbeafe;color:#1e40af}
+.jstop .st.next{background:#f1f5f9;color:#64748b}
 .routeswrap{max-height:300px;overflow-y:auto}
 .stoprow{display:grid;grid-template-columns:1.4fr 1fr 1fr .9fr;gap:6px;padding:8px 16px;border-bottom:1px solid var(--line);font-size:12.3px;align-items:center}
 .stoprow .nm{font-weight:600}
@@ -84,44 +107,16 @@ tr.sel td{background:#eff6ff}
 .drow .k{color:var(--muted)}
 .dhead{display:flex;gap:10px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line)}
 .dhead .av{width:36px;height:36px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-size:11px;font-weight:700}
+.locblock{display:flex;flex-direction:column;margin-bottom:6px}
+.locrow{display:flex;gap:10px;align-items:flex-start}
+.lpin{width:28px;height:28px;border-radius:50%;background:#e8f0fe;display:grid;place-items:center;font-size:13px;flex:none}
+.lpin.green{background:#d1fae5}
+.lcity{font-weight:700;font-size:13.5px}
+.lsub{font-size:11.5px;color:var(--muted)}
+.locline{border-left:2px dashed var(--line);height:16px;margin-left:13px}
 #toast{position:fixed;bottom:20px;right:20px;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;display:none;box-shadow:0 8px 24px rgba(2,6,23,.2);background:#d1fae5;color:#065f46;z-index:3000}
 @media (max-width:1280px){.grid{grid-template-columns:1fr 1fr}.col3{grid-column:1/-1}}
 @media (max-width:900px){.grid{grid-template-columns:1fr}}
-  .calwrap{position:relative;display:inline-flex;align-items:center;justify-content:center;
-    width:36px;height:36px;border:1px solid var(--line);border-radius:9px;background:#f1f5fb;
-    color:var(--muted);cursor:pointer;flex:none}
-  .calwrap:hover{border-color:var(--blue2);color:var(--blue)}
-  .calwrap svg{position:absolute;pointer-events:none;z-index:1}
-  .calwrap input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;border:0;padding:0}
-  .calwrap.has-date{background:#eff6ff;border-color:#93c5fd;color:var(--blue)}
-  .fbtn{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;
-    border:1px solid var(--line);border-radius:9px;background:#f1f5fb;color:var(--muted);cursor:pointer;flex:none}
-  .fbtn:hover{border-color:var(--blue2);color:var(--blue)}
-  .dropdown{position:absolute;top:calc(100% + 6px);right:0;background:#fff;border:1px solid var(--line);
-    border-radius:12px;box-shadow:0 12px 32px rgba(2,6,23,.18);min-width:240px;z-index:1500;display:none;padding:4px}
-  .dropdown.open{display:block}
-  .toolbar select{flex:0 1 auto}
-  .mtabs{display:flex;gap:4px;padding:10px 12px;border-bottom:1px solid var(--line)}
-  .mtabs button{border:0;background:transparent;padding:8px 12px;font:inherit;font-size:12.5px;font-weight:600;
-    color:var(--muted);cursor:pointer;border-bottom:2px solid transparent}
-  .mtabs button.on{color:var(--blue);border-bottom-color:var(--blue)}
-  #mapView{position:relative}
-  .jlist{display:none;padding:8px 0;max-height:340px;overflow-y:auto}
-  .jlist.show{display:block}
-  .jstop{display:flex;gap:12px;padding:8px 16px;align-items:flex-start}
-  .jstop .rail{width:14px;display:flex;flex-direction:column;align-items:center;flex:none}
-  .jstop .dot{width:11px;height:11px;border-radius:50%;border:3px solid #93c5fd;background:#fff}
-  .jstop.done .dot{border-color:var(--green)}
-  .jstop.now .dot{border-color:var(--blue)}
-  .jstop .ln{flex:1;border-left:2px dashed var(--line);min-height:26px;margin-top:2px}
-  .jstop:last-child .ln{display:none}
-  .jstop .tx{flex:1}
-  .jstop .nm{font-weight:700;font-size:12.8px}
-  .jstop .sub{font-size:11.5px;color:var(--muted)}
-  .jstop .st{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;justify-self:end}
-  .jstop .st.done{background:#d1fae5;color:#065f46}
-  .jstop .st.now{background:#dbeafe;color:#1e40af}
-  .jstop .st.next{background:#f1f5f9;color:#64748b}
 </style>
 </head>
 <body>
@@ -176,7 +171,9 @@ tr.sel td{background:#eff6ff}
           <select id="fVeh"><option value="">All Vehicles</option></select>
           <select id="fDrv"><option value="">All Drivers</option></select>
           <div style="position:relative">
-            <button class="fbtn" id="advBtn" title="More filters"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg></button>
+            <button class="fbtn" id="advBtn" title="More filters">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+            </button>
             <div class="dropdown" id="advMenu">
               <div style="padding:8px 10px"><label class="muted small">Corridor</label>
                 <select id="fRoute" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:7px 8px;font:inherit">
@@ -197,65 +194,76 @@ tr.sel td{background:#eff6ff}
           </div>
         </div>
         <div class="tblwrap"><table>
-          <thead><tr><th>Trip ID</th><th>Vehicle</th><th>Driver</th><th>Origin → Destination</th>
+          <thead><tr><th>Trip ID</th><th>Vehicle</th><th>Driver</th><th>Origin - Destination</th>
             <th>Status</th><th>Progress</th><th>ETA</th></tr></thead>
-          <tbody id="rows"><tr><td colspan="7" class="muted">Loading…</td></tr></tbody>
+          <tbody id="rows"><tr><td colspan="7" class="muted">Loading...</td></tr></tbody>
         </table></div>
         <div class="pager" id="pager"></div>
       </div>
 
       <div>
         <div class="card" style="margin-bottom:16px">
-          <h3 style="padding-bottom:0;border-bottom:0"></h3><div class="mtabs" id="mapTabBar"><button class="on" data-v="map">🗺️ Map View</button><button data-v="list">📋 List View</button><span class="muted small" id="mapMode" style="margin-left:auto;align-self:center;padding-right:12px">— all corridors</span></div>
-          <div style="position:relative"><div id="mapView"><div id="map"></div>
-            <div class="mlegend">
-              <div><i style="background:var(--green)"></i> Moving</div>
-              <div><i style="background:var(--amber)"></i> Idle</div>
-              <div><i style="background:#93c5fd"></i> Route</div>
-            </div></div>
-<div id="listView" class="jlist"></div>
+          <div class="mtabs" id="mapTabBar">
+            <button class="on" data-v="map">Map View</button>
+            <button data-v="list">List View</button>
           </div>
+          <div id="mapView">
+            <div style="position:relative">
+              <div id="map"></div>
+              <div class="mlegend">
+                <div><i style="background:var(--green)"></i> Moving</div>
+                <div><i style="background:var(--amber)"></i> Idle</div>
+                <div><i style="background:#93c5fd"></i> Route</div>
+              </div>
+            </div>
+          </div>
+          <div id="listView" class="jlist"></div>
         </div>
         <div class="card">
           <h3>Trip Route <span class="muted small" id="rtSub"></span></h3>
           <div class="routeswrap">
             <div class="stoprow" style="font-weight:700;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.4px">
-              <span>Stop</span><span>Position</span><span>Distance</span><span>Status</span></div>
-            <div id="stops"><div class="stoprow"><span class="muted">Select a trip…</span></div></div>
+              <span>Stop</span><span>Position</span><span>Segment</span><span>Status</span></div>
+            <div id="stops"><div class="stoprow"><span class="muted">Select a trip...</span></div></div>
           </div>
-          <div class="note">Stop arrival/departure timestamps require the trips module (stop-event detection on telemetry history). Waypoint status is computed live from the vehicle's position on the corridor.</div>
+          <div class="note">Stop arrival/departure timestamps require the trips module. Waypoint status is computed live from the vehicle position on the corridor.</div>
         </div>
       </div>
 
       <div class="col3">
         <div class="card" style="margin-bottom:16px">
           <h3>Trip Details <span id="tdStatus" style="margin-left:auto"></span></h3>
-          <div class="dhead"><div class="av" id="tdInit">–</div>
-            <div><b id="tdId">—</b><div class="muted small" id="tdWho">select a trip</div></div></div>
+          <div class="dhead"><div class="av" id="tdInit">-</div>
+            <div><b id="tdId" style="font-size:15px">-</b><div class="muted small" id="tdWho">select a trip</div></div></div>
           <div style="padding:12px 16px">
-            <div class="drow"><span class="k">📍 Origin</span><b id="tdFrom">—</b></div>
-            <div class="drow"><span class="k">🏁 Destination</span><b id="tdTo">—</b></div>
-            <div class="drow"><span class="k">🛣️ Corridor</span><b id="tdRoute">—</b></div>
-            <div class="drow"><span class="k">⏱ Current speed</span><b id="tdSpd">—</b></div>
-            <div class="drow"><span class="k">🕒 Last update</span><b id="tdUpd">—</b></div>
-            <div style="margin-top:10px">
-              <div class="drow" style="border:0"><span class="k">Progress</span><b id="tdPct">—</b></div>
-              <div class="pbar" style="width:100%"><i id="tdBar" style="width:0%"></i></div>
+            <div class="locblock">
+              <div class="locrow"><span class="lpin">📍</span>
+                <div><div class="lcity" id="tdFrom">-</div><div class="lsub" id="tdDep">Departed (est.) -</div></div></div>
+              <div class="locline"></div>
+              <div class="locrow"><span class="lpin green">🏁</span>
+                <div><div class="lcity" id="tdTo">-</div><div class="lsub" id="tdEtaWhen">ETA -</div></div></div>
             </div>
-            <div class="drow" style="margin-top:8px"><span class="k">Distance</span><b id="tdDist">—</b></div>
-            <div class="drow"><span class="k">Remaining</span><b id="tdRem">—</b></div>
-            <div class="drow"><span class="k">Estimated arrival</span><b id="tdEta">—</b></div>
-            <button class="btn" style="width:100%;margin-top:10px;background:#eef2f9;color:var(--text)" id="tdFull">View Full Trip Details</button>
+            <div style="margin-top:12px">
+              <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted)">
+                <span>Progress</span><b id="tdPct" style="color:var(--text)">-</b></div>
+              <div class="pbar" style="width:100%;margin-top:4px"><i id="tdBar" style="width:0%"></i></div>
+            </div>
+            <div style="margin-top:10px">
+              <div class="drow"><span class="k">Distance</span><b id="tdDist">-</b></div>
+              <div class="drow"><span class="k">Estimated arrival</span><b id="tdEta">-</b></div>
+              <div class="drow"><span class="k">Actual arrival</span><b>-</b></div>
+            </div>
+            <button class="btn" style="width:100%;margin-top:12px;background:#eef2f9;color:var(--text)" id="tdFull">View Full Trip Details</button>
           </div>
         </div>
         <div class="card">
           <h3>Driver Activity <span id="daChip" style="margin-left:auto"></span></h3>
-          <div class="dhead"><div class="av" id="daInit">–</div>
-            <div><b id="daName">—</b><div class="muted small" id="daId">—</div></div></div>
+          <div class="dhead"><div class="av" id="daInit">-</div>
+            <div><b id="daName">-</b><div class="muted small" id="daId">-</div></div></div>
           <div style="padding:12px 16px">
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;text-align:center;margin-bottom:10px">
-              <div style="border:1px solid var(--line);border-radius:10px;padding:8px"><div class="muted small">Avg Speed</div><b id="daSpd">–</b></div>
-              <div style="border:1px solid var(--line);border-radius:10px;padding:8px"><div class="muted small">Distance today</div><b id="daDist">–</b></div>
+              <div style="border:1px solid var(--line);border-radius:10px;padding:8px"><div class="muted small">Avg Speed</div><b id="daSpd">-</b></div>
+              <div style="border:1px solid var(--line);border-radius:10px;padding:8px"><div class="muted small">Distance today</div><b id="daDist">-</b></div>
             </div>
             <b class="small">Events (24h)</b>
             <div style="margin-top:6px">
@@ -277,16 +285,16 @@ tr.sel td{background:#eff6ff}
 /* ================= helpers ================= */
 const $=id=>document.getElementById(id);
 const esc=s=>(s??'').replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
-const fmt=n=>n==null?'–':Number(n).toFixed(0);
+const fmt=n=>n==null?'-':Number(n).toFixed(0);
 const fmtPlate=id=>{const m=/^(K[A-Z]{2})(\d{3}[A-Z])$/.exec(id||'');return m?m[1]+' '+m[2]:id||'';};
 const api=async p=>{const r=await fetch(p);if(!r.ok)throw new Error('HTTP '+r.status);return r.json();};
-const toast=(m,ok=true)=>{const t=$('toast');t.textContent=m;
-  t.style.background=ok?'#d1fae5':'#fee2e2';t.style.color=ok?'#065f46':'#991b1b';
+const toast=(m,ok)=>{const t=$('toast');t.textContent=m;
+  t.style.background=ok===false?'#fee2e2':'#d1fae5';t.style.color=ok===false?'#991b1b':'#065f46';
   t.style.display='block';setTimeout(()=>t.style.display='none',2600);};
 const initials=n=>(n||'?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
 const havKm=(a,b,c,d)=>{const R=6371,r=Math.PI/180,dLa=(c-a)*r,dLo=(d-b)*r,
   h=Math.sin(dLa/2)**2+Math.cos(a*r)*Math.cos(c*r)*Math.sin(dLo/2)**2;return 2*R*Math.asin(Math.sqrt(h));};
-const fmtDur=h=>{if(h==null||!isFinite(h))return '–';const H=Math.floor(h),M=Math.round((h-H)*60);return H?H+'h '+M+'m':M+'m';};
+const fmtDur=h=>{if(h==null||!isFinite(h))return '-';const H=Math.floor(h),M=Math.round((h-H)*60);return H?H+'h '+M+'m':M+'m';};
 
 /* ================= corridors ================= */
 const ROUTE_CATALOG={
@@ -295,36 +303,33 @@ const ROUTE_CATALOG={
  "NBO-ELD":[[-1.286,36.817],[-1.112,36.640],[-0.717,36.433],[-0.303,36.080],[-0.100,35.550],[0.150,35.420],[0.350,35.300],[0.514,35.270]],
  "NBO-NKR":[[-1.286,36.817],[-1.112,36.640],[-0.900,36.550],[-0.717,36.433],[-0.520,36.320],[-0.303,36.080]],
  "NBO-GSA":[[-1.286,36.817],[-1.233,37.100],[-1.000,37.500],[-0.700,38.300],[-0.453,39.646]]};
-const routeLabels={"NBO-MSA":"Nairobi → Mombasa","NBO-KSM":"Nairobi → Kisumu","NBO-ELD":"Nairobi → Eldoret","NBO-NKR":"Nairobi → Nakuru","NBO-GSA":"Nairobi → Garissa"};
+const routeLabels={"NBO-MSA":"Nairobi - Mombasa","NBO-KSM":"Nairobi - Kisumu","NBO-ELD":"Nairobi - Eldoret","NBO-NKR":"Nairobi - Nakuru","NBO-GSA":"Nairobi - Garissa"};
 const ROUTE_COLORS={"NBO-MSA":"#10b981","NBO-KSM":"#3b82f6","NBO-ELD":"#0ea5e9","NBO-NKR":"#14b8a6","NBO-GSA":"#6366f1"};
-/* precompute cumulative km per corridor */
 const CORRIDOR={};
 for(const[id,pts]of Object.entries(ROUTE_CATALOG)){
   const cum=[0];let acc=0;
   for(let i=1;i<pts.length;i++){acc+=havKm(pts[i-1][0],pts[i-1][1],pts[i][0],pts[i][1]);cum.push(acc);}
   CORRIDOR[id]={pts,cum,totalKm:acc};
 }
-/* project position onto corridor → traveled km */
 function projectOnRoute(rid,lat,lon){
   const R=CORRIDOR[rid];if(!R)return null;
-  let best={d:Infinity,traveled:0,seg:0};
+  let best={d:Infinity,traveled:0};
   for(let i=1;i<R.pts.length;i++){
-    const[ax,ay]=R.pts[i-1],[bx,by]=R.pts[i];
+    const ax=R.pts[i-1][0],ay=R.pts[i-1][1],bx=R.pts[i][0],by=R.pts[i][1];
     const segLen=R.cum[i]-R.cum[i-1];if(segLen<=0)continue;
-    /* approximate param by lat/lon lerp */
     const dx=bx-ax,dy=by-ay;
     let t=((lat-ax)*dx+(lon-ay)*dy)/((dx*dx+dy*dy)||1);t=Math.max(0,Math.min(1,t));
-    const px=ax+t*dx,py=ay+t*dy;
-    const d=havKm(lat,lon,px,py);
-    if(d<best.d)best={d,traveled:R.cum[i-1]+t*segLen,seg:i};
+    const d=havKm(lat,lon,ax+t*dx,ay+t*dy);
+    if(d<best.d)best={d,traveled:R.cum[i-1]+t*segLen};
   }
   return best;
 }
 
 /* ================= state ================= */
-let live=[],vehicles=new Map(),trips=[],selId=null,tabF='',page=0,pageSize=10;
-let alertsByVehicle=new Map(),yday=null,today=null,dueBefore='';
-let docsByVehicle=new Map();
+let live=[],trips=[],selId=null,tabF='',page=0,pageSize=10;
+let alertsByVehicle=new Map(),docsByVehicle=new Map(),yday=null,today=null,dueBefore='';
+let viewMode='map';
+const markers=new Map();
 const BADGE='<svg viewBox="0 0 24 24" width="13" height="13"><rect x="1.5" y="6.5" width="11" height="8" rx="1" fill="#fff"/><path d="M12.5 8.5h4.4c.5 0 .96.25 1.24.66L20.5 12.5V15h-8V8.5Z" fill="#dbeafe"/><circle cx="5.8" cy="16.6" r="1.7" fill="#fff"/><circle cx="16.4" cy="16.6" r="1.7" fill="#fff"/></svg>';
 function badgeIcon(st){const c=st==='MOVING'?'#10b981':'#f59e0b';
   return L.divIcon({className:'',html:'<div class="tmarker" style="background:'+c+'">'+BADGE+'</div>',iconSize:[26,26],iconAnchor:[13,13]});}
@@ -332,69 +337,66 @@ function badgeIcon(st){const c=st==='MOVING'?'#10b981':'#f59e0b';
 /* ================= map ================= */
 const map=L.map('map').setView([-0.9,36.9],7);
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap'}).addTo(map);
-const routeLines={},markers=new Map();
+const routeLines={};
 for(const[id,pts]of Object.entries(ROUTE_CATALOG)){
-  routeLines[id]=L.polyline(pts,{color:'#93c5fd',weight:4,opacity:.6}).bindTooltip('🛣️ '+routeLabels[id]).addTo(map);
+  routeLines[id]=L.polyline(pts,{color:'#93c5fd',weight:4,opacity:.6}).bindTooltip('Corridor: '+routeLabels[id]).addTo(map);
   const p=pts[0],q=pts[pts.length-1];
-  L.tooltip({permanent:true,direction:'right',className:'citylabel',offset:[6,0]}).setContent(routeLabels[id].split(' → ')[0]).setLatLng(p).addTo(map);
-  L.tooltip({permanent:true,direction:'right',className:'citylabel',offset:[6,0]}).setContent(routeLabels[id].split(' → ')[1]).setLatLng(q).addTo(map);
+  L.tooltip({permanent:true,direction:'right',className:'citylabel',offset:[6,0]}).setContent(routeLabels[id].split(' - ')[0]).setLatLng(p).addTo(map);
+  L.tooltip({permanent:true,direction:'right',className:'citylabel',offset:[6,0]}).setContent(routeLabels[id].split(' - ')[1]).setLatLng(q).addTo(map);
 }
 function highlightRoute(rid){
   for(const[id,ln]of Object.entries(routeLines))
-    ln.setStyle({color:rid&&id===rid?(ROUTE_COLORS[id]||'#3b82f6'):'#93c5fd',weight:rid&&id===rid?6:4,opacity:rid&&id===rid?.95:.6});
+    ln.setStyle({color:(rid&&id===rid)?(ROUTE_COLORS[id]||'#3b82f6'):'#93c5fd',
+                 weight:(rid&&id===rid)?6:4,opacity:(rid&&id===rid)?.95:.6});
 }
 
 /* ================= data ================= */
 async function load(){
   try{
-    const [lv,sum]=await Promise.all([
+    const [lv,sum,vp,al]=await Promise.all([
       api('/api/v1/vehicles/live'),
-      api('/api/v1/trips/summary')]);
+      api('/api/v1/trips/summary'),
+      api('/api/v1/vehicles?size=200'),
+      api('/api/v1/alerts/recent?limit=500').catch(()=>[])]);
     const yd=new Date();yd.setDate(yd.getDate()-1);
-    yday=yday||await api('/api/v1/trips/summary?date='+
-      yd.getFullYear()+'-'+String(yd.getMonth()+1).padStart(2,'0')+'-'+String(yd.getDate()).padStart(2,'0')).catch(()=>null);
+    if(!yday)yday=await api('/api/v1/trips/summary?date='+yd.getFullYear()+'-'+String(yd.getMonth()+1).padStart(2,'0')+'-'+String(yd.getDate()).padStart(2,'0')).catch(()=>null);
     today=sum;
-    const al=await api('/api/v1/alerts/recent?limit=500').catch(()=>[]);
+    docsByVehicle=new Map(vp.filter(v=>v.nextService||v.insuranceExpiry||v.inspectionExpiry)
+      .map(v=>[v.vehicleId,[v.nextService,v.insuranceExpiry,v.inspectionExpiry].filter(Boolean)]));
     const dayAgo=Date.now()-864e5;alertsByVehicle=new Map();
     al.forEach(a=>{if(new Date(a.ts).getTime()<dayAgo)return;
       const e=alertsByVehicle.get(a.vehicle_id)||{spd:0,brk:0,acc:0,geo:0};
       if(a.type==='SPEEDING')e.spd++;if(a.type==='HARSH_BRAKING')e.brk++;
       if(a.type==='HARSH_ACCELERATION')e.acc++;if(a.type==='GEOFENCE')e.geo++;
       alertsByVehicle.set(a.vehicle_id,e);});
-    const vp=await api('/api/v1/vehicles?size=200');
-    vehicles=new Map(vp.map(v=>[v.vehicleId,v]));
-
     live=lv;
     trips=lv.map((v,i)=>{
       const rid=v.routeId,proj=rid?projectOnRoute(rid,v.latitude,v.longitude):null;
       const C=rid?CORRIDOR[rid]:null;
-      const status=v.status==='MOVING'?'In Transit':'Pending';
       const progress=proj&&C?Math.min(100,Math.round(proj.traveled/C.totalKm*100)):null;
       const remaining=proj&&C?Math.max(0,C.totalKm-proj.traveled):null;
       const avg=v.speedKph>5?v.speedKph:45;
       const etaH=remaining!=null?remaining/avg:null;
-      return{tid:'T'+String(1001+i),v,rid,status,progress,remaining,etaH,
-             totalKm:C?C.totalKm:null};
+      return{tid:'T'+String(1001+i),v,rid,status:v.status==='MOVING'?'In Transit':'Pending',
+             progress,remaining,etaH,totalKm:C?C.totalKm:null};
     });
 
-    /* KPIs */
     const transit=trips.filter(t=>t.status==='In Transit').length;
     const pend=trips.filter(t=>t.status==='Pending').length;
-    const dTrend=yday?`<span class="trend ${today.departures>=yday.departures?'up':'down'}">${today.departures>=yday.departures?'↑':'↓'} ${Math.abs(today.departures-yday.departures)} vs yesterday</span>`:'<span class="trend">live</span>';
+    const dT=yday?'<span class="trend '+(today.departures>=yday.departures?'up':'down')+'">'
+      +(today.departures>=yday.departures?'\u2191':'\u2193')+' '+Math.abs(today.departures-yday.departures)+' vs yesterday</span>':'<span class="trend">live</span>';
     $('kpis').innerHTML=[
-      ['🔗','#e8f0fe','Trips Today',today.departures,dTrend],
-      ['✅','#dcfce7','Completed','0','<span class="trend">arrivals need trips module</span>'],
-      ['🚚','#dbeafe','In Transit',transit,transit?`<span class="trend up">${Math.round(transit/trips.length*100)}% of fleet</span>`:''],
-      ['🕐','#fef3c7','Pending',pend,'<span class="trend">idle at stop</span>'],
-      ['⛔','#fee2e2','Cancelled','0','<span class="trend">dispatch module</span>']
-    ].map(([ic,bg,l,v,t])=>`<div class="kpi"><div class="bub" style="background:${bg}">${ic}</div>
-      <div><div class="label">${l}</div><div class="value">${v}</div>${t}</div></div>`).join('');
+      ['\ud83d\udd17','#e8f0fe','Trips Today',today.departures,dT],
+      ['\u2705','#dcfce7','Completed','0','<span class="trend">arrivals need trips module</span>'],
+      ['\ud83d\ude9a','#dbeafe','In Transit',transit,'<span class="trend up">'+(trips.length?Math.round(transit/trips.length*100):0)+'% of fleet</span>'],
+      ['\ud83d\udd50','#fef3c7','Pending',pend,'<span class="trend">idle at stop</span>'],
+      ['\u26d4','#fee2e2','Cancelled','0','<span class="trend">dispatch module</span>']
+    ].map(([ic,bg,l,v,t])=>'<div class="kpi"><div class="bub" style="background:'+bg+'">'+ic+'</div><div><div class="label">'+l+'</div><div class="value">'+v+'</div>'+t+'</div></div>').join('');
     $('cAll').textContent='('+trips.length+')';
     $('cTransit').textContent='('+transit+')';
     $('cPending').textContent='('+pend+')';
     $('cDone').textContent='(0)';$('cCanc').textContent='(0)';
 
-    /* markers */
     const seen=new Set();
     trips.forEach(t=>{
       seen.add(t.v.vehicleId);
@@ -402,96 +404,143 @@ async function load(){
       if(!m){m=L.marker([t.v.latitude,t.v.longitude],{icon:badgeIcon(t.v.status)}).addTo(map);markers.set(t.v.vehicleId,m);}
       m.setLatLng([t.v.latitude,t.v.longitude]);
       if(m._st!==t.v.status){m.setIcon(badgeIcon(t.v.status));m._st=t.v.status;}
-      m.bindTooltip('<b>'+fmtPlate(t.v.vehicleId)+'</b> · '+t.tid+'<br/>'+fmt(t.v.speedKph)+' km/h · '+t.progress+'%');
+      m.bindTooltip('<b>'+fmtPlate(t.v.vehicleId)+'</b> \u00b7 '+t.tid+'<br/>'+fmt(t.v.speedKph)+' km/h'+(t.progress!=null?' \u00b7 '+t.progress+'%':''));
     });
     markers.forEach((m,id)=>{if(!seen.has(id)){map.removeLayer(m);markers.delete(id);}});
 
     render();
     if(selId)renderDetail();
-    $('conn').textContent='● LIVE';$('conn').className='conn live';
+    if(viewMode==='list')renderJourney();
+    $('conn').textContent='\u25cf LIVE';$('conn').className='conn live';
   }catch(e){
-    $('rows').innerHTML='<tr><td colspan="7" class="muted">Load failed: '+esc(e.message)+' — if HTTP 401/302, sign in again.</td></tr>';
-    $('conn').textContent='● OFFLINE';$('conn').className='conn down';
+    $('rows').innerHTML='<tr><td colspan="7" class="muted">Load failed: '+esc(e.message)+' - if HTTP 401/302, sign in again.</td></tr>';
+    $('conn').textContent='\u25cf OFFLINE';$('conn').className='conn down';
   }
 }
 
+/* ================= filters ================= */
+const ADV={route:'',dueBefore:''};
+function advMatch(v){
+  if(ADV.route&&v.routeId!==ADV.route)return false;
+  if(ADV.dueBefore!==''){
+    const due=docsByVehicle.get(v.vehicleId)||[];
+    if(!due.some(d=>d<=ADV.dueBefore))return false;
+  }
+  return true;}
+
 /* ================= table ================= */
 function render(){
-  const q=$('q').value.toUpperCase(),fr=$('fRoute').value,fd=$('fDrv').value;
-  const docsDue=v=>dueBefore===''||(docsByVehicle.get(v.vehicleId)||[]).some(d=>d<=dueBefore);
+  const fv=$('fVeh'),cur=fv.value;
+  const plates=[...new Set(trips.map(t=>t.v.vehicleId))].sort();
+  const opt='<option value="">All Vehicles</option>'+plates.map(p=>'<option'+(p===cur?' selected':'')+' value="'+p+'">'+fmtPlate(p)+'</option>').join('');
+  if(fv.innerHTML!==opt)fv.innerHTML=opt;
+
+  const q=$('q').value.toUpperCase(),st=$('fStatus').value,ve=fv.value,fr=$('fRoute').value,fd=$('fDrv').value;
   let rows=trips.filter(t=>{
     const hay=(t.tid+' '+t.v.vehicleId+' '+(t.v.driverName||'')+' '+(t.rid?routeLabels[t.rid]:'')).toUpperCase();
-    return(!tabF||t.status===tabF)&&(!fr||t.rid===fr)&&(!fd||t.v.driverName===fd)&&(!q||hay.includes(q))&&docsDue(t.v);});
+    return(!tabF||t.status===tabF)&&(!st||t.status===st)&&(!ve||t.v.vehicleId===ve)&&
+      (!fr||t.rid===fr)&&(!fd||t.v.driverName===fd)&&(!q||hay.includes(q))&&advMatch(t.v);});
   const pages=Math.max(1,Math.ceil(rows.length/pageSize));
   if(page>=pages)page=pages-1;
   const slice=rows.slice(page*pageSize,page*pageSize+pageSize);
-  $('rows').innerHTML=slice.map(t=>`<tr class="${selId===t.tid?'sel':''}" onclick="selectTrip('${t.tid}')">
-    <td><b>${t.tid}</b><div class="muted small">${new Date(t.v.lastSeen).toLocaleDateString()}</div></td>
-    <td><span class="plate">${fmtPlate(t.v.vehicleId)}</span><div class="muted small">${esc(t.v.make??'')} ${esc(t.v.model??'')}</div></td>
-    <td>${esc(t.v.driverName||'—')}</td>
-    <td>${t.rid?esc(routeLabels[t.rid]):'—'}<div class="muted small">${t.totalKm?fmt(t.totalKm)+' km':''}</div></td>
-    <td><span class="schip ${t.status.replace(' ','')||'Offline'}">${t.status}</span></td>
-    <td>${t.progress!=null?`<span class="pbar"><i style="width:${t.progress}%"></i></span>${t.progress}%`:'–'}</td>
-    <td>${t.status==='In Transit'?fmtDur(t.etaH):'–'}</td></tr>`).join('')
+  $('rows').innerHTML=slice.map(t=>'<tr class="'+(selId===t.tid?'sel':'')+'" onclick="selectTrip(\''+t.tid+'\')">'+
+    '<td><b>'+t.tid+'</b><div class="muted small">'+new Date(t.v.lastSeen).toLocaleDateString()+'</div></td>'+
+    '<td><span class="plate">'+fmtPlate(t.v.vehicleId)+'</span><div class="muted small">'+esc(t.v.make||'')+' '+esc(t.v.model||'')+'</div></td>'+
+    '<td>'+esc(t.v.driverName||'-')+'</td>'+
+    '<td>'+(t.rid?esc(routeLabels[t.rid]):'-')+(t.totalKm?'<div class="muted small">'+fmt(t.totalKm)+' km</div>':'')+'</td>'+
+    '<td><span class="schip '+(t.status.replace(' ','')||'Offline')+'">'+t.status+'</span></td>'+
+    '<td>'+(t.progress!=null?'<span class="pbar"><i style="width:'+t.progress+'%"></i></span>'+t.progress+'%':'-')+'</td>'+
+    '<td>'+(t.status==='In Transit'?fmtDur(t.etaH):'-')+'</td></tr>').join('')
     ||(tabF==='Completed'||tabF==='Cancelled'
-      ?`<tr><td colspan="7" class="muted">No ${tabF.toLowerCase()} trips — trip completion/cancellation detection arrives with the trips module (state machine over telemetry history).</td></tr>`
+      ?'<tr><td colspan="7" class="muted">No '+tabF.toLowerCase()+' trips - completion/cancellation detection arrives with the trips module.</td></tr>'
       :'<tr><td colspan="7" class="muted">No trips match.</td></tr>');
-  let pb='';for(let i=0;i<pages;i++)pb+=`<button class="${i===page?'on':''}" onclick="page=${i};render()">${i+1}</button>`;
-  $('pager').innerHTML=`<span>Showing ${rows.length?page*pageSize+1:0}–${Math.min((page+1)*pageSize,rows.length)} of ${rows.length} trips</span>
-    <span style="flex:1"></span><button ${page===0?'disabled':''} onclick="page--;render()">‹</button>${pb}
-    <button ${page>=pages-1?'disabled':''} onclick="page++;render()">›</button>
-    <select style="border:1px solid var(--line);border-radius:8px;padding:4px 8px;font:inherit" onchange="pageSize=+this.value;page=0;render()">
-    ${[10,25,50].map(n=>`<option ${n===pageSize?'selected':''}>${n}</option>`).join('')}</select>`;
+  let pb='';for(let i=0;i<pages;i++)pb+='<button class="'+(i===page?'on':'')+'" onclick="page='+i+';render()">'+(i+1)+'</button>';
+  $('pager').innerHTML='<span>Showing '+(rows.length?page*pageSize+1:0)+'-'+Math.min((page+1)*pageSize,rows.length)+' of '+rows.length+' trips</span>'+
+    '<span style="flex:1"></span><button '+(page===0?'disabled':'')+' onclick="page--;render()">\u2039</button>'+pb+
+    '<button '+(page>=pages-1?'disabled':'')+' onclick="page++;render()">\u203a</button>'+
+    '<select style="border:1px solid var(--line);border-radius:8px;padding:4px 8px;font:inherit" onchange="pageSize=+this.value;page=0;render()">'+
+    [10,25,50].map(n=>'<option '+(n===pageSize?'selected':'')+'>'+n+'</option>').join('')+'</select>';
 }
 
 /* ================= detail + route + driver ================= */
 function selectTrip(tid){selId=tid;render();renderDetail();
   const t=trips.find(x=>x.tid===tid);
-  if(t&&t.rid){highlightRoute(t.rid);map.fitBounds(L.latLngBounds(ROUTE_CATALOG[t.rid]).pad(0.05));
-    $('mapMode').textContent='— '+routeLabels[t.rid];}
-  else{$('mapMode').textContent='— all corridors';highlightRoute(null);}}
+  if(t&&t.rid){highlightRoute(t.rid);map.fitBounds(L.latLngBounds(ROUTE_CATALOG[t.rid]).pad(0.05));}
+  else highlightRoute(null);}
 
 function renderDetail(){
   const t=trips.find(x=>x.tid===selId);if(!t)return;
   const v=t.v,st=t.status;
-  $('tdStatus').innerHTML=`<span class="schip ${st.replace(' ','')||'Offline'}">${st}</span>`;
+  $('tdStatus').innerHTML='<span class="schip '+(st.replace(' ','')||'Offline')+'">'+st+'</span>';
   $('tdId').textContent=t.tid;
-  $('tdWho').textContent=fmtPlate(v.vehicleId)+' · '+(v.driverName||'—');
+  $('tdWho').textContent=fmtPlate(v.vehicleId)+' \u00b7 '+(v.driverName||'-');
   $('tdInit').textContent=initials(v.driverName);
-  $('tdFrom').textContent=t.rid?routeLabels[t.rid].split(' → ')[0]:'—';
-  $('tdTo').textContent=t.rid?routeLabels[t.rid].split(' → ')[1]:'—';
-  $('tdRoute').textContent=t.rid?routeLabels[t.rid]:'—';
-  $('tdSpd').textContent=fmt(v.speedKph)+' km/h';
-  $('tdUpd').textContent=v.lastSeen?new Date(v.lastSeen).toLocaleString():'—';
-  $('tdPct').textContent=t.progress!=null?t.progress+'%':'—';
+  $('tdFrom').textContent=t.rid?routeLabels[t.rid].split(' - ')[0]:'-';
+  $('tdTo').textContent=t.rid?routeLabels[t.rid].split(' - ')[1]:'-';
+  const now=Date.now();
+  let depEst='-',etaWhen='-';
+  if(t.rid&&CORRIDOR[t.rid]){
+    const proj=projectOnRoute(t.rid,v.latitude,v.longitude);
+    const traveled=proj?proj.traveled:0;
+    const avg=(v.speedKph>5?v.speedKph:45);
+    depEst=new Date(now-(traveled/avg)*3600e3).toLocaleString([],{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+    if(t.etaH!=null&&isFinite(t.etaH))etaWhen=new Date(now+t.etaH*3600e3).toLocaleString([],{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+  }
+  $('tdDep').textContent='Departed (est.) \u00b7 '+depEst;
+  $('tdEtaWhen').textContent='ETA \u00b7 '+etaWhen;
+  $('tdPct').textContent=t.progress!=null?t.progress+'%':'-';
   $('tdBar').style.width=(t.progress||0)+'%';
-  $('tdDist').textContent=t.totalKm?fmt(t.totalKm)+' km':'—';
-  $('tdRem').textContent=t.remaining!=null?fmt(t.remaining)+' km':'—';
-  $('tdEta').textContent=st==='In Transit'?fmtDur(t.etaH):'—';
-  $('daChip').innerHTML=`<span class="schip ${st==='In Transit'?'InTransit':'Pending'}">${st==='In Transit'?'Active':'Idle'}</span>`;
+  $('tdDist').textContent=t.totalKm?fmt(t.totalKm)+' km':'-';
+  $('tdEta').textContent=st==='In Transit'?fmtDur(t.etaH):'-';
+  $('daChip').innerHTML='<span class="schip '+(st==='In Transit'?'InTransit':'Pending')+'">'+(st==='In Transit'?'Active':'Idle')+'</span>';
   $('daInit').textContent=initials(v.driverName);
-  $('daName').textContent=v.driverName||'—';
-  $('daId').textContent='Driver · '+(v.driverId||'—');
+  $('daName').textContent=v.driverName||'-';
+  $('daId').textContent='Driver \u00b7 '+(v.driverId||'-');
   $('daSpd').textContent=fmt(v.speedKph)+' km/h';
-  $('daDist').textContent=today?fmt(today.distanceKm)+' km':'—';
+  $('daDist').textContent=today?fmt(today.distanceKm)+' km':'-';
   const e=alertsByVehicle.get(v.vehicleId)||{spd:0,brk:0,acc:0,geo:0};
   $('evSpd').textContent=e.spd;$('evBrk').textContent=e.brk;
   $('evAcc').textContent=e.acc;$('vGeo').textContent=e.geo;
-  /* route stop table */
   const C=t.rid?CORRIDOR[t.rid]:null;
   if(!C){$('stops').innerHTML='<div class="stoprow"><span class="muted">No corridor assigned.</span></div>';$('rtSub').textContent='';return;}
   const proj=projectOnRoute(t.rid,v.latitude,v.longitude);
   const traveled=proj?proj.traveled:0;
-  $('rtSub').textContent='— '+routeLabels[t.rid];
+  $('rtSub').textContent='- '+routeLabels[t.rid];
   let rows='';
   C.pts.forEach((p,i)=>{
     const done=C.cum[i]<=traveled-1,next=C.cum[i]>traveled+1;
     const citySt=(i===0?'(Start)':i===C.pts.length-1?'(Destination)':'');
     const sc=done?'<span class="stopchip done">Passed</span>':next?'<span class="stopchip next">Ahead</span>':'<span class="stopchip now">Near / At</span>';
-    rows+=`<div class="stoprow"><span class="nm">WP${i} ${citySt}</span>
-      <span class="tm">${fmt(C.cum[i])} km</span>
-      <span class="tm">${i>0?'+'+fmt(C.cum[i]-C.cum[i-1])+' km':'—'}</span>${sc}</div>`;});
+    rows+='<div class="stoprow"><span class="nm">WP'+i+' '+citySt+'</span>'+
+      '<span class="tm">'+fmt(C.cum[i])+' km</span>'+
+      '<span class="tm">'+(i>0?'+'+fmt(C.cum[i]-C.cum[i-1])+' km':'-')+'</span>'+sc+'</div>';});
   $('stops').innerHTML=rows;
+}
+
+/* ================= map/list toggle ================= */
+function applyView(){
+  const mv=$('mapView'),list=$('listView');
+  if(viewMode==='map'){mv.style.display='';list.classList.remove('show');setTimeout(()=>map.invalidateSize(),50);}
+  else{mv.style.display='none';list.classList.add('show');renderJourney();}
+}
+function renderJourney(){
+  const el=$('listView');if(!el)return;
+  const t=trips.find(x=>x.tid===selId);
+  if(!t||!t.rid||!CORRIDOR[t.rid]){
+    el.innerHTML='<div class="vbell-empty" style="padding:14px 16px;color:var(--muted);font-size:12.5px">Select a trip with an assigned corridor to see its journey.</div>';return;}
+  const v=t.v,C=CORRIDOR[t.rid];
+  const proj=projectOnRoute(t.rid,v.latitude,v.longitude);
+  const traveled=proj?proj.traveled:0;
+  let rows='';
+  C.pts.forEach((p,i)=>{
+    const done=C.cum[i]<=traveled-1,next=C.cum[i]>traveled+1;
+    const st=done?'<span class="st done">Passed</span>':next?'<span class="st next">Ahead</span>':'<span class="st now">Near / At</span>';
+    const nm=(i===0?routeLabels[t.rid].split(' - ')[0]:i===C.pts.length-1?routeLabels[t.rid].split(' - ')[1]:'Waypoint '+i);
+    rows+='<div class="jstop '+(done?'done':next?'':'now')+'">'+
+      '<span class="rail"><span class="jdot"></span><span class="ln"></span></span>'+
+      '<span class="tx"><div class="nm">'+esc(nm)+', Kenya</div>'+
+      '<div class="sub">'+fmt(C.cum[i])+' km from origin</div></span>'+st+'</div>';});
+  el.innerHTML=rows;
 }
 
 /* ================= wiring ================= */
@@ -499,128 +548,23 @@ document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>{
   document.querySelectorAll('#tabs button').forEach(x=>x.classList.remove('on'));
   b.classList.add('on');tabF=b.dataset.f;page=0;render();});
  $('q').oninput=()=>{page=0;render();};
- $('fRoute').onchange=()=>{page=0;render();};
+ $('fStatus').onchange=()=>{page=0;render();};
+ $('fVeh').onchange=()=>{page=0;render();};
  $('fDrv').onchange=()=>{page=0;render();};
+ $('advBtn').onclick=e=>{e.stopPropagation();$('advMenu').classList.toggle('open');};
+document.addEventListener('click',e=>{const w=$('advMenu');if(w&&!w.parentElement.contains(e.target))w.classList.remove('open');});
+ $('advApply').onclick=()=>{ADV.route=$('fRoute').value;ADV.dueBefore=$('calDate').value||'';$('advMenu').classList.remove('open');page=0;render();};
+ $('advClear').onclick=()=>{ADV.route='';ADV.dueBefore='';$('fRoute').value='';$('calDate').value='';page=0;render();};
  $('refreshBtn').onclick=()=>{load();toast('Refreshed',true);};
- $('newTripBtn').onclick=()=>toast('Trip dispatch belongs to the trips module — trips are derived live from telemetry',false);
+ $('newTripBtn').onclick=()=>toast('Trip dispatch belongs to the trips module - trips are derived live from telemetry',false);
  $('tdFull').onclick=()=>toast('Full trip history (stops, timeline, replay) arrives with the trips module',false);
-
-/* driver filter options */
-(async()=>{try{
-  const lv=await api('/api/v1/vehicles/live');
-  const ds=[...new Set(lv.map(v=>v.driverName).filter(Boolean))].sort();
-  $('fDrv').innerHTML='<option value="">All Drivers</option>'+ds.map(d=>`<option>${esc(d)}</option>`).join('');
-}catch(e){}})();
-
-const _cd=document.getElementById("calDate");
-if(_cd){_cd.addEventListener("change",()=>{
-  dueBefore=_cd.value||"";
-  const w=_cd.closest(".calwrap"); if(w) w.classList.toggle("has-date",!!_cd.value);
-  page=0;render();});}
+document.querySelectorAll('#mapTabBar button').forEach(b=>b.onclick=()=>{
+  viewMode=b.dataset.v;
+  document.querySelectorAll('#mapTabBar button').forEach(x=>x.classList.toggle('on',x===b));
+  applyView();});
 
 load();setInterval(load,5000);
 const autoSel=setInterval(()=>{if(trips.length&&!selId){selectTrip(trips[0].tid);clearInterval(autoSel);}},800);
-
-/* ================= toolbar overrides (mockup parity) ================= */
-function render(){                                    /* overrides earlier version */
-  const fv=$("fVeh");
-  const cur=fv.value;
-  const plates=[...new Set(trips.map(t=>t.v.vehicleId))].sort();
-  const opt='<option value="">All Vehicles</option>'+
-    plates.map(p=>'<option'+(p===cur?' selected':'')+'>'+fmtPlate(p)+'</option>').join('');
-  if(fv.innerHTML!==opt)fv.innerHTML=opt;
-
-  const q=$("q").value.toUpperCase();
-  const st=$("fStatus").value, ve=fv.value, fr=$("fRoute").value, fd=$("fDrv").value;
-  let rows=trips.filter(t=>{
-    const hay=(t.tid+" "+t.v.vehicleId+" "+(t.v.driverName||"")+" "+(t.rid?routeLabels[t.rid]:"")).toUpperCase();
-    return(!tabF||t.status===tabF)&&(!st||t.status===st)&&(!ve||t.v.vehicleId===ve)&&
-          (!fr||t.rid===fr)&&(!fd||t.v.driverName===fd)&&(!q||hay.includes(q))&&docsDue(t.v);});
-  const pages=Math.max(1,Math.ceil(rows.length/pageSize));
-  if(page>=pages)page=pages-1;
-  const slice=rows.slice(page*pageSize,page*pageSize+pageSize);
-  $("rows").innerHTML=slice.map(t=>`<tr class="${selId===t.tid?'sel':''}" onclick="selectTrip('${t.tid}')">
-    <td><b>${t.tid}</b><div class="muted small">${new Date(t.v.lastSeen).toLocaleDateString()}</div></td>
-    <td><span class="plate">${fmtPlate(t.v.vehicleId)}</span><div class="muted small">${esc(t.v.make??'')} ${esc(t.v.model??'')}</div></td>
-    <td>${esc(t.v.driverName||'-')}</td>
-    <td>${t.rid?esc(routeLabels[t.rid]):'-'}<div class="muted small">${t.totalKm?fmt(t.totalKm)+' km':''}</div></td>
-    <td><span class="schip ${t.status.replace(' ','')||'Offline'}">${t.status}</span></td>
-    <td>${t.progress!=null?`<span class="pbar"><i style="width:${t.progress}%"></i></span>${t.progress}%`:'-'}</td>
-    <td>${t.status==='In Transit'?fmtDur(t.etaH):'-'}</td></tr>`).join('')
-    ||(tabF==='Completed'||tabF==='Cancelled'
-      ?`<tr><td colspan="7" class="muted">No ${tabF.toLowerCase()} trips - completion/cancellation detection arrives with the trips module.</td></tr>`
-      :'<tr><td colspan="7" class="muted">No trips match.</td></tr>');
-  let pb='';for(let i=0;i<pages;i++)pb+=`<button class="${i===page?'on':''}" onclick="page=${i};render()">${i+1}</button>`;
-  $("pager").innerHTML=`<span>Showing ${rows.length?page*pageSize+1:0}-${Math.min((page+1)*pageSize,rows.length)} of ${rows.length} trips</span>
-    <span style="flex:1"></span><button ${page===0?'disabled':''} onclick="page--;render()">‹</button>${pb}
-    <button ${page>=pages-1?'disabled':''} onclick="page++;render()">›</button>
-    <select style="border:1px solid var(--line);border-radius:8px;padding:4px 8px;font:inherit" onchange="pageSize=+this.value;page=0;render()">
-    ${[10,25,50].map(n=>`<option ${n===pageSize?'selected':''}>${n}</option>`).join('')}</select>`;
-}
-
- $("advBtn").onclick=e=>{e.stopPropagation();$("advMenu").classList.toggle("open");};
-document.addEventListener("click",e=>{const w=$("advMenu");if(w&&!w.parentElement.contains(e.target))w.classList.remove("open");});
- $("advApply").onclick=()=>{$("advMenu").classList.remove("open");page=0;render();};
- $("advClear").onclick=()=>{ADV.dueBefore="";$("fRoute").value="";$("calDate").value="";page=0;render();};
-
-
-/* ================= global docsDue + docs data (scope fix) ================= */
-function docsDue(v){
-  if(typeof dueBefore==='undefined' || dueBefore==='') return true;
-  const due=(window.__docsByVehicle && window.__docsByVehicle.get(v.vehicleId))||[];
-  return due.some(d=>d<=dueBefore);
-}
-async function refreshDocs(){
-  try{
-    const r=await fetch('/api/v1/vehicles?size=200');
-    if(!r.ok)return;
-    const vp=await r.json();
-    window.__docsByVehicle=new Map(
-      vp.filter(v=>v.nextService||v.insuranceExpiry||v.inspectionExpiry)
-        .map(v=>[v.vehicleId,[v.nextService,v.insuranceExpiry,v.inspectionExpiry].filter(Boolean)]));
-  }catch(e){}
-}
-refreshDocs(); setInterval(refreshDocs,60000);
-
-/* repair funnel Clear: ADV does not exist on this page - use dueBefore */
- $("advClear").onclick=()=>{dueBefore="";$("fRoute").value="";$("calDate").value="";page=0;render();};
-
-/* ================= Map/List view toggle (end-of-script) ================= */
-let __viewMode='map';
- $("mapTabBar").querySelectorAll("button").forEach(b=>b.onclick=()=>{
-  __viewMode=b.dataset.v;
-  $("mapTabBar").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b));
-  applyView();
-});
-function applyView(){
-  const map=$("mapView"), list=$("listView");
-  if(__viewMode==='map'){ map.style.display=""; list.classList.remove("show");
-    setTimeout(()=>map.invalidateSize(),50); }
-  else{ map.style.display="none"; list.classList.add("show"); renderJourney(); }
-}
-function renderJourney(){
-  const el=$("listView"); if(!el) return;
-  const t=trips.find(x=>x.tid===selId);
-  if(!t||!t.rid||!CORRIDOR[t.rid]){
-    el.innerHTML='<div class="vbell-empty">Select a trip with an assigned corridor to see its journey.</div>';return;}
-  const v=t.v, C=CORRIDOR[t.rid];
-  const proj=projectOnRoute(t.rid,v.latitude,v.longitude);
-  const traveled=proj?proj.traveled:0;
-  let rows='';
-  C.pts.forEach((p,i)=>{
-    const done=C.cum[i]<=traveled-1, next=C.cum[i]>traveled+1;
-    const st=done?'<span class="st done">Passed</span>':next?'<span class="st next">Ahead</span>':'<span class="st now">Near / At</span>';
-    const nm=(i===0?routeLabels[t.rid].split(" \u2192 ")[0]:i===C.pts.length-1?routeLabels[t.rid].split(" \u2192 ")[1]:"Waypoint "+i);
-    rows+='<div class="jstop '+(done?'done':next?'':'now')+'">'+
-      '<span class="rail"><span class="dot"></span><span class="ln"></span></span>'+
-      '<span class="tx"><div class="nm">'+esc(nm)+', Kenya</div>'+
-      '<div class="sub">'+fmt(C.cum[i])+' km from origin · '+fmt(t.v.speedKph)+' km/h now</div></span>'+st+'</div>';});
-  el.innerHTML=rows;
-}
-/* re-render journey list when data refreshes while list view is open */
-const _tripsLoad=load;
-load=async function(){ const r=await _tripsLoad.apply(this,arguments);
-  if(__viewMode==='list') renderJourney(); return r; };
 </script>
 </body>
 </html>
