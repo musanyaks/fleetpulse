@@ -101,6 +101,27 @@ tr.sel td{background:#eff6ff}
     border-radius:12px;box-shadow:0 12px 32px rgba(2,6,23,.18);min-width:240px;z-index:1500;display:none;padding:4px}
   .dropdown.open{display:block}
   .toolbar select{flex:0 1 auto}
+  .mtabs{display:flex;gap:4px;padding:10px 12px;border-bottom:1px solid var(--line)}
+  .mtabs button{border:0;background:transparent;padding:8px 12px;font:inherit;font-size:12.5px;font-weight:600;
+    color:var(--muted);cursor:pointer;border-bottom:2px solid transparent}
+  .mtabs button.on{color:var(--blue);border-bottom-color:var(--blue)}
+  #mapView{position:relative}
+  .jlist{display:none;padding:8px 0;max-height:340px;overflow-y:auto}
+  .jlist.show{display:block}
+  .jstop{display:flex;gap:12px;padding:8px 16px;align-items:flex-start}
+  .jstop .rail{width:14px;display:flex;flex-direction:column;align-items:center;flex:none}
+  .jstop .dot{width:11px;height:11px;border-radius:50%;border:3px solid #93c5fd;background:#fff}
+  .jstop.done .dot{border-color:var(--green)}
+  .jstop.now .dot{border-color:var(--blue)}
+  .jstop .ln{flex:1;border-left:2px dashed var(--line);min-height:26px;margin-top:2px}
+  .jstop:last-child .ln{display:none}
+  .jstop .tx{flex:1}
+  .jstop .nm{font-weight:700;font-size:12.8px}
+  .jstop .sub{font-size:11.5px;color:var(--muted)}
+  .jstop .st{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;justify-self:end}
+  .jstop .st.done{background:#d1fae5;color:#065f46}
+  .jstop .st.now{background:#dbeafe;color:#1e40af}
+  .jstop .st.next{background:#f1f5f9;color:#64748b}
 </style>
 </head>
 <body>
@@ -185,13 +206,14 @@ tr.sel td{background:#eff6ff}
 
       <div>
         <div class="card" style="margin-bottom:16px">
-          <h3>🗺️ Map View <span class="muted small" id="mapMode">— all corridors</span></h3>
-          <div style="position:relative"><div id="map"></div>
+          <h3 style="padding-bottom:0;border-bottom:0"></h3><div class="mtabs" id="mapTabBar"><button class="on" data-v="map">🗺️ Map View</button><button data-v="list">📋 List View</button><span class="muted small" id="mapMode" style="margin-left:auto;align-self:center;padding-right:12px">— all corridors</span></div>
+          <div style="position:relative"><div id="mapView"><div id="map"></div>
             <div class="mlegend">
               <div><i style="background:var(--green)"></i> Moving</div>
               <div><i style="background:var(--amber)"></i> Idle</div>
               <div><i style="background:#93c5fd"></i> Route</div>
-            </div>
+            </div></div>
+<div id="listView" class="jlist"></div>
           </div>
         </div>
         <div class="card">
@@ -562,6 +584,43 @@ refreshDocs(); setInterval(refreshDocs,60000);
 
 /* repair funnel Clear: ADV does not exist on this page - use dueBefore */
  $("advClear").onclick=()=>{dueBefore="";$("fRoute").value="";$("calDate").value="";page=0;render();};
+
+/* ================= Map/List view toggle (end-of-script) ================= */
+let __viewMode='map';
+ $("mapTabBar").querySelectorAll("button").forEach(b=>b.onclick=()=>{
+  __viewMode=b.dataset.v;
+  $("mapTabBar").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b));
+  applyView();
+});
+function applyView(){
+  const map=$("mapView"), list=$("listView");
+  if(__viewMode==='map'){ map.style.display=""; list.classList.remove("show");
+    setTimeout(()=>map.invalidateSize(),50); }
+  else{ map.style.display="none"; list.classList.add("show"); renderJourney(); }
+}
+function renderJourney(){
+  const el=$("listView"); if(!el) return;
+  const t=trips.find(x=>x.tid===selId);
+  if(!t||!t.rid||!CORRIDOR[t.rid]){
+    el.innerHTML='<div class="vbell-empty">Select a trip with an assigned corridor to see its journey.</div>';return;}
+  const v=t.v, C=CORRIDOR[t.rid];
+  const proj=projectOnRoute(t.rid,v.latitude,v.longitude);
+  const traveled=proj?proj.traveled:0;
+  let rows='';
+  C.pts.forEach((p,i)=>{
+    const done=C.cum[i]<=traveled-1, next=C.cum[i]>traveled+1;
+    const st=done?'<span class="st done">Passed</span>':next?'<span class="st next">Ahead</span>':'<span class="st now">Near / At</span>';
+    const nm=(i===0?routeLabels[t.rid].split(" \u2192 ")[0]:i===C.pts.length-1?routeLabels[t.rid].split(" \u2192 ")[1]:"Waypoint "+i);
+    rows+='<div class="jstop '+(done?'done':next?'':'now')+'">'+
+      '<span class="rail"><span class="dot"></span><span class="ln"></span></span>'+
+      '<span class="tx"><div class="nm">'+esc(nm)+', Kenya</div>'+
+      '<div class="sub">'+fmt(C.cum[i])+' km from origin · '+fmt(t.v.speedKph)+' km/h now</div></span>'+st+'</div>';});
+  el.innerHTML=rows;
+}
+/* re-render journey list when data refreshes while list view is open */
+const _tripsLoad=load;
+load=async function(){ const r=await _tripsLoad.apply(this,arguments);
+  if(__viewMode==='list') renderJourney(); return r; };
 </script>
 </body>
 </html>
