@@ -174,6 +174,10 @@ tr.sel td{background:#eff6ff}
 
     <div class="kpis" id="kpis"></div>
 
+    <div class="card" id="dispatchStrip" style="display:none;padding:10px 16px">
+      <b class="small">Dispatched this session:</b> <span id="dispatchList" class="muted small"></span>
+    </div>
+
     <div class="grid">
       <div class="card">
         <div class="tabs" id="tabs">
@@ -299,6 +303,27 @@ tr.sel td{background:#eff6ff}
     </div>
   </div>
 </main>
+</div>
+<div class="modal" id="tripModal" style="position:fixed;inset:0;background:rgba(2,6,23,.55);display:none;place-items:center;z-index:2500">
+  <div style="background:#fff;border-radius:16px;max-width:440px;width:92%;padding:22px 24px;position:relative">
+    <button class="x" onclick="closeTripModal()" style="position:absolute;top:14px;right:16px;border:0;background:none;font-size:18px;cursor:pointer;color:var(--muted)">✕</button>
+    <h2 style="font-size:18px;margin-bottom:4px">Start Trip</h2>
+    <div class="muted small" style="margin-bottom:12px">Marks a vehicle's current corridor position as its trip start. Progress, ETA and the route table then run from this point for the session. Persisted dispatch arrives with the trips module.</div>
+    <label class="muted small">Vehicle</label>
+    <select id="tVeh" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:inherit;margin:4px 0 10px"></select>
+    <label class="muted small">Direction</label>
+    <select id="tDir" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:inherit;margin:4px 0 10px">
+      <option value="fwd">Forward (origin → destination)</option>
+      <option value="rev">Return (destination → origin)</option>
+    </select>
+    <label class="muted small">Reference</label>
+    <input id="tRef" placeholder="Load ref / notes (optional)" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:inherit;margin:4px 0 12px"/>
+    <div style="display:flex;gap:10px">
+      <button class="btn" style="flex:1" id="tGo">Start Trip</button>
+      <button class="btn ghost" style="flex:1" onclick="closeTripModal()">Cancel</button>
+    </div>
+    <div class="muted small" id="tMsg" style="margin-top:8px;min-height:16px"></div>
+  </div>
 </div>
 <div id="toast"></div>
 
@@ -670,6 +695,67 @@ function renderStopsPhoto(){
  $("rtClose").onclick=()=>{const w=document.querySelector(".routeswrap");
   const hid=w.style.display==="none";w.style.display=hid?"":"none";
   $("rtClose").textContent=hid?"\u2715":"\u25be";};
+
+/* ================= Refresh + New Trip (end-of-script) ================= */
+const _origLoadBtn=load;
+async function loadWithSpin(){
+  const b=$("refreshBtn");
+  if(b){b.disabled=true;b.innerHTML="⟳ Refreshing…";}
+  try{ await _origLoadBtn(); } finally {
+    if(b){b.disabled=false;b.innerHTML="⟳ Refresh";}
+  }
+}
+ $("refreshBtn").onclick=()=>loadWithSpin();
+
+/* session dispatch store: vehicleId -> {startKm, dir, ref, at} */
+window.__dispatch = window.__dispatch || {};
+
+function openTripModal(){
+  const sel=$("tVeh");
+  const opts=trips.map(t=>'<option value="'+t.v.vehicleId+'">'+
+    fmtPlate(t.v.vehicleId)+' — '+(t.rid?routeLabels[t.rid]:'no corridor')+'</option>').join('');
+  sel.innerHTML=opts||'<option value="">No vehicles reporting</option>';
+  if(selId){const t=trips.find(x=>x.tid===selId);if(t)sel.value=t.v.vehicleId;}
+  $("tripModal").style.display="grid";
+}
+function closeTripModal(){ $("tripModal").style.display="none"; }
+ $("newTripBtn").onclick=openTripModal;
+ $("tripModal").addEventListener("click",e=>{ if(e.target.id==="tripModal") closeTripModal(); });
+ $("tGo").onclick=()=>{
+  const vid=$("tVeh").value;
+  if(!vid){ $("tMsg").textContent="No vehicle selected"; return; }
+  const t=trips.find(x=>x.v.vehicleId===vid);
+  if(!t||!t.rid||!CORRIDOR[t.rid]){ $("tMsg").textContent="Vehicle has no corridor assigned"; return; }
+  const proj=projectOnRoute(t.rid,t.v.latitude,t.v.longitude);
+  window.__dispatch[vid]={ startKm:proj?proj.traveled:0,
+    dir:$("tDir").value, ref:$("tRef").value.trim(), at:Date.now(),
+    label:routeLabels[t.rid] };
+  renderDispatchStrip();
+  selId=t.tid; renderDetail();
+  $("tMsg").textContent="Trip started for "+fmtPlate(vid);
+  setTimeout(()=>{ closeTripModal(); toast("Trip started: "+fmtPlate(vid)+" on "+routeLabels[t.rid],true); },600);
+};
+function renderDispatchStrip(){
+  const strip=$("dispatchStrip"), list=$("dispatchList");
+  const keys=Object.keys(window.__dispatch||{});
+  if(!keys.length){ strip.style.display="none"; return; }
+  strip.style.display="";
+  list.innerHTML=keys.map(vid=>{
+    const d=window.__dispatch[vid];
+    const t=trips.find(x=>x.v.vehicleId===vid);
+    let pct="–";
+    if(t&&t.rid&&CORRIDOR[t.rid]){
+      const proj=projectOnRoute(t.rid,t.v.latitude,t.v.longitude);
+      const trav=proj?Math.max(0,proj.traveled-d.startKm):0;
+      const total=Math.max(1,CORRIDOR[t.rid].totalKm-d.startKm);
+      pct=Math.min(100,Math.round(trav/total*100))+"%";
+    }
+    return "<b>"+fmtPlate(vid)+"</b> ("+d.label+(d.ref?", "+esc(d.ref):"")+") — "+pct;
+  }).join(" · ");
+}
+/* fold dispatch strip refresh into render: wrap it once */
+const _renderDispatched=render;
+render=function(){ _renderDispatched.apply(this,arguments); try{renderDispatchStrip();}catch(e){} };
 </script>
 </body>
 </html>
