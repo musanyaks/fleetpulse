@@ -364,7 +364,7 @@ const LayersCtl=L.Control.extend({onAdd(){const d=L.DomUtil.create('div','leafle
   a.innerHTML="<svg viewBox='0 0 24 24' width='14' height='14' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polygon points='12 2 2 7 12 12 22 7 12 2'/><polyline points='2 17 12 22 22 17'/><polyline points='2 12 12 17 22 12'/></svg>";
   L.DomEvent.on(a,'click',e=>{L.DomEvent.stop(e);
     const p=document.querySelector('#map .leaflet-tile-pane');
-    p.style.filter=p.style.filter?'':'saturate(.5) brightness(1.1)';});
+    p.style.filter=(p.style.filter==='none'?'':'none');});
   return d;}});
 new LayersCtl({position:'bottomleft'}).addTo(map);
 const routeLines={};
