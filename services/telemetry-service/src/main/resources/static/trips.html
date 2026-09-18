@@ -541,6 +541,27 @@ document.addEventListener("click",e=>{const w=$("advMenu");if(w&&!w.parentElemen
  $("advApply").onclick=()=>{$("advMenu").classList.remove("open");page=0;render();};
  $("advClear").onclick=()=>{ADV.dueBefore="";$("fRoute").value="";$("calDate").value="";page=0;render();};
 
+
+/* ================= global docsDue + docs data (scope fix) ================= */
+function docsDue(v){
+  if(typeof dueBefore==='undefined' || dueBefore==='') return true;
+  const due=(window.__docsByVehicle && window.__docsByVehicle.get(v.vehicleId))||[];
+  return due.some(d=>d<=dueBefore);
+}
+async function refreshDocs(){
+  try{
+    const r=await fetch('/api/v1/vehicles?size=200');
+    if(!r.ok)return;
+    const vp=await r.json();
+    window.__docsByVehicle=new Map(
+      vp.filter(v=>v.nextService||v.insuranceExpiry||v.inspectionExpiry)
+        .map(v=>[v.vehicleId,[v.nextService,v.insuranceExpiry,v.inspectionExpiry].filter(Boolean)]));
+  }catch(e){}
+}
+refreshDocs(); setInterval(refreshDocs,60000);
+
+/* repair funnel Clear: ADV does not exist on this page - use dueBefore */
+ $("advClear").onclick=()=>{dueBefore="";$("fRoute").value="";$("calDate").value="";page=0;render();};
 </script>
 </body>
 </html>
