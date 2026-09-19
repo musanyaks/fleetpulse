@@ -1,47 +1,370 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Fuel · FleetPulse</title><link rel="stylesheet" href="/css/app.css"/></head>
-<body data-page="fuel">
-<div id="sidebar"></div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Fuel Tracking · FleetPulse</title>
+<style>
+:root{--bg:#f4f6fb;--panel:#fff;--line:#e6eaf2;--text:#1e293b;--muted:#64748b;--blue:#2563eb;--blue2:#3b82f6;--green:#10b981;--amber:#f59e0b;--red:#ef4444;--navy:#0d2b57}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font:14px/1.5 "Segoe UI",system-ui,sans-serif}
+.layout{display:flex;min-height:100vh}
+aside{width:212px;background:var(--navy);color:#cdd9ee;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;flex:none}
+.logo{display:flex;align-items:center;gap:10px;padding:20px 18px;font-size:17px;font-weight:700;color:#fff}
+.logo .sq{width:30px;height:30px;border-radius:8px;background:var(--blue2);display:grid;place-items:center;font-size:15px}
+nav{flex:1;padding:6px 10px;overflow-y:auto}
+nav a{display:flex;align-items:center;gap:11px;padding:9px 12px;margin:2px 0;border-radius:9px;color:#c3d2e8;text-decoration:none;font-size:13px}
+nav a .ic{width:18px;text-align:center}
+nav a:hover{background:rgba(255,255,255,.06);color:#fff}
+nav a.active{background:var(--blue2);color:#fff;font-weight:600}
+main{flex:1;min-width:0;display:flex;flex-direction:column}
+.topbar{display:flex;align-items:center;gap:12px;padding:12px 24px;background:var(--panel);border-bottom:1px solid var(--line)}
+.gsearch{flex:1;max-width:300px;display:flex;align-items:center;gap:8px;background:#f1f5fb;border:1px solid var(--line);border-radius:10px;padding:8px 14px}
+.gsearch input{border:0;background:transparent;outline:none;font:inherit;width:100%}
+.spacer{flex:1}
+.tbell{position:relative;font-size:18px;background:#f1f5fb;border-radius:10px;padding:8px 12px;text-decoration:none}
+.tbadge{position:absolute;top:-6px;right:-6px;background:var(--red);color:#fff;font-size:10px;font-weight:700;border-radius:99px;padding:2px 6px}
+.fbtn{border:1px solid var(--line);background:#fff;border-radius:9px;padding:7px 11px;cursor:pointer;font-size:15px}
+.tchipuser{display:flex;align-items:center;gap:9px}
+.upic{width:34px;height:34px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-size:11px;font-weight:700}
+.uname{font-weight:700;font-size:13px}.urole{font-size:11px;color:var(--muted)}
+.content{padding:18px 24px;display:flex;flex-direction:column;gap:16px}
+.pagehead{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.pagehead .ic{font-size:26px}
+.pagehead h1{font-size:22px;font-weight:800}
+.pagehead .sub{color:var(--muted);font-size:12.5px}
+.pagehead .spacer{flex:1}
+.datechip{font-size:12.5px;font-weight:600;background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:8px 14px}
+input[type=date]{border:1px solid var(--line);border-radius:9px;padding:7px 10px;font:inherit;background:#fff}
+select{border:1px solid var(--line);border-radius:9px;padding:8px 10px;font:inherit;background:#fff}
+.btn{border:0;border-radius:9px;padding:9px 14px;font:inherit;font-weight:600;background:var(--blue);color:#fff;cursor:pointer}
+.banner{background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;border-radius:12px;padding:9px 14px;font-size:12px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;gap:12px;align-items:center}
+.kpi .bub{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:20px;flex:none}
+.kpi .label{color:var(--muted);font-size:12px}.kpi .value{font-size:21px;font-weight:700}
+.kpi .trend{font-size:11px;font-weight:600}
+.trend.up{color:var(--green)}.trend.down{color:var(--red)}.trend.flat{color:var(--muted)}
+.grid{display:grid;gap:16px;align-items:start}
+.r1{grid-template-columns:1.4fr 1fr 1.1fr}
+.r2{grid-template-columns:1fr 1.2fr 1fr}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.card>h3{font-size:13px;font-weight:700;padding:12px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}
+.card>h3 .lg{margin-left:auto;display:flex;gap:12px;font-size:11px;color:var(--muted);font-weight:500}
+.card>h3 .lg i{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:4px}
+.pad{padding:12px 16px}
+.legend-rows .r{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:12.5px}
+.legend-rows i{width:10px;height:10px;border-radius:50%}
+.legend-rows b{margin-left:auto}
+.hrow{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:12.3px}
+.hrow .nm{width:74px;font-weight:700}
+.hrow .tr{flex:1;height:9px;border-radius:99px;background:#eef2f9;overflow:hidden}
+.hrow .tr i{display:block;height:100%;border-radius:99px}
+.hrow .v{width:44px;text-align:right;font-weight:700}
+.tblwrap{overflow:auto;max-height:320px}
+table{width:100%;border-collapse:collapse;font-size:12.3px;white-space:nowrap}
+th{text-align:left;color:var(--muted);font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;padding:8px 10px;border-bottom:1px solid var(--line);background:#fafbfe;position:sticky;top:0}
+td{padding:7px 10px;border-bottom:1px solid var(--line)}
+tbody tr:hover td{background:#f8fafc}
+.plate{font-weight:700;letter-spacing:.3px}
+.fbar{width:54px;height:6px;border-radius:99px;background:#eef2f9;display:inline-block;vertical-align:middle;margin-right:6px;overflow:hidden}
+.fbar i{display:block;height:100%;border-radius:99px}
+.schip{font-size:10px;font-weight:700;padding:2px 9px;border-radius:99px}
+.schip.Normal{background:#d1fae5;color:#065f46}.schip.LowFuel{background:#fef3c7;color:#92400e}
+.schip.High{background:#fee2e2;color:#991b1b}.schip.Medium{background:#fef3c7;color:#92400e}.schip.Critical{background:#fee2e2;color:#991b1b}.schip.Low{background:#dbeafe;color:#1e40af}
+.muted{color:var(--muted)}.small{font-size:12px}
+#toast{position:fixed;bottom:20px;right:20px;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;display:none;box-shadow:0 8px 24px rgba(2,6,23,.2);background:#d1fae5;color:#065f46;z-index:3000}
+@media (max-width:1300px){.r1,.r2{grid-template-columns:1fr 1fr}}
+@media (max-width:900px){.r1,.r2,.kpis{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside>
+  <div class="logo"><span class="sq">&#128666;</span> FleetPulse</div>
+  <nav>
+    <a href="index.html"><span class="ic">&#127968;</span> Overview</a>
+    <a href="vehicles.html"><span class="ic">&#128666;</span> Vehicles</a>
+    <a href="tracking.html"><span class="ic">&#128205;</span> Live Tracking</a>
+    <a href="trips.html"><span class="ic">&#128733;</span> Trips</a>
+    <a href="drivers.html"><span class="ic">&#129691;</span> Drivers</a>
+    <a class="active" href="fuel.html"><span class="ic">&#9981;</span> Fuel</a>
+    <a href="maintenance.html"><span class="ic">&#128295;</span> Maintenance</a>
+    <a href="alerts.html"><span class="ic">&#128276;</span> Alerts</a>
+    <a href="geofences.html"><span class="ic">&#127919;</span> Geofences</a>
+    <a href="reports.html"><span class="ic">&#128202;</span> Analytics</a>
+    <a href="reports.html"><span class="ic">&#128196;</span> Reports</a>
+    <a href="alerts.html"><span class="ic">&#128276;</span> Notifications</a>
+    <a href="settings.html"><span class="ic">&#128101;</span> Users &amp; Roles</a>
+    <a href="settings.html"><span class="ic">&#9881;&#65039;</span> Settings</a>
+  </nav>
+</aside>
 <main>
-  <div class="pagehead"><h1>Fuel Analytics</h1></div>
-  <div class="banner">Percent-level fuel from tank sensors. km/L efficiency needs refill events + tank capacity — fuel-service module on the roadmap.</div>
-  <div class="cards grid4" id="stats"></div>
-  <div class="card"><h3>Fleet Average — live (session)</h3><div class="pad">
-    <svg viewBox="0 0 300 70" width="100%" height="70" preserveAspectRatio="none">
-      <path id="spark" fill="none" stroke="#2563eb" stroke-width="2"/></svg></div></div>
-  <div class="card"><h3>Vehicles by Fuel Level (lowest first)</h3>
-    <div class="tblwrap"><table><thead><tr><th>Plate</th><th>Status</th><th>Fuel</th><th>Speed</th><th>Fuel trend per minute</th></tr></thead>
-    <tbody id="rows"></tbody></table></div></div>
+  <div class="topbar">
+    <div class="gsearch">&#128269;<input id="gq" placeholder="Search vehicle..."/></div>
+    <span class="spacer"></span>
+    <a href="alerts.html" class="tbell" title="Alerts">&#128276;<span class="tbadge" id="topBell" style="display:none">0</span></a>
+    <button class="fbtn" id="fsBtn">&#9004;</button>
+    <div class="tchipuser" id="userChip"><div class="upic" id="uInit">?</div>
+      <div><div class="uname" id="uName">Sign in</div><div class="urole" id="uRole">-</div></div></div>
+  </div>
+
+  <div class="content">
+    <div class="pagehead"><span class="ic">&#9981;</span>
+      <div><h1>Fuel Tracking</h1><div class="sub">Monitor fuel consumption, efficiency and costs across your fleet</div></div>
+      <span class="spacer"></span>
+      <input type="date" id="from"/> <input type="date" id="to"/>
+      <select id="fVeh"><option value="">All Vehicles</option></select>
+      <button class="btn" id="exportBtn">&#11015; Export Report</button>
+    </div>
+
+    <div class="banner">Tank sensors report fuel as <b>% of tank</b>. Liters and KES are <b>estimates</b> from declared assumptions: <b id="assump">200 L tank &middot; KES 180/L</b> (constants in fuel.html until the fuel-service module adds per-vehicle tank capacity and refill events).</div>
+
+    <div class="kpis">
+      <div class="kpi"><div class="bub" style="background:#e8f0fe">&#9981;</div>
+        <div><div class="label">Fuel Consumed (est.)</div><div class="value" id="kUsed">-</div><div class="trend flat">range total</div></div></div>
+      <div class="kpi"><div class="bub" style="background:#d1fae5">&#128176;</div>
+        <div><div class="label">Fuel Cost (est.)</div><div class="value" id="kCost">-</div><div class="trend flat">KES 180/L</div></div></div>
+      <div class="kpi"><div class="bub" style="background:#dbeafe">&#128992;</div>
+        <div><div class="label">Avg Efficiency</div><div class="value" id="kEff">-</div><div class="trend flat">km / L (est.)</div></div></div>
+      <div class="kpi"><div class="bub" style="background:#ffedd5">&#9888;</div>
+        <div><div class="label">Fuel Anomalies</div><div class="value" id="kAnom">-</div><div class="trend" id="kAnomT">low-fuel + excess use</div></div></div>
+    </div>
+
+    <div class="grid r1">
+      <div class="card"><h3>Fuel Consumption Trend <span class="lg"><span><i style="background:var(--blue)"></i>Consumed (L est.)</span><span><i style="background:var(--green)"></i>Cost (KES)</span></span></h3>
+        <div class="pad" id="chTrend"></div></div>
+      <div class="card"><h3>Fuel Efficiency by Vehicle <span class="muted small">km/L (est.)</span></h3>
+        <div class="pad" id="chEff"></div></div>
+      <div class="card"><h3>Fuel Anomalies <a class="view" href="alerts.html" style="margin-left:auto;font-size:12px;color:var(--blue);font-weight:600;text-decoration:none">View all</a></h3>
+        <div class="tblwrap"><table>
+          <thead><tr><th>Vehicle</th><th>Issue</th><th>Level</th><th>Time</th></tr></thead>
+          <tbody id="anomRows"><tr><td colspan="4" class="muted">Loading...</td></tr></tbody></table></div>
+      </div>
+    </div>
+
+    <div class="grid r2">
+      <div class="card"><h3>Fuel Consumption by Vehicle <span class="muted small">L (est.)</span></h3>
+        <div class="pad" id="chByVeh"></div></div>
+      <div class="card"><h3>Fuel Cost Trend <span class="muted small">KES (est.)</span></h3>
+        <div class="pad" id="chCost"></div></div>
+      <div class="card"><h3>Fuel Consumption by Corridor</h3>
+        <div class="pad" style="display:flex;gap:16px;align-items:center">
+          <div id="donut"></div>
+          <div class="legend-rows" id="donutLegend" style="flex:1"></div>
+        </div></div>
+    </div>
+
+    <div class="card">
+      <h3>Vehicle Fuel Details <span class="muted small" id="detRange"></span>
+        <input id="fq" placeholder="Search vehicle..." style="margin-left:auto;border:1px solid var(--line);border-radius:8px;padding:5px 10px;font:inherit"/></h3>
+      <div class="tblwrap"><table>
+        <thead><tr><th>Vehicle</th><th>Fuel Level now</th><th>Used in range (pts)</th><th>Efficiency (km/pt)</th><th>Efficiency (km/L est.)</th><th>Status</th></tr></thead>
+        <tbody id="detRows"><tr><td colspan="6" class="muted">Loading...</td></tr></tbody></table></div>
+    </div>
+  </div>
 </main>
-<script src="/js/app.js"></script>
+</div>
+<div id="toast"></div>
+
 <script>
-const U=window.FleetUI; let samples=[], prev=new Map();
+/* ================= helpers ================= */
+const $=id=>document.getElementById(id);
+const esc=s=>(s??'').replace(/[<>&"]/g,function(c){return {'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c];});
+const fmt=n=>n==null?'\u2013':Number(n).toFixed(0);
+const fmtPlate=id=>{const m=/^(K[A-Z]{2})(\d{3}[A-Z])$/.exec(id||'');return m?m[1]+' '+m[2]:id||'';};
+const api=async p=>{const r=await fetch(p);if(!r.ok)throw new Error('HTTP '+r.status);return r.json();};
+const toast=(m,ok)=>{const t=$('toast');t.textContent=m;
+  t.style.background=ok===false?'#fee2e2':'#d1fae5';t.style.color=ok===false?'#991b1b':'#065f46';
+  t.style.display='block';setTimeout(function(){t.style.display='none';},2600);};
+const TANK=200, PRICE=180;
+const localISO=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const routeLabels={"NBO-MSA":"Nairobi - Mombasa","NBO-KSM":"Nairobi - Kisumu","NBO-ELD":"Nairobi - Eldoret","NBO-NKR":"Nairobi - Nakuru","NBO-GSA":"Nairobi - Garissa"};
+
+/* ================= state ================= */
+let fuelRows=[],live=[],routeByVeh={},alerts=[],detFiltered=[];
+
+/* ================= charts (inline SVG) ================= */
+function barChart(el, data, color){
+  if(!data.length){el.innerHTML='<div class="muted small">No data.</div>';return;}
+  const max=Math.max.apply(null,data.map(d=>d.v))||1, W=el.clientWidth||420, H=170, bw=Math.min(46,(W-20)/data.length*0.55);
+  let s='<svg width="100%" viewBox="0 0 '+W+' '+H+'">';
+  data.forEach(function(d,i){
+    const x=20+i*((W-40)/data.length)+( (W-40)/data.length-bw)/2;
+    const h=Math.max(2,(d.v/max)*(H-42));
+    s+='<rect x="'+x+'" y="'+(H-24-h)+'" width="'+bw+'" height="'+h+'" rx="4" fill="'+color+'" opacity="0.9"/>';
+    s+='<text x="'+(x+bw/2)+'" y="'+(H-24-h-5)+'" text-anchor="middle" font-size="9.5" fill="#334155">'+fmt(d.v)+'</text>';
+    s+='<text x="'+(x+bw/2)+'" y="'+(H-8)+'" text-anchor="middle" font-size="9.5" fill="#64748b">'+esc(d.l)+'</text>';
+  });
+  s+='</svg>';el.innerHTML=s;
+}
+function lineChart(el, data, color){
+  if(!data.length){el.innerHTML='<div class="muted small">No data.</div>';return;}
+  const W=el.clientWidth||420,H=170,max=Math.max.apply(null,data.map(d=>d.v))||1,min=Math.min.apply(null,data.map(d=>d.v));
+  const rng=(max-min)||1;
+  const pts=data.map(function(d,i){
+    const x=30+i*((W-50)/Math.max(1,data.length-1));
+    const y=14+(1-(d.v-min)/rng)*(H-52);
+    return [x,y];});
+  let s='<svg width="100%" viewBox="0 0 '+W+' '+H+'">';
+  s+='<polyline fill="none" stroke="'+color+'" stroke-width="2.5" points="'+pts.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ')+'"/>';
+  pts.forEach(function(p,i){s+='<circle cx="'+p[0]+'" cy="'+p[1]+'" r="4" fill="'+color+'"/>';
+    if(i%2===0||data.length<=8)s+='<text x="'+p[0]+'" y="'+(H-8)+'" text-anchor="middle" font-size="9.5" fill="#64748b">'+esc(data[i].l)+'</text>';});
+  s+='</svg>';el.innerHTML=s;
+}
+function hBars(el, rows){
+  if(!rows.length){el.innerHTML='<div class="muted small">No data.</div>';return;}
+  const max=Math.max.apply(null,rows.map(r=>r.v))||1;
+  el.innerHTML=rows.map(function(r){
+    const col=r.v>=1.8*max/2.8?'#10b981':r.v>=1.2*max/2.8?'#f59e0b':'#ef4444';
+    return '<div class="hrow"><span class="nm">'+esc(r.l)+'</span>'+
+      '<span class="tr"><i style="width:'+(r.v/max*100).toFixed(0)+'%;background:'+col+'"></i></span>'+
+      '<span class="v">'+r.v.toFixed(2)+'</span></div>';}).join('');
+}
+function donutChart(el, legendEl, segs, centerN, centerL){
+  const total=segs.reduce(function(a,s){return a+s.v;},0)||1;
+  const R=52,C=2*Math.PI*R;let off=0,segsSvg='';
+  segs.forEach(function(s){
+    const frac=s.v/total;
+    segsSvg+='<circle r="'+R+'" cx="60" cy="60" fill="transparent" stroke="'+s.c+'" stroke-width="16" '
+      +'stroke-dasharray="'+(frac*C).toFixed(1)+' '+C.toFixed(1)+'" stroke-dashoffset="'+(-off*C).toFixed(1)+'" transform="rotate(-90 60 60)"/>';
+    off+=frac;});
+  el.innerHTML='<svg width="120" height="120" viewBox="0 0 120 120">'+segsSvg+
+    '<text x="60" y="57" text-anchor="middle" font-size="13" font-weight="800" fill="#1e293b">'+centerN+'</text>'+
+    '<text x="60" y="72" text-anchor="middle" font-size="9" fill="#64748b">'+centerL+'</text></svg>';
+  legendEl.innerHTML=segs.map(function(s){
+    return '<div class="r"><i style="background:'+s.c+'"></i>'+esc(s.l)+'<b>'+Math.round(s.v/total*100)+'%</b></div>';}).join('');
+}
+
+/* ================= data load ================= */
 async function load(){
   try{
-    const lv=await U.api('/api/v1/vehicles/live');
-    const fuels=lv.map(v=>v.fuelLevelPct).filter(x=>x!=null);
-    const avg=fuels.length?fuels.reduce((a,b)=>a+b,0)/fuels.length:null;
-    const low=lv.filter(v=>v.fuelLevelPct!=null&&v.fuelLevelPct<15).length;
-    const mid=lv.filter(v=>v.fuelLevelPct!=null&&v.fuelLevelPct>=15&&v.fuelLevelPct<35).length;
-    document.getElementById('stats').innerHTML=[
-      ['Fleet Avg Fuel',avg==null?'–':avg.toFixed(1)+'%'],['Vehicles <15%',low],['Vehicles <35%',mid],['Reporting',lv.length]
-    ].map(([l,v])=>`<div class="kpi"><div class="label">${l}</div><div class="value">${v}</div></div>`).join('');
-    if(avg!=null){samples.push(avg);if(samples.length>60)samples.shift();
-      const min=Math.min(...samples),max=Math.max(...samples),rng=(max-min)||1;
-      document.getElementById('spark').setAttribute('d',samples.map((s,i)=>{
-        const x=i/(samples.length-1||1)*300,y=62-(s-min)/rng*54+4;
-        return (i?'L':'M')+x.toFixed(1)+' '+y.toFixed(1);}).join(''));}
-    document.getElementById('rows').innerHTML=lv.filter(v=>v.fuelLevelPct!=null)
-      .sort((a,b)=>a.fuelLevelPct-b.fuelLevelPct).map(v=>{
-        const f=v.fuelLevelPct, col=f<15?'var(--red)':f<35?'var(--amber)':'var(--green)';
-        const rate=prev.has(v.vehicleId)?(f-prev.get(v.vehicleId)).toFixed(2):'–';
-        prev.set(v.vehicleId,f);
-        return `<tr><td><b>${U.fmtPlate(v.vehicleId)}</b></td>
-          <td>${v.status}</td>
-          <td><span class="fring" style="--p:${f.toFixed(0)};--c:${col}"><div>${f.toFixed(0)}%</div></span></td>
-          <td>${U.fmt(v.speedKph)} km/h</td>
-          <td class="muted">${rate} %/2s</td></tr>`;}).join('')||'<tr><td colspan="5" class="muted">Waiting for telemetry…</td></tr>';
-  }catch(e){}
+    const from=$('from').value,to=$('to').value;
+    const [fuel,lv,al]=await Promise.all([
+      api('/api/v1/reports/fuel?from='+from+'&to='+to),
+      api('/api/v1/vehicles/live'),
+      api('/api/v1/alerts/recent?limit=300').catch(function(){return [];})]);
+    fuelRows=fuel.rows;
+    live=lv;
+    routeByVeh={};lv.forEach(function(v){routeByVeh[v.vehicleId]=v.routeId;});
+
+    /* KPIs */
+    const liters=fuelRows.reduce(function(a,r){return a+(r.fuel_used_pct||0)/100*TANK;},0);
+    const dist=fuelRows.reduce(function(a,r){return a+(r.distance_km||0);},0);
+    $('kUsed').textContent=fmt(liters.toLocaleString())+' L';
+    $('kCost').textContent='KES '+(liters*PRICE/1e6).toFixed(1)+'M';
+    $('kEff').textContent=liters>1?(dist/liters).toFixed(2)+' km/L':'-';
+
+    /* anomalies: real LOW_FUEL alerts + excess-consumption flags (est.) */
+    const meds=fuelRows.map(r=>r.km_per_fuel_pct).filter(x=>x).sort(function(a,b){return a-b;});
+    const med=meds.length?meds[Math.floor(meds.length/2)]:0;
+    const anomalies=[];
+    al.filter(a=>a.type==='LOW_FUEL').forEach(a=>anomalies.push({v:a.vehicle_id,issue:'Low fuel level',sev:'Medium',ts:a.ts}));
+    fuelRows.forEach(function(r){
+      if(r.km_per_fuel_pct&&med&&r.km_per_fuel_pct<med*0.7&&r.distance_km>30)
+        anomalies.push({v:r.vehicle_id,issue:'Excess consumption (est.)',sev:r.km_per_fuel_pct<med*0.5?'High':'Medium',ts:null});});
+    anomalies.sort(function(a,b){return (b.ts||'').localeCompare(a.ts||'');});
+    $('kAnom').textContent=anomalies.length;
+    $('anomRows').innerHTML=anomalies.slice(0,10).map(a=>
+      '<tr><td><b>'+fmtPlate(a.v)+'</b></td><td>'+esc(a.issue)+'</td>'+
+      '<td><span class="schip '+esc(a.sev)+'">'+esc(a.sev)+'</span></td>'+
+      '<td class="muted small">'+(a.ts?new Date(a.ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'-')+'</td></tr>').join('')
+      ||'<tr><td colspan="4" class="muted">No anomalies in range.</td></tr>';
+
+    /* efficiency by vehicle (km/L est) sorted best first */
+    const eff=fuelRows.filter(r=>r.km_per_fuel_pct)
+      .map(r=>({l:fmtPlate(r.vehicle_id),v:r.km_per_fuel_pct/100*TANK}))
+      .sort(function(a,b){return b.v-a.v;});
+    hBars($('chEff'), eff);
+
+    /* consumption by vehicle (L est) sorted desc */
+    const byVeh=fuelRows.map(r=>({l:fmtPlate(r.vehicle_id),v:(r.fuel_used_pct||0)/100*TANK}))
+      .sort(function(a,b){return b.v-a.v;}).slice(0,8);
+    barChart($('chByVeh'), byVeh, '#2563eb');
+
+    /* 7-day trend: per-day fleet usage via per-day endpoint calls */
+    const days=[];
+    for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);days.push(localISO(d));}
+    const results=await Promise.all(days.map(function(d){
+      return api('/api/v1/reports/fuel?from='+d+'&to='+d).catch(function(){return {rows:[]};});}));
+    const trend=results.map(function(res,i){
+      const L=res.rows.reduce(function(a,r){return a+(r.fuel_used_pct||0)/100*TANK;},0);
+      return {l:days[i].slice(5).replace('-','/'),v:Math.round(L)};});
+    barChart($('chTrend'), trend, '#2563eb');
+    lineChart($('chCost'), trend.map(function(t){return {l:t.l,v:Math.round(t.v*PRICE)};}), '#10b981');
+
+    /* by corridor donut (by current corridor assignment) */
+    const byRoute={};
+    fuelRows.forEach(function(r){
+      const rid=routeByVeh[r.vehicle_id]||'other';
+      const key=routeLabels[rid]||'Other / unassigned';
+      byRoute[key]=(byRoute[key]||0)+(r.fuel_used_pct||0)/100*TANK;});
+    const cols=['#14b8a6','#f59e0b','#fb923c','#3b82f6','#8b5cf6','#94a3b8'];
+    const segs=Object.entries(byRoute).sort(function(a,b){return b[1]-a[1];})
+      .map(function(kv,i){return {l:kv[0],v:kv[1],c:cols[i%cols.length]};});
+    donutChart($('donut'), $('donutLegend'), segs, fmt(liters)+' L', 'Total Fuel (est.)');
+
+    /* details table */
+    renderDetails();
+    /* populate vehicle filter */
+    const cur=$('fVeh').value;
+    $('fVeh').innerHTML='<option value="">All Vehicles</option>'+
+      fuelRows.map(r=>'<option value="'+esc(r.vehicle_id)+'">'+fmtPlate(r.vehicle_id)+'</option>').join('');
+    $('fVeh').value=cur;
+    $('detRange').textContent='\u2014 '+from+' to '+to;
+  }catch(e){
+    $('detRows').innerHTML='<tr><td colspan="6" class="muted">Load failed: '+esc(e.message)+' - if HTTP 401/302, sign in again.</td></tr>';
+  }
 }
-load(); setInterval(load,2000);
-</script></body></html>
+
+function renderDetails(){
+  const q=$('fq').value.toUpperCase(),fv=$('fVeh').value;
+  detFiltered=fuelRows.filter(r=>(!fv||r.vehicle_id===fv)&&(!q||r.vehicle_id.toUpperCase().includes(q)));
+  const liveMap={};live.forEach(v=>liveMap[v.vehicleId]=v);
+  $('detRows').innerHTML=detFiltered.map(function(r){
+    const L=liveMap[r.vehicle_id]||{};
+    const f=L.fuelLevelPct;
+    const st=(f!=null&&f<15)?'LowFuel':'Normal';
+    const col=f==null?'#94a3b8':f<15?'var(--red)':f<35?'var(--amber)':'var(--green)';
+    return '<tr><td><b>'+fmtPlate(r.vehicle_id)+'</b></td>'+
+      '<td><span class="fbar"><i style="width:'+(f==null?0:f.toFixed(0))+'%;background:'+col+'"></i></span>'+(f==null?'-':f.toFixed(0)+'%')+'</td>'+
+      '<td>'+fmt(r.fuel_used_pct)+' pts</td>'+
+      '<td>'+(r.km_per_fuel_pct?r.km_per_fuel_pct.toFixed(2):'-')+'</td>'+
+      '<td>'+(r.km_per_fuel_pct?(r.km_per_fuel_pct/100*TANK).toFixed(2):'-')+'</td>'+
+      '<td><span class="schip '+st+'">'+(st==='Normal'?'Normal':'Low Fuel')+'</span></td></tr>';}).join('')
+    ||'<tr><td colspan="6" class="muted">No vehicles in range.</td></tr>';
+}
+
+/* ================= wiring ================= */
+ $('fq').oninput=renderDetails;
+ $('fVeh').onchange=renderDetails;
+ $('exportBtn').onclick=function(){
+  const csv=['plate,fuel_used_pts,distance_km,km_per_pt,km_per_L_est',
+    ...detFiltered.map(r=>[fmtPlate(r.vehicle_id),r.fuel_used_pct,r.distance_km,
+      r.km_per_fuel_pct?r.km_per_fuel_pct.toFixed(2):'',r.km_per_fuel_pct?(r.km_per_fuel_pct/100*TANK).toFixed(2):'']
+      .map(x=>'"'+(x??'')+'"').join(','))].join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download='fleetpulse-fuel.csv';a.click();toast('Exported fleetpulse-fuel.csv',true);};
+ $('fsBtn').onclick=function(){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();};
+function refreshBell(){fetch('/api/v1/alerts/recent?limit=100').then(function(r){return r.ok?r.json():[];})
+  .then(function(al){var n=al.filter(function(a){return new Date(a.ts).getTime()>Date.now()-36e5;}).length;
+    var b=$('topBell');b.textContent=n;b.style.display=n?'block':'none';}).catch(function(){});}
+refreshBell();setInterval(refreshBell,5000);
+(function(){try{
+  fetch('/api/v1/me',{headers:{'Accept':'application/json'}}).then(function(res){
+    var ct=res.headers.get('content-type')||'';
+    if(!res.ok||ct.indexOf('application/json')<0)throw 0;
+    return res.json();
+  }).then(function(me){
+    $('uInit').textContent=(me.username||'?').split(' ').map(function(w){return w[0];}).slice(0,2).join('').toUpperCase();
+    $('uName').textContent=me.username;$('uRole').textContent=me.roles.join(', ');
+  }).catch(function(){$('userChip').onclick=function(){location.href='/login.html';};});
+}catch(e){}})();
+
+/* default range: last 7 days */
+(function(){const to=new Date(),from=new Date();from.setDate(from.getDate()-6);
+  $('to').value=localISO(to);$('from').value=localISO(from);})();
+ $('from').onchange=load;$('to').onchange=load;
+load();setInterval(load,60000);
+</script>
+</body>
+</html>
