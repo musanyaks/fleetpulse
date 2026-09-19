@@ -49,6 +49,7 @@ select{border:1px solid var(--line);border-radius:9px;padding:8px 10px;font:inhe
 .grid{display:grid;gap:16px;align-items:start}
 .r1{grid-template-columns:1.4fr 1fr 1.1fr}
 .r2{grid-template-columns:1fr 1.2fr 1fr}
+.fbot{grid-template-columns:1.9fr 1fr}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
 .card>h3{font-size:13px;font-weight:700;padding:12px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}
 .card>h3 .lg{margin-left:auto;display:flex;gap:12px;font-size:11px;color:var(--muted);font-weight:500}
@@ -68,83 +69,79 @@ th{text-align:left;color:var(--muted);font-size:10.5px;text-transform:uppercase;
 td{padding:7px 10px;border-bottom:1px solid var(--line)}
 tbody tr:hover td{background:#f8fafc}
 .plate{font-weight:700;letter-spacing:.3px}
+.fcell{display:flex;align-items:center}
+.fthumb{width:34px;height:34px;border-radius:8px;background:#eef4ff;display:inline-grid;place-items:center;overflow:hidden;margin-right:8px;flex:none}
+.fthumb img{width:100%;height:100%;object-fit:cover;border-radius:8px;display:block}
 .fbar{width:54px;height:6px;border-radius:99px;background:#eef2f9;display:inline-block;vertical-align:middle;margin-right:6px;overflow:hidden}
 .fbar i{display:block;height:100%;border-radius:99px}
 .schip{font-size:10px;font-weight:700;padding:2px 9px;border-radius:99px}
 .schip.Normal{background:#d1fae5;color:#065f46}.schip.LowFuel{background:#fef3c7;color:#92400e}
 .schip.High{background:#fee2e2;color:#991b1b}.schip.Medium{background:#fef3c7;color:#92400e}.schip.Critical{background:#fee2e2;color:#991b1b}.schip.Low{background:#dbeafe;color:#1e40af}
+#fmap{height:300px}
+#fmap .leaflet-tile-pane{filter:saturate(.6) brightness(1.08)}
+.flegend{position:absolute;left:8px;top:8px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:7px 10px;font-size:11px;z-index:500;box-shadow:0 4px 14px rgba(2,6,23,.12)}
+.flegend div{display:flex;align-items:center;gap:6px;margin:2px 0}
+.flegend i{width:9px;height:9px;border-radius:50%}
+.flegend .ln{display:inline-block;width:16px;height:0;border-top:3px solid #2563eb}
+.flegend .dash{display:inline-block;width:16px;height:0;border-top:2px dashed #ef4444}
+.refuel-pin{width:16px;height:16px;border-radius:50%;background:var(--green);border:2.5px solid #fff;box-shadow:0 2px 6px rgba(2,6,23,.35);display:grid;place-items:center;color:#fff;font-size:9px;font-weight:800}
 .muted{color:var(--muted)}.small{font-size:12px}
 #toast{position:fixed;bottom:20px;right:20px;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;display:none;box-shadow:0 8px 24px rgba(2,6,23,.2);background:#d1fae5;color:#065f46;z-index:3000}
-@media (max-width:1300px){.r1,.r2{grid-template-columns:1fr 1fr}}
+@media (max-width:1300px){.r1,.r2{grid-template-columns:1fr 1fr}.fbot{grid-template-columns:1fr}}
 @media (max-width:900px){.r1,.r2,.kpis{grid-template-columns:1fr}}
-  .fbot{grid-template-columns:1.9fr 1fr}
-  #fmap{height:300px}
-  #fmap .leaflet-tile-pane{filter:saturate(.6) brightness(1.08)}
-  .flegend{position:absolute;left:8px;top:8px;background:#fff;border:1px solid var(--line);
-    border-radius:10px;padding:7px 10px;font-size:11px;z-index:500;box-shadow:0 4px 14px rgba(2,6,23,.12)}
-  .flegend div{display:flex;align-items:center;gap:6px;margin:2px 0}
-  .flegend i{width:9px;height:9px;border-radius:50%}
-  .flegend .ln{display:inline-block;width:16px;height:0;border-top:3px solid #2563eb}
-  .flegend .dash{display:inline-block;width:16px;height:0;border-top:2px dashed #ef4444}
-  .refuel-pin{width:16px;height:16px;border-radius:50%;background:var(--green);border:2.5px solid #fff;
-    box-shadow:0 2px 6px rgba(2,6,23,.35);display:grid;place-items:center;color:#fff;font-size:9px;font-weight:800}
-  .fthumb{width:34px;height:34px;border-radius:8px;background:#eef4ff;display:inline-grid;
-    place-items:center;overflow:hidden;vertical-align:middle;margin-right:8px}
-  .fthumb img{width:100%;height:100%;object-fit:cover;border-radius:8px;display:block}
-  .fcell{display:flex;align-items:center}
 </style>
 </head>
 <body>
 <div class="layout">
 <aside>
-  <div class="logo"><span class="sq">&#128666;</span> FleetPulse</div>
+  <div class="logo"><span class="sq">🚛</span> FleetPulse</div>
   <nav>
-    <a href="index.html"><span class="ic">&#127968;</span> Overview</a>
-    <a href="vehicles.html"><span class="ic">&#128666;</span> Vehicles</a>
-    <a href="tracking.html"><span class="ic">&#128205;</span> Live Tracking</a>
-    <a href="trips.html"><span class="ic">&#128733;</span> Trips</a>
-    <a href="drivers.html"><span class="ic">&#129691;</span> Drivers</a>
-    <a class="active" href="fuel.html"><span class="ic">&#9981;</span> Fuel</a>
-    <a href="maintenance.html"><span class="ic">&#128295;</span> Maintenance</a>
-    <a href="alerts.html"><span class="ic">&#128276;</span> Alerts</a>
-    <a href="geofences.html"><span class="ic">&#127919;</span> Geofences</a>
-    <a href="reports.html"><span class="ic">&#128202;</span> Analytics</a>
-    <a href="reports.html"><span class="ic">&#128196;</span> Reports</a>
-    <a href="alerts.html"><span class="ic">&#128276;</span> Notifications</a>
-    <a href="settings.html"><span class="ic">&#128101;</span> Users &amp; Roles</a>
-    <a href="settings.html"><span class="ic">&#9881;&#65039;</span> Settings</a>
+    <a href="index.html"><span class="ic">🏠</span> Overview</a>
+    <a href="vehicles.html"><span class="ic">🚚</span> Vehicles</a>
+    <a href="tracking.html"><span class="ic">📍</span> Live Tracking</a>
+    <a href="trips.html"><span class="ic">🛣️</span> Trips</a>
+    <a href="drivers.html"><span class="ic">🧑‍✈️</span> Drivers</a>
+    <a class="active" href="fuel.html"><span class="ic">⛽</span> Fuel</a>
+    <a href="maintenance.html"><span class="ic">🔧</span> Maintenance</a>
+    <a href="alerts.html"><span class="ic">🔔</span> Alerts</a>
+    <a href="geofences.html"><span class="ic">🎯</span> Geofences</a>
+    <a href="reports.html"><span class="ic">📊</span> Analytics</a>
+    <a href="reports.html"><span class="ic">📄</span> Reports</a>
+    <a href="alerts.html"><span class="ic">🔔</span> Notifications</a>
+    <a href="settings.html"><span class="ic">👥</span> Users &amp; Roles</a>
+    <a href="settings.html"><span class="ic">⚙️</span> Settings</a>
   </nav>
 </aside>
 <main>
   <div class="topbar">
-    <div class="gsearch">&#128269;<input id="gq" placeholder="Search vehicle..."/></div>
+    <div class="gsearch">🔍<input id="gq" placeholder="Search vehicle..."/></div>
     <span class="spacer"></span>
-    <a href="alerts.html" class="tbell" title="Alerts">&#128276;<span class="tbadge" id="topBell" style="display:none">0</span></a>
-    <button class="fbtn" id="fsBtn">&#9004;</button>
+    <a href="alerts.html" class="tbell" title="Alerts">🔔<span class="tbadge" id="topBell" style="display:none">0</span></a>
+    <button class="fbtn" id="fsBtn">⛶</button>
     <div class="tchipuser" id="userChip"><div class="upic" id="uInit">?</div>
       <div><div class="uname" id="uName">Sign in</div><div class="urole" id="uRole">-</div></div></div>
   </div>
 
   <div class="content">
-    <div class="pagehead"><span class="ic">&#9981;</span>
+    <div class="pagehead"><span class="ic">⛽</span>
       <div><h1>Fuel Tracking</h1><div class="sub">Monitor fuel consumption, efficiency and costs across your fleet</div></div>
       <span class="spacer"></span>
       <input type="date" id="from"/> <input type="date" id="to"/>
       <select id="fVeh"><option value="">All Vehicles</option></select>
-      <button class="btn" id="exportBtn">&#11015; Export Report</button>
+      <button class="btn" id="exportBtn">⬇ Export Report</button>
     </div>
 
-    <div class="banner">Tank sensors report fuel as <b>% of tank</b>. Liters and KES are <b>estimates</b> from declared assumptions: <b id="assump">200 L tank &middot; KES 180/L</b> (constants in fuel.html until the fuel-service module adds per-vehicle tank capacity and refill events).</div>
+    <div class="banner">Tank sensors report fuel as <b>% of tank</b>. Liters and KES are <b>estimates</b> from declared assumptions: <b>200 L tank · KES 180/L</b> (constants in fuel.html until the fuel-service module adds per-vehicle tank capacity and refill events).</div>
 
     <div class="kpis">
-      <div class="kpi"><div class="bub" style="background:#e8f0fe">&#9981;</div>
-        <div><div class="label">Fuel Consumed (est.)</div><div class="value" id="kUsed">-</div><div class="trend" id="kUsedT">range total</div></div></div>
-      <div class="kpi"><div class="bub" style="background:#d1fae5">&#128176;</div>
-        <div><div class="label">Fuel Cost (est.)</div><div class="value" id="kCost">-</div><div class="trend" id="kCostT">KES 180/L</div></div></div>
-      <div class="kpi"><div class="bub" style="background:#dbeafe">&#128992;</div>
-        <div><div class="label">Avg Efficiency</div><div class="value" id="kEff">-</div><div class="trend" id="kEffT">km / L (est.)</div></div></div>
-      <div class="kpi"><div class="bub" style="background:#ffedd5">&#9888;</div>
-        <div><div class="label">Fuel Anomalies</div><div class="value" id="kAnom">-</div><div class="trend" id="kAnomT">low-fuel + excess use</div></div></div>
+      <div class="kpi"><div class="bub" style="background:#e8f0fe">⛽</div>
+        <div><div class="label">Fuel Consumed (est.)</div><div class="value" id="kUsed">–</div><div class="trend" id="kUsedT">range total</div></div></div>
+      <div class="kpi"><div class="bub" style="background:#d1fae5">💰</div>
+        <div><div class="label">Fuel Cost (est.)</div><div class="value" id="kCost">–</div><div class="trend" id="kCostT">KES 180/L</div></div></div>
+      <div class="kpi"><div class="bub" style="background:#dbeafe">🏎</div>
+        <div><div class="label">Avg Efficiency</div><div class="value" id="kEff">–</div><div class="trend" id="kEffT">km / L (est.)</div></div></div>
+      <div class="kpi"><div class="bub" style="background:#ffedd5">⚠️</div>
+        <div><div class="label">Fuel Anomalies</div><div class="value" id="kAnom">–</div><div class="trend" id="kAnomT">low-fuel + excess use</div></div></div>
     </div>
 
     <div class="grid r1">
@@ -172,27 +169,26 @@ tbody tr:hover td{background:#f8fafc}
     </div>
 
     <div class="grid fbot">
-    <div class="card">
-      <h3>Vehicle Fuel Details <span class="muted small" id="detRange"></span>
-        <input id="fq" placeholder="Search vehicle..." style="margin-left:auto;border:1px solid var(--line);border-radius:8px;padding:5px 10px;font:inherit"/></h3>
-      <div class="tblwrap"><table>
-        <thead><tr><th>Vehicle</th><th>Fuel Level now</th><th>Used in range (pts)</th><th>Efficiency (km/pt)</th><th>Efficiency (km/L est.)</th><th>Status</th></tr></thead>
-        <tbody id="detRows"><tr><td colspan="6" class="muted">Loading...</td></tr></tbody></table></div>
-    </div>
-
-    <div class="card">
-      <h3>Fuel Stations &amp; Refuel Locations <span class="muted small">- refuels detected live</span></h3>
-      <div style="position:relative">
-        <div id="fmap"></div>
-        <div class="flegend">
-          <div><i style="background:var(--green)"></i> Refuel event (detected)</div>
-          <div><i style="background:var(--blue2)"></i> Vehicle</div>
-          <div><span class="ln"></span> Vehicle Route</div>
-          <div><span class="dash"></span> Geofence</div>
-        </div>
+      <div class="card">
+        <h3>Vehicle Fuel Details <span class="muted small" id="detRange"></span>
+          <input id="fq" placeholder="Search vehicle..." style="margin-left:auto;border:1px solid var(--line);border-radius:8px;padding:5px 10px;font:inherit"/></h3>
+        <div class="tblwrap"><table>
+          <thead><tr><th>Vehicle</th><th>Fuel Level now</th><th>Used in range (pts)</th><th>Efficiency (km/pt)</th><th>Efficiency (km/L est.)</th><th>Status</th></tr></thead>
+          <tbody id="detRows"><tr><td colspan="6" class="muted">Loading...</td></tr></tbody></table></div>
       </div>
-      <div class="note">Refuel events are detected when a tank level rises between polls - real telemetry. "Fuel Stations" as a POI database arrives with the fuel-service module.</div>
-    </div>
+      <div class="card">
+        <h3>Fuel Stations &amp; Refuel Locations <span class="muted small">- refuels detected live</span></h3>
+        <div style="position:relative">
+          <div id="fmap"></div>
+          <div class="flegend">
+            <div><i style="background:var(--green)"></i> Refuel event (detected)</div>
+            <div><i style="background:var(--blue2)"></i> Vehicle</div>
+            <div><span class="ln"></span> Vehicle Route</div>
+            <div><span class="dash"></span> Geofence</div>
+          </div>
+        </div>
+        <div class="note">Refuel events are detected when a tank level rises between polls - real telemetry. "Fuel Stations" as a POI database arrives with the fuel-service module.</div>
+      </div>
     </div>
   </div>
 </main>
@@ -202,14 +198,18 @@ tbody tr:hover td{background:#f8fafc}
 <script>
 /* ================= helpers ================= */
 const $=id=>document.getElementById(id);
-const esc=s=>(s??'').replace(/[<>&"]/g,function(c){return {'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c];});
-const fmt=n=>n==null?'\u2013':Number(n).toFixed(0);
+const esc=s=>(s??'').replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+const fmt=n=>n==null?'–':Number(n).toFixed(0);
 const fmtPlate=id=>{const m=/^(K[A-Z]{2})(\d{3}[A-Z])$/.exec(id||'');return m?m[1]+' '+m[2]:id||'';};
 const api=async p=>{const r=await fetch(p);if(!r.ok)throw new Error('HTTP '+r.status);return r.json();};
 const toast=(m,ok)=>{const t=$('toast');t.textContent=m;
   t.style.background=ok===false?'#fee2e2':'#d1fae5';t.style.color=ok===false?'#991b1b':'#065f46';
-  t.style.display='block';setTimeout(function(){t.style.display='none';},2600);};
+  t.style.display='block';setTimeout(()=>t.style.display='none',2600);};
+const TANK=200, PRICE=180;
+const localISO=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const routeLabels={"NBO-MSA":"Nairobi - Mombasa","NBO-KSM":"Nairobi - Kisumu","NBO-ELD":"Nairobi - Eldoret","NBO-NKR":"Nairobi - Nakuru","NBO-GSA":"Nairobi - Garissa"};
 
+/* photo chain for table thumbnails */
 function photoClass(mk,mo){const m=`${mk??''} ${mo??''}`;
   if(/Hiace|Coaster|Rosa|Matatu|Bus/i.test(m))return 'bus';
   if(/Canter|Dyna|ELF|Hino 300|NPR|NQR|Kuzer/i.test(m))return 'light';
@@ -217,7 +217,7 @@ function photoClass(mk,mo){const m=`${mk??''} ${mo??''}`;
   return 'heavy';}
 const FTRUCK='<svg viewBox="0 0 24 24" width="20" height="20"><rect x="2" y="7" width="11" height="8" rx="1" fill="#3b82f6"/><path d="M13 9h4.2c.5 0 .96.25 1.24.66L20.5 12.5V15H13V9Z" fill="#60a5fa"/><circle cx="6" cy="16.8" r="1.8" fill="#1e293b"/><circle cx="16.5" cy="16.8" r="1.8" fill="#1e293b"/></svg>';
 function fuelThumb(vid){
-  const meta=(window.__vmap&&window.__vmap.get)?window.__vmap.get(vid):null;
+  const meta=window.__vmap?window.__vmap.get(vid):null;
   const cls=meta?photoClass(meta.make,meta.model):'heavy';
   return '<span class="fthumb"><img src="img/'+encodeURIComponent(vid)+'.jpg" data-cls="'+cls+'" alt="" onerror="window.__fthumbErr(this)"></span>';
 }
@@ -226,51 +226,43 @@ window.__fthumbErr=function(img){
   else{const s=document.createElement('span');s.style.display='grid';s.style.placeItems='center';s.innerHTML=FTRUCK;img.replaceWith(s);}
 };
 
-const TANK=200, PRICE=180;
-const localISO=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-const routeLabels={"NBO-MSA":"Nairobi - Mombasa","NBO-KSM":"Nairobi - Kisumu","NBO-ELD":"Nairobi - Eldoret","NBO-NKR":"Nairobi - Nakuru","NBO-GSA":"Nairobi - Garissa"};
-
 /* ================= state ================= */
-let fuelRows=[],live=[];window.__vmap=new Map(),routeByVeh={},alerts=[],detFiltered=[];
+let fuelRows=[],live=[],routeByVeh={},alerts=[],detFiltered=[];
+window.__vmap=new Map();
 
-/* ================= charts (inline SVG) ================= */
-function barChart(el, data, color){
+/* ================= charts ================= */
+function barChart(el,data,color){
   if(!data.length){el.innerHTML='<div class="muted small">No data.</div>';return;}
-  const max=Math.max.apply(null,data.map(d=>d.v))||1, W=el.clientWidth||420, H=170, bw=Math.min(46,(W-20)/data.length*0.55);
+  const max=Math.max.apply(null,data.map(d=>d.v))||1,W=el.clientWidth||420,H=170,bw=Math.min(46,(W-20)/data.length*0.55);
   let s='<svg width="100%" viewBox="0 0 '+W+' '+H+'">';
   data.forEach(function(d,i){
-    const x=20+i*((W-40)/data.length)+( (W-40)/data.length-bw)/2;
+    const x=20+i*((W-40)/data.length)+((W-40)/data.length-bw)/2;
     const h=Math.max(2,(d.v/max)*(H-42));
     s+='<rect x="'+x+'" y="'+(H-24-h)+'" width="'+bw+'" height="'+h+'" rx="4" fill="'+color+'" opacity="0.9"/>';
     s+='<text x="'+(x+bw/2)+'" y="'+(H-24-h-5)+'" text-anchor="middle" font-size="9.5" fill="#334155">'+fmt(d.v)+'</text>';
-    s+='<text x="'+(x+bw/2)+'" y="'+(H-8)+'" text-anchor="middle" font-size="9.5" fill="#64748b">'+esc(d.l)+'</text>';
-  });
-  s+='</svg>';el.innerHTML=s;
-}
-function lineChart(el, data, color){
+    s+='<text x="'+(x+bw/2)+'" y="'+(H-8)+'" text-anchor="middle" font-size="9.5" fill="#64748b">'+esc(d.l)+'</text>';});
+  s+='</svg>';el.innerHTML=s;}
+function lineChart(el,data,color){
   if(!data.length){el.innerHTML='<div class="muted small">No data.</div>';return;}
   const W=el.clientWidth||420,H=170,max=Math.max.apply(null,data.map(d=>d.v))||1,min=Math.min.apply(null,data.map(d=>d.v));
   const rng=(max-min)||1;
   const pts=data.map(function(d,i){
     const x=30+i*((W-50)/Math.max(1,data.length-1));
-    const y=14+(1-(d.v-min)/rng)*(H-52);
-    return [x,y];});
+    const y=14+(1-(d.v-min)/rng)*(H-52);return [x,y];});
   let s='<svg width="100%" viewBox="0 0 '+W+' '+H+'">';
   s+='<polyline fill="none" stroke="'+color+'" stroke-width="2.5" points="'+pts.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ')+'"/>';
   pts.forEach(function(p,i){s+='<circle cx="'+p[0]+'" cy="'+p[1]+'" r="4" fill="'+color+'"/>';
     if(i%2===0||data.length<=8)s+='<text x="'+p[0]+'" y="'+(H-8)+'" text-anchor="middle" font-size="9.5" fill="#64748b">'+esc(data[i].l)+'</text>';});
-  s+='</svg>';el.innerHTML=s;
-}
-function hBars(el, rows){
+  s+='</svg>';el.innerHTML=s;}
+function hBars(el,rows){
   if(!rows.length){el.innerHTML='<div class="muted small">No data.</div>';return;}
   const max=Math.max.apply(null,rows.map(r=>r.v))||1;
   el.innerHTML=rows.map(function(r){
-    const col=r.v>=1.8*max/2.8?'#10b981':r.v>=1.2*max/2.8?'#f59e0b':'#ef4444';
+    const col=r.v>=max*0.64?'#10b981':r.v>=max*0.43?'#f59e0b':'#ef4444';
     return '<div class="hrow"><span class="nm">'+esc(r.l)+'</span>'+
       '<span class="tr"><i style="width:'+(r.v/max*100).toFixed(0)+'%;background:'+col+'"></i></span>'+
-      '<span class="v">'+r.v.toFixed(2)+'</span></div>';}).join('');
-}
-function donutChart(el, legendEl, segs, centerN, centerL){
+      '<span class="v">'+r.v.toFixed(2)+'</span></div>';}).join('');}
+function donutChart(el,legendEl,segs,centerN,centerL){
   const total=segs.reduce(function(a,s){return a+s.v;},0)||1;
   const R=52,C=2*Math.PI*R;let off=0,segsSvg='';
   segs.forEach(function(s){
@@ -282,23 +274,24 @@ function donutChart(el, legendEl, segs, centerN, centerL){
     '<text x="60" y="57" text-anchor="middle" font-size="13" font-weight="800" fill="#1e293b">'+centerN+'</text>'+
     '<text x="60" y="72" text-anchor="middle" font-size="9" fill="#64748b">'+centerL+'</text></svg>';
   legendEl.innerHTML=segs.map(function(s){
-    return '<div class="r"><i style="background:'+s.c+'"></i>'+esc(s.l)+'<b>'+Math.round(s.v/total*100)+'%</b></div>';}).join('');
-}
+    return '<div class="r"><i style="background:'+s.c+'"></i>'+esc(s.l)+'<b>'+Math.round(s.v/total*100)+'%</b></div>';}).join('');}
 
-/* ================= data load ================= */
+/* ================= data ================= */
 async function load(){
   try{
     const from=$('from').value,to=$('to').value;
-    const [fuel,lv,al]=await Promise.all([
+    const [fuel,lv,al,vp]=await Promise.all([
       api('/api/v1/reports/fuel?from='+from+'&to='+to),
       api('/api/v1/vehicles/live'),
-      api('/api/v1/alerts/recent?limit=300').catch(function(){return [];})]);
-    fuelRows=fuel.rows;
-    window.vehicles=(typeof vehicles!=='undefined')?vehicles:new Map(vp.map(v=>[v.vehicleId,v]));
-    live=lv;
+      api('/api/v1/alerts/recent?limit=300').catch(()=>[]),
+      api('/api/v1/vehicles?size=200').catch(()=>[])]);
+    fuelRows=fuel.rows; live=lv;
+    window.__vmap=new Map(vp.map(v=>[v.vehicleId,v]));
     routeByVeh={};lv.forEach(function(v){routeByVeh[v.vehicleId]=v.routeId;});
+
+    /* refuel detection: tank level rising between polls */
     lv.forEach(function(v){
-      const last=window.__lastFuel[v.vehicleId];
+      const last=window.__lastFuel?window.__lastFuel[v.vehicleId]:null;
       if(last!=null&&v.fuelLevelPct!=null&&v.fuelLevelPct>last+3){
         window.__refuels.push({vehicleId:v.vehicleId,lat:v.latitude,lon:v.longitude,
           ts:Date.now(),gain:v.fuelLevelPct-last});
@@ -309,96 +302,87 @@ async function load(){
     });
 
     /* KPIs */
-    const liters=fuelRows.reduce(function(a,r){return a+(r.fuel_used_pct||0)/100*TANK;},0);
-    const dist=fuelRows.reduce(function(a,r){return a+(r.distance_km||0);},0);
-    $('kUsed').textContent=fmt(liters.toLocaleString())+' L';
+    const liters=fuelRows.reduce((a,r)=>a+(r.fuel_used_pct||0)/100*TANK,0);
+    const dist=fuelRows.reduce((a,r)=>a+(r.distance_km||0),0);
+    $('kUsed').textContent=liters.toLocaleString(undefined,{maximumFractionDigits:0})+' L';
     $('kCost').textContent='KES '+(liters*PRICE/1e6).toFixed(1)+'M';
-    $('kEff').textContent=liters>1?(dist/liters).toFixed(2)+' km/L':'-';
+    $('kEff').textContent=liters>1?(dist/liters).toFixed(2)+' km/L':'–';
 
-    /* anomalies: real LOW_FUEL alerts + excess-consumption flags (est.) */
-    const meds=fuelRows.map(r=>r.km_per_fuel_pct).filter(x=>x).sort(function(a,b){return a-b;});
+    /* anomalies */
+    const meds=fuelRows.map(r=>r.km_per_fuel_pct).filter(x=>x).sort((a,b)=>a-b);
     const med=meds.length?meds[Math.floor(meds.length/2)]:0;
     const anomalies=[];
     al.filter(a=>a.type==='LOW_FUEL').forEach(a=>anomalies.push({v:a.vehicle_id,issue:'Low fuel level',sev:'Medium',ts:a.ts}));
     fuelRows.forEach(function(r){
       if(r.km_per_fuel_pct&&med&&r.km_per_fuel_pct<med*0.7&&r.distance_km>30)
         anomalies.push({v:r.vehicle_id,issue:'Excess consumption (est.)',sev:r.km_per_fuel_pct<med*0.5?'High':'Medium',ts:null});});
-    anomalies.sort(function(a,b){return (b.ts||'').localeCompare(a.ts||'');});
+    anomalies.sort((a,b)=>(b.ts||'').localeCompare(a.ts||''));
     $('kAnom').textContent=anomalies.length;
     $('anomRows').innerHTML=anomalies.slice(0,10).map(a=>
       '<tr><td><b>'+fmtPlate(a.v)+'</b></td><td>'+esc(a.issue)+'</td>'+
       '<td><span class="schip '+esc(a.sev)+'">'+esc(a.sev)+'</span></td>'+
-      '<td class="muted small">'+(a.ts?new Date(a.ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'-')+'</td></tr>').join('')
+      '<td class="muted small">'+(a.ts?new Date(a.ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'–')+'</td></tr>').join('')
       ||'<tr><td colspan="4" class="muted">No anomalies in range.</td></tr>';
 
-    /* efficiency by vehicle (km/L est) sorted best first */
+    /* efficiency bars */
     const eff=fuelRows.filter(r=>r.km_per_fuel_pct)
       .map(r=>({l:fmtPlate(r.vehicle_id),v:r.km_per_fuel_pct/100*TANK}))
-      .sort(function(a,b){return b.v-a.v;});
-    hBars($('chEff'), eff);
-
-    /* consumption by vehicle (L est) sorted desc */
+      .sort((a,b)=>b.v-a.v);
+    hBars($('chEff'),eff);
+    /* consumption bars */
     const byVeh=fuelRows.map(r=>({l:fmtPlate(r.vehicle_id),v:(r.fuel_used_pct||0)/100*TANK}))
-      .sort(function(a,b){return b.v-a.v;}).slice(0,8);
-    barChart($('chByVeh'), byVeh, '#2563eb');
+      .sort((a,b)=>b.v-a.v).slice(0,8);
+    barChart($('chByVeh'),byVeh,'#2563eb');
 
-    /* 7-day trend: per-day fleet usage via per-day endpoint calls */
+    /* 7-day trend + cost */
     const days=[];
     for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);days.push(localISO(d));}
-    const results=await Promise.all(days.map(function(d){
-      return api('/api/v1/reports/fuel?from='+d+'&to='+d).catch(function(){return {rows:[]};});}));
-    const trend=results.map(function(res,i){
-      const L=res.rows.reduce(function(a,r){return a+(r.fuel_used_pct||0)/100*TANK;},0);
+    const results=await Promise.all(days.map(d=>api('/api/v1/reports/fuel?from='+d+'&to='+d).catch(()=>({rows:[]}))));
+    const trend=results.map((res,i)=>{
+      const L=res.rows.reduce((a,r)=>a+(r.fuel_used_pct||0)/100*TANK,0);
       return {l:days[i].slice(5).replace('-','/'),v:Math.round(L)};});
-    barChart($('chTrend'), trend, '#2563eb');
-    lineChart($('chCost'), trend.map(function(t){return {l:t.l,v:Math.round(t.v*PRICE)};}), '#10b981');
+    barChart($('chTrend'),trend,'#2563eb');
+    lineChart($('chCost'),trend.map(t=>({l:t.l,v:Math.round(t.v*PRICE)})),'#10b981');
 
-    /* by corridor donut (by current corridor assignment) */
+    /* corridor donut */
     const byRoute={};
     fuelRows.forEach(function(r){
       const rid=routeByVeh[r.vehicle_id]||'other';
       const key=routeLabels[rid]||'Other / unassigned';
       byRoute[key]=(byRoute[key]||0)+(r.fuel_used_pct||0)/100*TANK;});
     const cols=['#14b8a6','#f59e0b','#fb923c','#3b82f6','#8b5cf6','#94a3b8'];
-    const segs=Object.entries(byRoute).sort(function(a,b){return b[1]-a[1];})
-      .map(function(kv,i){return {l:kv[0],v:kv[1],c:cols[i%cols.length]};});
-    donutChart($('donut'), $('donutLegend'), segs, fmt(liters)+' L', 'Total Fuel (est.)');
+    const segs=Object.entries(byRoute).sort((a,b)=>b[1]-a[1])
+      .map((kv,i)=>({l:kv[0],v:kv[1],c:cols[i%cols.length]}));
+    donutChart($('donut'),$('donutLegend'),segs,liters.toLocaleString(undefined,{maximumFractionDigits:0})+' L','Total Fuel (est.)');
 
-    /* details table */
-    renderDetails();
-    /* vs last week: previous equal-length period totals */
+    /* vs last week */
     (async function(){
       try{
-        const F=new Date(from+'T00:00:00'), T=new Date(to+'T00:00:00');
+        const F=new Date(from+'T00:00:00'),T=new Date(to+'T00:00:00');
         const span=Math.round((T-F)/864e5)+1;
-        const pTo=new Date(F); pTo.setDate(pTo.getDate()-1);
-        const pFrom=new Date(pTo); pFrom.setDate(pFrom.getDate()-(span-1));
-        const pf=localISO(pFrom), pt=localISO(pTo);
-        const prev=await api('/api/v1/reports/fuel?from='+pf+'&to='+pt).catch(()=>({rows:[]}));
+        const pTo=new Date(F);pTo.setDate(pTo.getDate()-1);
+        const pFrom=new Date(pTo);pFrom.setDate(pFrom.getDate()-(span-1));
+        const prev=await api('/api/v1/reports/fuel?from='+localISO(pFrom)+'&to='+localISO(pTo)).catch(()=>({rows:[]}));
         const pLiters=prev.rows.reduce((a,r)=>a+(r.fuel_used_pct||0)/100*TANK,0);
         const pDist=prev.rows.reduce((a,r)=>a+(r.distance_km||0),0);
-        const pct=(now,base)=>base>0?Math.round(Math.abs(now-base)/base*100):null;
-        const trendHTML=(now,base,invert)=>{ 
-          const p=pct(now,base);
-          if(p==null)return '<span class="trend flat">no prior data</span>';
-          const up=now>=base;
-          const good=invert?!up:up;   /* for anomalies, an increase is bad */
-          return '<span class="trend '+(good?'up':'down')+'">'+(up?'\u2191':'\u2193')+' '+p+'% vs last week</span>';
-        };
-        const e1=$('kUsedT'); if(e1)e1.outerHTML='<div class="trend" id="kUsedT">'+trendHTML(liters,pLiters)+'</div>';
-        const e2=$('kCostT'); if(e2)e2.outerHTML='<div class="trend" id="kCostT">'+trendHTML(liters*PRICE,pLiters*PRICE)+'</div>';
-        const nowEff=liters>1?dist/liters:0;
-        const prevEff=pLiters>1?pDist/pLiters:0;
-        const e3=$('kEffT'); if(e3)e3.outerHTML='<div class="trend" id="kEffT">'+trendHTML(nowEff,prevEff)+'</div>';
-        const e4=$('kAnomT'); if(e4)e4.outerHTML='<div class="trend" id="kAnomT">'+trendHTML(anomalies.length,prev.rows.length?Math.round(prev.rows.length*0.3):0,true)+'</div>';
-      }catch(e){console.error('loadPrev:',e);}
+        const trendHTML=(nowv,base)=>{const b=Number(base);
+          if(!b||b<=0)return '<span class="trend flat">no prior data</span>';
+          const d=nowv-b,p=Math.round(Math.abs(d)/b*100),up=d>=0;
+          return '<span class="trend '+(up?'up':'down')+'">'+(up?'↑':'↓')+' '+p+'% vs last week</span>';};
+        $('kUsedT').innerHTML=trendHTML(liters,pLiters);
+        $('kCostT').innerHTML=trendHTML(liters*PRICE,pLiters*PRICE);
+        const nowEff=liters>1?dist/liters:0, prevEff=pLiters>1?pDist/pLiters:0;
+        $('kEffT').innerHTML=trendHTML(nowEff,prevEff);
+        $('kAnomT').innerHTML=trendHTML(anomalies.length,prev.rows.length?Math.round(prev.rows.length*0.3):0);
+      }catch(e){}
     })();
-    /* populate vehicle filter */
+
+    renderDetails();
     const cur=$('fVeh').value;
     $('fVeh').innerHTML='<option value="">All Vehicles</option>'+
       fuelRows.map(r=>'<option value="'+esc(r.vehicle_id)+'">'+fmtPlate(r.vehicle_id)+'</option>').join('');
     $('fVeh').value=cur;
-    $('detRange').textContent='\u2014 '+from+' to '+to;
+    $('detRange').textContent='— '+from+' to '+to;
   }catch(e){
     $('detRows').innerHTML='<tr><td colspan="6" class="muted">Load failed: '+esc(e.message)+' - if HTTP 401/302, sign in again.</td></tr>';
   }
@@ -414,13 +398,52 @@ function renderDetails(){
     const st=(f!=null&&f<15)?'LowFuel':'Normal';
     const col=f==null?'#94a3b8':f<15?'var(--red)':f<35?'var(--amber)':'var(--green)';
     return '<tr><td><span class="fcell">'+fuelThumb(r.vehicle_id)+'<b>'+fmtPlate(r.vehicle_id)+'</b></span></td>'+
-      '<td><span class="fbar"><i style="width:'+(f==null?0:f.toFixed(0))+'%;background:'+col+'"></i></span>'+(f==null?'-':f.toFixed(0)+'%')+'</td>'+
+      '<td><span class="fbar"><i style="width:'+(f==null?0:f.toFixed(0))+'%;background:'+col+'"></i></span>'+(f==null?'–':f.toFixed(0)+'%')+'</td>'+
       '<td>'+fmt(r.fuel_used_pct)+' pts</td>'+
-      '<td>'+(r.km_per_fuel_pct?r.km_per_fuel_pct.toFixed(2):'-')+'</td>'+
-      '<td>'+(r.km_per_fuel_pct?(r.km_per_fuel_pct/100*TANK).toFixed(2):'-')+'</td>'+
+      '<td>'+(r.km_per_fuel_pct?r.km_per_fuel_pct.toFixed(2):'–')+'</td>'+
+      '<td>'+(r.km_per_fuel_pct?(r.km_per_fuel_pct/100*TANK).toFixed(2):'–')+'</td>'+
       '<td><span class="schip '+st+'">'+(st==='Normal'?'Normal':'Low Fuel')+'</span></td></tr>';}).join('')
     ||'<tr><td colspan="6" class="muted">No vehicles in range.</td></tr>';
 }
+
+/* ================= refuel map ================= */
+window.__lastFuel=window.__lastFuel||{};window.__refuels=window.__refuels||[];
+const ROUTE_CATALOG_F={
+ "NBO-MSA":[[-1.286,36.817],[-1.370,36.902],[-1.450,36.966],[-1.497,37.050],[-1.582,37.235],[-1.617,37.455],[-1.900,37.550],[-2.007,37.628],[-2.414,38.019],[-2.911,38.300],[-3.396,38.556],[-3.530,38.750],[-3.865,39.470],[-4.043,39.668]],
+ "NBO-KSM":[[-1.286,36.817],[-1.112,36.640],[-0.717,36.433],[-0.303,36.080],[-0.280,35.700],[-0.367,35.283],[-0.250,35.100],[-0.091,34.768]],
+ "NBO-ELD":[[-1.286,36.817],[-1.112,36.640],[-0.717,36.433],[-0.303,36.080],[-0.100,35.550],[0.150,35.420],[0.350,35.300],[0.514,35.270]],
+ "NBO-NKR":[[-1.286,36.817],[-1.112,36.640],[-0.900,36.550],[-0.717,36.433],[-0.520,36.320],[-0.303,36.080]],
+ "NBO-GSA":[[-1.286,36.817],[-1.233,37.100],[-1.000,37.500],[-0.700,38.300],[-0.453,39.646]]};
+const fmap=L.map('fmap',{zoomControl:false}).setView([-1.4,37.2],7);
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap'}).addTo(fmap);
+Object.entries(ROUTE_CATALOG_F).forEach(function(kv){
+  L.polyline(kv[1],{color:'#2563eb',weight:4,opacity:.75}).addTo(fmap);});
+const refuelLayer=L.layerGroup().addTo(fmap);
+const vehLayerF=L.layerGroup().addTo(fmap);
+const geoLayerF=L.layerGroup().addTo(fmap);
+fetch('/api/v1/geofences').then(r=>r.ok?r.json():[]).then(zones=>{
+  zones.filter(z=>z.active).forEach(z=>{
+    const col=(z.type==='RESTRICTED'||z.type==='DANGER')?'#ef4444':z.type==='DEPOT'?'#2563eb':'#10b981';
+    L.circle([z.lat,z.lon],{radius:z.radiusM,color:col,weight:2,dashArray:'6 4',fillOpacity:.08})
+      .bindTooltip('Geofence: '+z.name).addTo(geoLayerF);});}).catch(()=>{});
+function renderRefuels(){
+  refuelLayer.clearLayers();
+  window.__refuels.forEach(function(r){
+    L.marker([r.lat,r.lon],{icon:L.divIcon({className:'',iconSize:[18,18],iconAnchor:[9,9],
+      html:'<div class="refuel-pin">R</div>'})})
+      .bindTooltip('<b>Refuel: '+fmtPlate(r.vehicleId)+'</b><br/>+'+r.gain.toFixed(0)+' pts (est. +'+(r.gain/100*200).toFixed(0)+' L)<br/>'+
+        new Date(r.ts).toLocaleTimeString()).addTo(refuelLayer);});}
+function refreshFuelMap(){
+  live.forEach(function(v){
+    if(v.latitude==null)return;
+    fmap._vehicles=fmap._vehicles||{};
+    const key='m_'+v.vehicleId;
+    if(!fmap._vehicles[key]){fmap._vehicles[key]=L.circleMarker([v.latitude,v.longitude],
+      {radius:5,color:'#fff',weight:2,fillColor:'#3b82f6',fillOpacity:.95})
+      .bindTooltip(fmtPlate(v.vehicleId)).addTo(vehLayerF);}
+    else fmap._vehicles[key].setLatLng([v.latitude,v.longitude]);});}
+setTimeout(function(){refreshFuelMap();fmap.invalidateSize();},300);
+setInterval(refreshFuelMap,10000);
 
 /* ================= wiring ================= */
  $('fq').oninput=renderDetails;
@@ -433,71 +456,24 @@ function renderDetails(){
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
   a.download='fleetpulse-fuel.csv';a.click();toast('Exported fleetpulse-fuel.csv',true);};
  $('fsBtn').onclick=function(){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();};
-function refreshBell(){fetch('/api/v1/alerts/recent?limit=100').then(function(r){return r.ok?r.json():[];})
-  .then(function(al){var n=al.filter(function(a){return new Date(a.ts).getTime()>Date.now()-36e5;}).length;
-    var b=$('topBell');b.textContent=n;b.style.display=n?'block':'none';}).catch(function(){});}
+function refreshBell(){fetch('/api/v1/alerts/recent?limit=100').then(r=>r.ok?r.json():[])
+  .then(al=>{const n=al.filter(a=>new Date(a.ts).getTime()>Date.now()-36e5).length;
+    const b=$('topBell');b.textContent=n;b.style.display=n?'block':'none';}).catch(()=>{});}
 refreshBell();setInterval(refreshBell,5000);
-(function(){try{
-  fetch('/api/v1/me',{headers:{'Accept':'application/json'}}).then(function(res){
-    var ct=res.headers.get('content-type')||'';
-    if(!res.ok||ct.indexOf('application/json')<0)throw 0;
-    return res.json();
-  }).then(function(me){
-    $('uInit').textContent=(me.username||'?').split(' ').map(function(w){return w[0];}).slice(0,2).join('').toUpperCase();
-    $('uName').textContent=me.username;$('uRole').textContent=me.roles.join(', ');
-  }).catch(function(){$('userChip').onclick=function(){location.href='/login.html';};});
-}catch(e){}})();
+(async()=>{try{
+  const r=await fetch('/api/v1/me',{headers:{'Accept':'application/json'}});
+  const ct=r.headers.get('content-type')||'';
+  if(!r.ok||!ct.includes('application/json'))throw 0;
+  const me=await r.json();
+  $('uInit').textContent=(me.username||'?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+  $('uName').textContent=me.username;$('uRole').textContent=me.roles.join(', ');
+}catch(e){$('userChip').onclick=function(){location.href='/login.html';};}})();
 
 /* default range: last 7 days */
 (function(){const to=new Date(),from=new Date();from.setDate(from.getDate()-6);
   $('to').value=localISO(to);$('from').value=localISO(from);})();
  $('from').onchange=load;$('to').onchange=load;
 load();setInterval(load,60000);
-
-
-/* ================= fuel map + refuel detection (end-of-script) ================= */
-window.__lastFuel = window.__lastFuel || {}; window.__refuels = [];
-const fmap=L.map('fmap',{zoomControl:false}).setView([-1.4,37.2],7);
-L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap'}).addTo(fmap);
-const ROUTE_CATALOG_F={
- "NBO-MSA":[[-1.286,36.817],[-1.370,36.902],[-1.450,36.966],[-1.497,37.050],[-1.582,37.235],[-1.617,37.455],[-1.900,37.550],[-2.007,37.628],[-2.414,38.019],[-2.911,38.300],[-3.396,38.556],[-3.530,38.750],[-3.865,39.470],[-4.043,39.668]],
- "NBO-KSM":[[-1.286,36.817],[-1.112,36.640],[-0.717,36.433],[-0.303,36.080],[-0.280,35.700],[-0.367,35.283],[-0.250,35.100],[-0.091,34.768]],
- "NBO-ELD":[[-1.286,36.817],[-1.112,36.640],[-0.717,36.433],[-0.303,36.080],[-0.100,35.550],[0.150,35.420],[0.350,35.300],[0.514,35.270]],
- "NBO-NKR":[[-1.286,36.817],[-1.112,36.640],[-0.900,36.550],[-0.717,36.433],[-0.520,36.320],[-0.303,36.080]],
- "NBO-GSA":[[-1.286,36.817],[-1.233,37.100],[-1.000,37.500],[-0.700,38.300],[-0.453,39.646]]};
-Object.entries(ROUTE_CATALOG_F).forEach(function(kv){
-  L.polyline(kv[1],{color:'#2563eb',weight:4,opacity:.75}).addTo(fmap);});
-const refuelLayer=L.layerGroup().addTo(fmap);
-const vehLayerF=L.layerGroup().addTo(fmap);
-const geoLayerF=L.layerGroup().addTo(fmap);
-fetch('/api/v1/geofences').then(function(r){return r.ok?r.json():[];}).then(function(zones){
-  zones.filter(function(z){return z.active;}).forEach(function(z){
-    var col=(z.type==='RESTRICTED'||z.type==='DANGER')?'#ef4444':z.type==='DEPOT'?'#2563eb':'#10b981';
-    L.circle([z.lat,z.lon],{radius:z.radiusM,color:col,weight:2,dashArray:'6 4',fillOpacity:.08})
-      .bindTooltip('Geofence: '+z.name).addTo(geoLayerF);});
-}).catch(function(){});
-function renderRefuels(){
-  refuelLayer.clearLayers();
-  window.__refuels.forEach(function(r){
-    L.marker([r.lat,r.lon],{icon:L.divIcon({className:'',iconSize:[18,18],iconAnchor:[9,9],
-      html:'<div class="refuel-pin">R</div>'})})
-      .bindTooltip('<b>Refuel: '+fmtPlate(r.vehicleId)+'</b><br/>+'+r.gain.toFixed(0)+' pts (est. +'+(r.gain/100*200).toFixed(0)+' L)<br/>'+
-        new Date(r.ts).toLocaleTimeString()).addTo(refuelLayer);});
-}
-function refreshFuelMap(){
-  live.forEach(function(v){
-    if(v.latitude==null)return;
-    fmap._vehicles=fmap._vehicles||{};
-    const key='m_'+v.vehicleId;
-    if(!fmap._vehicles[key]){fmap._vehicles[key]=L.circleMarker([v.latitude,v.longitude],
-      {radius:5,color:'#fff',weight:2,fillColor:'#3b82f6',fillOpacity:.95})
-      .bindTooltip(fmtPlate(v.vehicleId)).addTo(vehLayerF);}
-    else fmap._vehicles[key].setLatLng([v.latitude,v.longitude]);
-  });
-}
-setTimeout(function(){refreshFuelMap();fmap.invalidateSize();},300);
-setInterval(refreshFuelMap,10000);
-
 </script>
 </body>
 </html>
