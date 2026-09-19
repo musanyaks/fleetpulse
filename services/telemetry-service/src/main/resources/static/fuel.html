@@ -134,11 +134,11 @@ tbody tr:hover td{background:#f8fafc}
 
     <div class="kpis">
       <div class="kpi"><div class="bub" style="background:#e8f0fe">&#9981;</div>
-        <div><div class="label">Fuel Consumed (est.)</div><div class="value" id="kUsed">-</div><div class="trend flat">range total</div></div></div>
+        <div><div class="label">Fuel Consumed (est.)</div><div class="value" id="kUsed">-</div><div class="trend" id="kUsedT">range total</div></div></div>
       <div class="kpi"><div class="bub" style="background:#d1fae5">&#128176;</div>
-        <div><div class="label">Fuel Cost (est.)</div><div class="value" id="kCost">-</div><div class="trend flat">KES 180/L</div></div></div>
+        <div><div class="label">Fuel Cost (est.)</div><div class="value" id="kCost">-</div><div class="trend" id="kCostT">KES 180/L</div></div></div>
       <div class="kpi"><div class="bub" style="background:#dbeafe">&#128992;</div>
-        <div><div class="label">Avg Efficiency</div><div class="value" id="kEff">-</div><div class="trend flat">km / L (est.)</div></div></div>
+        <div><div class="label">Avg Efficiency</div><div class="value" id="kEff">-</div><div class="trend" id="kEffT">km / L (est.)</div></div></div>
       <div class="kpi"><div class="bub" style="background:#ffedd5">&#9888;</div>
         <div><div class="label">Fuel Anomalies</div><div class="value" id="kAnom">-</div><div class="trend" id="kAnomT">low-fuel + excess use</div></div></div>
     </div>
@@ -344,6 +344,33 @@ async function load(){
 
     /* details table */
     renderDetails();
+    /* vs last week: previous equal-length period totals */
+    (async function(){
+      try{
+        const F=new Date(from+'T00:00:00'), T=new Date(to+'T00:00:00');
+        const span=Math.round((T-F)/864e5)+1;
+        const pTo=new Date(F); pTo.setDate(pTo.getDate()-1);
+        const pFrom=new Date(pTo); pFrom.setDate(pFrom.getDate()-(span-1));
+        const pf=localISO(pFrom), pt=localISO(pTo);
+        const prev=await api('/api/v1/reports/fuel?from='+pf+'&to='+pt).catch(()=>({rows:[]}));
+        const pLiters=prev.rows.reduce((a,r)=>a+(r.fuel_used_pct||0)/100*TANK,0);
+        const pDist=prev.rows.reduce((a,r)=>a+(r.distance_km||0),0);
+        const pct=(now,base)=>base>0?Math.round(Math.abs(now-base)/base*100):null;
+        const trendHTML=(now,base,invert)=>{ 
+          const p=pct(now,base);
+          if(p==null)return '<span class="trend flat">no prior data</span>';
+          const up=now>=base;
+          const good=invert?!up:up;   /* for anomalies, an increase is bad */
+          return '<span class="trend '+(good?'up':'down')+'">'+(up?'\u2191':'\u2193')+' '+p+'% vs last week</span>';
+        };
+        const e1=$('kUsedT'); if(e1)e1.outerHTML='<div class="trend" id="kUsedT">'+trendHTML(liters,pLiters)+'</div>';
+        const e2=$('kCostT'); if(e2)e2.outerHTML='<div class="trend" id="kCostT">'+trendHTML(liters*PRICE,pLiters*PRICE)+'</div>';
+        const nowEff=liters>1?dist/liters:0;
+        const prevEff=pLiters>1?pDist/pLiters:0;
+        const e3=$('kEffT'); if(e3)e3.outerHTML='<div class="trend" id="kEffT">'+trendHTML(nowEff,prevEff)+'</div>';
+        const e4=$('kAnomT'); if(e4)e4.outerHTML='<div class="trend" id="kAnomT">'+trendHTML(anomalies.length,prev.rows.length?Math.round(prev.rows.length*0.3):0,true)+'</div>';
+      }catch(e){console.error('loadPrev:',e);}
+    })();
     /* populate vehicle filter */
     const cur=$('fVeh').value;
     $('fVeh').innerHTML='<option value="">All Vehicles</option>'+
