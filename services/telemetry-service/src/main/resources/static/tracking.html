@@ -36,14 +36,13 @@ main{flex:1;min-width:0;display:flex;flex-direction:column}
 .pagehead .sub{color:var(--muted);font-size:12.5px}
 .pagehead .spacer{flex:1}
 .datechip{font-size:12.5px;font-weight:600;background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:8px 14px}
-.autoref{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:var(--text);background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:8px 14px}
+.autoref{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:8px 14px}
 .autoref i{width:8px;height:8px;border-radius:50%;background:var(--green)}
 .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
 .kpi{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;gap:12px;align-items:center}
 .kpi .bub{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:20px;flex:none}
 .kpi .label{color:var(--muted);font-size:12px}.kpi .value{font-size:22px;font-weight:700}
 .kpi .trend{font-size:11px;font-weight:600;color:var(--muted)}
-.trend.up{color:var(--green)}.trend.down{color:var(--red)}
 .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px 14px}
 .toolbar select{border:1px solid var(--line);border-radius:9px;padding:8px 10px;font:inherit;background:#fff}
 .tgl{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--muted);cursor:pointer;user-select:none}
@@ -69,21 +68,32 @@ main{flex:1;min-width:0;display:flex;flex-direction:column}
 .mlegend .ln{display:inline-block;width:16px;height:0;border-top:3px solid #2563eb}
 .mlegend .dash{display:inline-block;width:16px;height:0;border-top:2px dashed #ef4444}
 .rcol{display:flex;flex-direction:column;gap:16px}
-.phead{display:flex;gap:10px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line)}
-.phead .thumb{width:48px;height:48px;border-radius:10px;background:#eef4ff;display:grid;place-items:center;overflow:hidden;font-size:22px}
-.phead .thumb img{width:100%;height:100%;object-fit:cover;border-radius:10px}
-.phead .x{margin-left:auto;border:0;background:none;font-size:16px;color:var(--muted);cursor:pointer}
+/* ---------- Vehicle Details (mockup) ---------- */
+#panel .phead{display:flex;gap:10px;align-items:center;padding:12px 14px;border-bottom:1px solid var(--line)}
+#panel .phead .pthumb{width:52px;height:52px;border-radius:10px;background:#eef4ff;display:grid;place-items:center;overflow:hidden;flex:none}
+#panel .phead .pthumb img{width:100%;height:100%;object-fit:cover;border-radius:10px}
+#panel .x{margin-left:auto;border:0;background:none;font-size:16px;color:var(--muted);cursor:pointer}
 .ptabs{display:flex;gap:2px;padding:0 10px;border-bottom:1px solid var(--line)}
-.ptabs button{border:0;background:transparent;padding:9px 10px;font:inherit;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent}
+.ptabs button{border:0;background:transparent;padding:9px 9px;font:inherit;font-size:11.5px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent}
 .ptabs button.on{color:var(--blue);border-bottom-color:var(--blue)}
-.pbody{padding:12px 14px;max-height:430px;overflow-y:auto}
-.prow{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid var(--line);font-size:12.5px}
-.prow:last-child{border-bottom:0}
-.prow .k{color:var(--muted)}
+.pbody{padding:12px 14px;max-height:440px;overflow-y:auto}
+.locrow2{display:flex;gap:9px;align-items:flex-start}
+.lpin2{width:26px;height:26px;border-radius:50%;background:#e8f0fe;display:grid;place-items:center;flex:none}
+.locbtn{margin-left:auto;border:0;border-radius:8px;padding:6px 12px;font:inherit;font-size:11.5px;font-weight:700;background:var(--blue);color:#fff;cursor:pointer}
+.vtile{border:1px solid var(--line);border-radius:10px;padding:9px 11px}
+.vtile .h{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--muted)}
+.vtile .ic{width:22px;height:22px;border-radius:8px;display:grid;place-items:center;font-size:12px;flex:none}
+.vtile .v{font-size:15px;font-weight:700;margin:3px 0 5px}
+.vtile .pbar{width:100%}
 .pbar{width:70px;height:6px;border-radius:99px;background:#eef2f9;overflow:hidden;display:inline-block;vertical-align:middle}
 .pbar i{display:block;height:100%;border-radius:99px}
-.tile{border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-bottom:8px}
-.tile .k{font-size:11px;color:var(--muted)}.tile .v{font-size:15px;font-weight:700;margin-top:2px}
+.live{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;padding:2px 9px;border-radius:99px;background:#d1fae5;color:#065f46}
+.live::before{content:'';width:6px;height:6px;border-radius:50%;background:#10b981}
+.davatar{width:30px;height:30px;border-radius:50%;background:var(--navy);color:#fff;display:inline-grid;place-items:center;font-size:10.5px;font-weight:700;margin-right:8px;vertical-align:middle}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.duo .cell{border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.duo .cell .k{font-size:11px;color:var(--muted)}
+.duo .cell .v{font-weight:700;font-size:12.8px;margin-top:2px}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .schip{font-size:10px;font-weight:700;padding:2px 9px;border-radius:99px}
 .schip.MOVING{background:#d1fae5;color:#065f46}.schip.IDLE{background:#e0e7ff;color:#3730a3}.schip.OFFLINE{background:#fee2e2;color:#991b1b}
@@ -108,28 +118,10 @@ tr.sel td{background:#eff6ff}
 .qa button{border:1px solid var(--line);background:#fff;border-radius:10px;padding:12px 6px;font:inherit;font-size:11.5px;font-weight:600;color:var(--text);cursor:pointer;display:flex;flex-direction:column;gap:6px;align-items:center}
 .qa button:hover{border-color:var(--blue2);color:var(--blue)}
 .qa button .ic{font-size:18px}
-.note{background:#fffbeb;border:1px solid #fde68a;color:#92400e;border-radius:10px;padding:7px 10px;font-size:10.5px;margin:8px 14px}
+.note{background:#fffbeb;border:1px solid #fde68a;color:#92400e;border-radius:10px;padding:7px 10px;font-size:10.5px;margin:8px 0}
 .muted{color:var(--muted)}.small{font-size:12px}
 #toast{position:fixed;bottom:20px;right:20px;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;display:none;box-shadow:0 8px 24px rgba(2,6,23,.2);background:#d1fae5;color:#065f46;z-index:3000}
 @media (max-width:1200px){.cols{grid-template-columns:1fr}.bottom{grid-template-columns:1fr}}
-  .vtile{border:1px solid var(--line);border-radius:10px;padding:9px 11px}
-  .vtile .h{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--muted)}
-  .vtile .ic{width:22px;height:22px;border-radius:8px;display:grid;place-items:center;font-size:12px;flex:none}
-  .vtile .v{font-size:15px;font-weight:700;margin:3px 0 5px}
-  .vtile .pbar{width:100%}
-  .live{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;
-    padding:2px 9px;border-radius:99px;background:#d1fae5;color:#065f46}
-  .live::before{content:'';width:6px;height:6px;border-radius:50%;background:#10b981}
-  .locrow2{display:flex;gap:9px;align-items:flex-start}
-  .lpin2{width:26px;height:26px;border-radius:50%;background:#e8f0fe;display:grid;place-items:center;flex:none}
-  .locbtn{margin-left:auto;border:0;border-radius:8px;padding:6px 12px;font:inherit;font-size:11.5px;
-    font-weight:700;background:var(--blue);color:#fff;cursor:pointer}
-  .davatar{width:34px;height:34px;border-radius:50%;background:var(--navy);color:#fff;
-    display:inline-grid;place-items:center;font-size:11px;font-weight:700;margin-right:8px;vertical-align:middle}
-  .duo{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-  .duo .cell{border:1px solid var(--line);border-radius:10px;padding:8px 10px}
-  .duo .cell .k{font-size:11px;color:var(--muted)}
-  .duo .cell .v{font-weight:700;font-size:12.8px;margin-top:2px}
 </style>
 </head>
 <body>
@@ -207,11 +199,13 @@ tr.sel td{background:#eff6ff}
         </div>
       </div>
 
-      <div class="card">
+      <div class="card" id="panel">
         <div class="phead">
-          <span class="thumb" id="dThumb">🚚</span>
-          <div><div style="display:flex;gap:8px;align-items:center"><b id="dPlate">–</b><span id="dStatus"></span></div>
-          <div class="muted small" id="dSub">select a vehicle</div></div>
+          <span class="pthumb" id="dThumb">🚚</span>
+          <div>
+            <div style="display:flex;gap:8px;align-items:center"><b id="dPlate">–</b><span id="dStatus"></span></div>
+            <div class="muted small" id="dSub">select a vehicle</div>
+          </div>
           <button class="x" id="dClose">✕</button>
         </div>
         <div class="ptabs" id="dTabs">
@@ -306,7 +300,6 @@ Object.entries(ROUTE_CATALOG).forEach(([id,pts])=>{
   L.polyline(pts,{color:'#2563eb',weight:4,opacity:.75}).bindTooltip('Corridor: '+routeLabels[id]).addTo(routeLayer);});
 const geoLayer=L.layerGroup();
 
-/* toggles */
  $('tgRoutes').onclick=()=>{const t=$('tgRoutes');
   if(map.hasLayer(routeLayer)){map.removeLayer(routeLayer);t.classList.remove('on');}
   else{routeLayer.addTo(map);t.classList.add('on');}};
@@ -328,7 +321,8 @@ const geoLayer=L.layerGroup();
   $('uName').textContent=me.username;$('uRole').textContent=me.roles.join(', ');
 }catch(e){$('uName').textContent='Sign in';$('uRole').textContent='session expired';
   $('userChip').onclick=()=>location.href='/login.html';}})();
- $('dateChip').textContent='📅 '+new Date().toLocaleDateString([],{day:'numeric',month:'short',year:'numeric'})+' · '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+function setDateTime(){$('dateChip').textContent='📅 '+new Date().toLocaleDateString([],{day:'numeric',month:'short',year:'numeric'})+' · '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});}
+setDateTime();setInterval(setDateTime,30000);
  $('fsBtn').onclick=()=>document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();
 function refreshBell(){fetch('/api/v1/alerts/recent?limit=100').then(r=>r.ok?r.json():[])
   .then(al=>{const n=al.filter(a=>new Date(a.ts).getTime()>Date.now()-36e5).length;
@@ -353,7 +347,6 @@ async function load(){
       .map(v=>[v.vehicleId,[v.nextService,v.insuranceExpiry,v.inspectionExpiry].filter(Boolean)]));
     alerts=al;
 
-    /* KPIs */
     lv.forEach(v=>{lastSeen.set(v.vehicleId,Date.now());known.add(v.vehicleId);});
     const now=Date.now();
     const offline=[...known].filter(id=>now-(lastSeen.get(id)||0)>60_000&&!lv.some(v=>v.vehicleId===id)).length;
@@ -364,7 +357,6 @@ async function load(){
     $('kIdle').textContent=lv.length-moving;
     $('kOff').textContent=offline;
 
-    /* markers + labels */
     const seen=new Set();
     lv.forEach(v=>{
       seen.add(v.vehicleId);
@@ -372,8 +364,7 @@ async function load(){
       if(!m){
         m=L.marker([v.latitude,v.longitude],{icon:badgeIcon(v.status)}).addTo(map);
         markers.set(v.vehicleId,m);
-        m.bindTooltip(fmtPlate(v.vehicleId),{permanent:true,direction:'right',offset:[16,0],
-          className:'vlabel'});
+        m.bindTooltip(fmtPlate(v.vehicleId),{permanent:true,direction:'right',offset:[16,0],className:'vlabel'});
         m.on('click',()=>selectVehicle(v.vehicleId));
       }
       m.setLatLng([v.latitude,v.longitude]);
@@ -389,8 +380,6 @@ async function load(){
 }
 
 /* ================= fleet list + events ================= */
-function statusOf(id){const L=live.find(v=>v.vehicleId===id);
-  return L?L.status:'OFFLINE';}
 function fuelColor(f){return f==null?'#94a3b8':f<15?'var(--red)':f<35?'var(--amber)':'var(--green)';}
 function renderFleet(){
   const q=$('gq').value.toUpperCase(),fs=$('fStatus').value,ft=$('fType').value,fd=$('fDrv').value,fv=$('fVeh').value;
@@ -410,26 +399,27 @@ function renderFleet(){
     ||'<tr><td colspan="6" class="muted">No vehicles match.</td></tr>';
 }
 const TYPE_ICON={ENGINE_OVERHEATING:'🔥',LOW_FUEL:'⛽',SPEEDING:'💨',HARSH_BRAKING:'🛑',HARSH_ACCELERATION:'🚀',GEOFENCE:'🎯'};
+const SEV_MAP={'CRITICAL':'High','WARNING':'Medium','INFO':'Info'};
 function renderEvents(){
-  const map={'CRITICAL':'High','WARNING':'Medium','INFO':'Info'};
   $('events').innerHTML=alerts.slice(0,12).map(a=>'<div class="evrow">'+
     '<time>'+new Date(a.ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})+'</time>'+
     '<div class="tx"><b>'+(TYPE_ICON[a.type]||'⚠️')+' '+esc(a.message)+'</b>'+
     '<div class="muted small">'+fmtPlate(esc(a.vehicle_id))+'</div></div>'+
-    '<span class="chip '+esc(map[a.severity]||'Info')+'">'+esc(map[a.severity]||a.severity)+'</span></div>').join('')
+    '<span class="chip '+esc(SEV_MAP[a.severity]||'Info')+'">'+esc(SEV_MAP[a.severity]||a.severity)+'</span></div>').join('')
     ||'<div class="evrow"><span class="muted">No recent events.</span></div>';
 }
 
 /* ================= detail panel ================= */
 function selectVehicle(id){
-  selected=id;
+  selected=id;tab='overview';
   document.querySelectorAll('#dTabs button').forEach(b=>b.classList.toggle('on',b.dataset.t==='overview'));
-  tab='overview';renderDetail();
+  renderDetail();
   const L=live.find(v=>v.vehicleId===id);
   if(L)map.setView([L.latitude,L.longitude],10);
 }
- $('dClose').onclick=()=>{$('dBody').innerHTML='<span class="muted small">Click a truck or fleet-list row.</span>';
-  $('dPlate').textContent='-';$('dSub').textContent='select a vehicle';$('dStatus').innerHTML='';$('dThumb').textContent='🚚';selected=null;};
+ $('dClose').onclick=()=>{selected=null;
+  $('dBody').innerHTML='<span class="muted small">Click a truck or fleet-list row.</span>';
+  $('dPlate').textContent='-';$('dSub').textContent='select a vehicle';$('dStatus').innerHTML='';$('dThumb').textContent='🚚';};
 document.querySelectorAll('#dTabs button').forEach(b=>b.onclick=()=>{
   tab=b.dataset.t;
   document.querySelectorAll('#dTabs button').forEach(x=>x.classList.toggle('on',x===b));
@@ -442,91 +432,112 @@ function exportLive(){
     ...live.map(v=>[fmtPlate(v.vehicleId),v.status,v.speedKph,v.fuelLevelPct,v.engineTempC,v.driverName||'',v.latitude,v.longitude].map(x=>'"'+(x??'')+'"').join(','))].join('\n');
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
   a.download='fleetpulse-live.csv';a.click();toast('Exported fleetpulse-live.csv',true);}
+function driverEvents(vid){
+  const e={spd:0,brk:0,acc:0,geo:0};
+  alerts.forEach(a=>{if(a.vehicle_id!==vid)return;
+    if(a.type==='SPEEDING')e.spd++;if(a.type==='HARSH_BRAKING')e.brk++;
+    if(a.type==='HARSH_ACCELERATION')e.acc++;if(a.type==='GEOFENCE')e.geo++;});
+  return e;}
 
+/* overview: mockup layout - rendered on selection/tab change, values patched by id */
 function renderDetail(){
   if(!selected)return;
-  const v=live.find(x=>x.vehicleId===selected);
-  const meta=vehicles.get(selected);
-  if(!v){renderStaticDetail('OFFLINE');return;}
-  const st=v.status;
-  $('dThumb').innerHTML=vThumb(meta||{vehicleId:selected,make:v.make,model:v.model});
-  $('dPlate').textContent=fmtPlate(selected);
-  $('dStatus').innerHTML='<span class="schip '+st+'">'+st+'</span>';
-  $('dSub').textContent=(v.make||'')+' '+(v.model||'')+' · '+vClass(v.make,v.model)+(meta&&meta.year?' · '+meta.year:'');
-  const b=$('dBody');
-  if(tab==='overview'){
-    const docs=docsByVehicle.get(selected)||[];
-    const nextSvc=docs[0]||(meta&&meta.nextService)||null;
-    const days=nextSvc?Math.ceil((new Date(nextSvc)-Date.now())/864e5):null;
-    const mi=meta?meta.vin:null;
-    b.innerHTML=
-      '<div class="locrow2"><span class="lpin2">\ud83d\udccd</span>'+
-      '<div><div class="muted small">Current Location</div>'+
-      '<div style="font-weight:700;font-size:12.8px">'+nearestCity(v.latitude,v.longitude)+', Kenya</div>'+
-      '<div class="muted small" id="dCoords">'+v.latitude.toFixed(4)+'\u00b0 S, '+v.longitude.toFixed(4)+'\u00b0 E</div></div>'+
-      '<button class="locbtn" onclick="trackSelected()">View on Map</button></div>'+
-      '<div class="grid2" style="margin:10px 0">'+
-      '<div class="vtile"><div class="h"><span class="ic" style="background:#e8f0fe;color:var(--blue)">\u23f1</span> Speed</div>'+
-        '<div class="v" id="vtSpeed">'+fmt(v.speedKph)+' km/h</div>'+
-        '<span class="pbar"><i id="vtSpeedBar" style="width:'+Math.min(100,v.speedKph/1.6).toFixed(0)+'%;background:var(--blue2)"></i></span></div>'+
-      '<div class="vtile"><div class="h"><span class="ic" style="background:#d1fae5;color:var(--green)">\u26fd</span> Fuel Level</div>'+
-        '<div class="v" id="vtFuel">'+fmt(v.fuelLevelPct)+'%</div>'+
-        '<span class="pbar"><i id="vtFuelBar" style="width:'+(v.fuelLevelPct??0).toFixed(0)+'%;background:'+fuelColor(v.fuelLevelPct)+'"></i></span></div>'+
-      '<div class="vtile"><div class="h"><span class="ic" style="background:#ffedd5;color:#ea580c">\ud83c\udf21</span> Engine Temp</div>'+
-        '<div class="v" id="vtTemp">'+fmt(v.engineTempC)+'\u00b0C</div>'+
-        '<span class="pbar"><i id="vtTempBar" style="width:'+Math.max(0,Math.min(100,(((v.engineTempC??70)-60)/60*100))).toFixed(0)+'%;background:'+(v.engineTempC>=105?'var(--red)':'var(--amber)')+'"></i></span></div>'+
-      '<div class="vtile"><div class="h"><span class="ic" style="background:#dbeafe;color:var(--blue)">\ud83d\udd0b</span> Battery Voltage</div>'+
-        '<div class="v" id="vtBatt">'+fmt(v.batteryVoltage)+' V</div>'+
-        '<span class="pbar"><i id="vtBattBar" style="width:'+Math.min(100,(((v.batteryVoltage??0)-20)/10*100)).toFixed(0)+'%;background:var(--blue2)"></i></span></div>'+
-      '</div>'+
-      '<div class="duo">'+
-      '<div class="cell"><div class="k">\ud83d\udc64 Driver</div><div class="v"><span class="davatar">'+initials(v.driverName)+'</span>'+esc(v.driverName||'-')+'</div></div>'+
-      '<div class="cell"><div class="k">Last Update</div><div class="v"><span id="vtUpd">'+(v.lastSeen?new Date(v.lastSeen).toLocaleString([],{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'-')+'</span> <span class="live">Live</span></div></div>'+
-      '<div class="cell"><div class="k">\ud83d\udcc5 Next Service</div><div class="v">'+esc(nextSvc||'-')+(days!=null?' <span class="muted small">(in '+days+' days)</span>':'')+'</div></div>'+
-      '<div class="cell"><div class="k">\ud83e\ude9b Total Mileage</div><div class="v">'+(v.odometerKm?Math.round(v.odometerKm).toLocaleString()+' km':'-')+'</div></div>'+
-      '</div>';
-  } else if(tab==='telemetry'){
-    b.innerHTML='<div class="prow"><span class="k">⚡ Ignition</span><b>'+(v.status==='MOVING'?'ON':v.status==='IDLE'?'ON (idle)':'-')+'</b></div>'+
-      '<div class="prow"><span class="k">🔩 RPM</span><b>'+fmt(v.rpm)+'</b></div>'+
-      '<div class="prow"><span class="k">🌡 Engine Temp</span><b>'+fmt(v.engineTempC)+' °C</b></div>'+
-      '<div class="prow"><span class="k">⛽ Fuel</span><b>'+fmt(v.fuelLevelPct)+' %</b></div>'+
-      '<div class="prow"><span class="k">🔋 Battery</span><b>'+fmt(v.batteryVoltage)+' V</b></div>'+
-      '<div class="prow"><span class="k">🧭 Odometer</span><b>'+(v.odometerKm?Math.round(v.odometerKm).toLocaleString()+' km':'-')+'</b></div>';
-  } else if(tab==='trips'){
-    b.innerHTML='<div class="prow"><span class="k">🛣️ Corridor</span><b>'+(v.routeId&&routeLabels[v.routeId]?esc(routeLabels[v.routeId]):'-')+'</b></div>'+
-      '<div class="prow"><span class="k">State</span><b>'+st+'</b></div>'+
-      '<div class="note">Persisted trip history arrives with the trips module. See the Trips tab for live progress and schedule.</div>'+
-      '<button class="btn" style="width:100%" onclick="location.href=\'trips.html\'">Open Trips</button>';
-  } else if(tab==='driver'){
-    const e=alertsByDriverEvents(selected);
-    b.innerHTML='<div class="prow"><span class="k">👤 Name</span><b>'+esc(v.driverName||'-')+'</b></div>'+
-      '<div class="prow"><span class="k">🆔 Driver ID</span><b>'+esc(v.driverId||'-')+'</b></div>'+
-      '<div class="prow"><span class="k">💨 Speeding 24h</span><b>'+e.spd+'</b></div>'+
-      '<div class="prow"><span class="k">🛑 Harsh braking</span><b>'+e.brk+'</b></div>'+
-      '<div class="prow"><span class="k">🚀 Harsh accel</span><b>'+e.acc+'</b></div>';
-  } else if(tab==='maint'){
-    const docs=docsByVehicle.get(selected)||[];
-    b.innerHTML='<div class="prow"><span class="k">🧾 Next Service</span><b>'+esc(docs[0]||meta&&meta.nextService||'-')+'</b></div>'+
-      '<div class="prow"><span class="k">🛡 Insurance Expiry</span><b>'+esc(docs[1]||'-')+'</b></div>'+
-      '<div class="prow"><span class="k">📋 Inspection</span><b>'+esc(docs[2]||'-')+'</b></div>'+
-      '<div class="prow"><span class="k">🧭 Mileage</span><b>'+(v.odometerKm?Math.round(v.odometerKm).toLocaleString()+' km':'-')+'</b></div>'+
-      '<div class="note">Full service history arrives with the maintenance module.</div>';
-  }
-}
-function renderStaticDetail(st){
   const meta=vehicles.get(selected)||{};
+  const v=live.find(x=>x.vehicleId===selected);
+  $('dThumb').innerHTML=v? vThumb(meta.vehicleId?meta:v) : (TRUCK_SVG);
   $('dPlate').textContent=fmtPlate(selected);
-  $('dStatus').innerHTML='<span class="schip OFFLINE">OFFLINE</span>';
-  $('dSub').textContent=(meta.make||'')+' '+(meta.model||'');
-  $('dBody').innerHTML='<div class="prow"><span class="k">Signal</span><b>OFFLINE - last packet &gt; 60s ago</b></div>'+
-    '<div class="note">This vehicle is registered but not reporting. It goes live when a device is installed and assigned.</div>';
+  $('dSub').textContent=(meta.make||'')+' '+(meta.model||'')+' · '+vClass(meta.make,meta.model)+(meta.year?' · '+meta.year:'');
+  const b=$('dBody');
+  if(!v){
+    $('dStatus').innerHTML='<span class="schip OFFLINE">OFFLINE</span>';
+    b.innerHTML='<div class="prow" style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);font-size:12.5px"><span class="muted">Signal</span><b>OFFLINE - not reporting</b></div>'+
+      '<div class="note">This vehicle is registered but not reporting. It goes live when a device is installed and assigned.</div>';
+    return;
+  }
+  const st=v.status;
+  $('dStatus').innerHTML='<span class="schip '+st+'">'+st+'</span>';
+  const docs=docsByVehicle.get(selected)||[];
+  const nextSvc=docs[0]||meta.nextService||null;
+  const days=nextSvc?Math.ceil((new Date(nextSvc)-Date.now())/864e5):null;
+  b.innerHTML=
+    '<div class="locrow2"><span class="lpin2">📍</span>'+
+    '<div><div class="muted small" style="font-size:11px">Current Location</div>'+
+    '<div style="font-weight:700;font-size:12.8px" id="vtCity">'+nearestCity(v.latitude,v.longitude)+', Kenya</div>'+
+    '<div class="muted small" id="vtCoords" style="font-size:11px">'+v.latitude.toFixed(4)+'° S, '+v.longitude.toFixed(4)+'° E</div></div>'+
+    '<button class="locbtn" onclick="trackSelected()">View on Map</button></div>'+
+    '<div class="grid2" style="margin:10px 0">'+
+    '<div class="vtile"><div class="h"><span class="ic" style="background:#e8f0fe;color:var(--blue)">⏱</span> Speed</div>'+
+      '<div class="v" id="vtSpeed">'+fmt(v.speedKph)+' km/h</div>'+
+      '<span class="pbar" style="width:100%"><i id="vtSpeedBar" style="width:'+Math.min(100,v.speedKph/1.6).toFixed(0)+'%;background:var(--blue2)"></i></span></div>'+
+    '<div class="vtile"><div class="h"><span class="ic" style="background:#d1fae5;color:var(--green)">⛽</span> Fuel Level</div>'+
+      '<div class="v" id="vtFuel">'+fmt(v.fuelLevelPct)+'%</div>'+
+      '<span class="pbar" style="width:100%"><i id="vtFuelBar" style="width:'+(v.fuelLevelPct??0).toFixed(0)+'%;background:'+fuelColor(v.fuelLevelPct)+'"></i></span></div>'+
+    '<div class="vtile"><div class="h"><span class="ic" style="background:#ffedd5;color:#ea580c">🌡</span> Engine Temp</div>'+
+      '<div class="v" id="vtTemp">'+fmt(v.engineTempC)+'°C</div>'+
+      '<span class="pbar" style="width:100%"><i id="vtTempBar" style="width:'+Math.max(0,Math.min(100,(((v.engineTempC??70)-60)/60*100))).toFixed(0)+'%;background:'+(v.engineTempC>=105?'var(--red)':'var(--amber)')+'"></i></span></div>'+
+    '<div class="vtile"><div class="h"><span class="ic" style="background:#dbeafe;color:var(--blue)">🔋</span> Battery Voltage</div>'+
+      '<div class="v" id="vtBatt">'+fmt(v.batteryVoltage)+' V</div>'+
+      '<span class="pbar" style="width:100%"><i id="vtBattBar" style="width:'+Math.min(100,(((v.batteryVoltage??0)-20)/10*100)).toFixed(0)+'%;background:var(--blue2)"></i></span></div>'+
+    '</div>'+
+    '<div class="duo">'+
+    '<div class="cell"><div class="k">👤 Driver</div><div class="v"><span class="davatar">'+initials(v.driverName)+'</span>'+esc(v.driverName||'-')+'</div></div>'+
+    '<div class="cell"><div class="k">Last Update</div><div class="v"><span id="vtUpd">'+(v.lastSeen?new Date(v.lastSeen).toLocaleString([],{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'-')+'</span> <span class="live">Live</span></div></div>'+
+    '<div class="cell"><div class="k">📅 Next Service</div><div class="v">'+esc(nextSvc||'-')+(days!=null?' <span class="muted small">(in '+days+' days)</span>':'')+'</div></div>'+
+    '<div class="cell"><div class="k">🧾 Total Mileage</div><div class="v">'+(v.odometerKm?Math.round(v.odometerKm).toLocaleString()+' km':'-')+'</div></div>'+
+    '</div>';
 }
-function alertsByDriverEvents(vid){
-  const e={spd:0,brk:0,acc:0};
-  alerts.forEach(a=>{if(a.vehicle_id!==vid)return;
-    if(a.type==='SPEEDING')e.spd++;if(a.type==='HARSH_BRAKING')e.brk++;if(a.type==='HARSH_ACCELERATION')e.acc++;});
-  return e;
+/* live patch: values only, structure untouched */
+function patchOverviewLive(){
+  if(!selected||tab!=='overview')return;
+  const v=live.find(x=>x.vehicleId===selected);if(!v)return;
+  const st=v.status;
+  $("dStatus").innerHTML='<span class="schip '+st+'">'+st+'</span>';
+  const set=(id,val)=>{const el=document.getElementById(id);if(el)el.textContent=val;};
+  set("vtCity",nearestCity(v.latitude,v.longitude)+', Kenya');
+  set("vtCoords",v.latitude.toFixed(4)+'° S, '+v.longitude.toFixed(4)+'° E');
+  set("vtSpeed",fmt(v.speedKph)+' km/h');
+  set("vtFuel",fmt(v.fuelLevelPct)+'%');
+  set("vtTemp",fmt(v.engineTempC)+'°C');
+  set("vtBatt",fmt(v.batteryVoltage)+' V');
+  const sb=$("vtSpeedBar");if(sb)sb.style.width=Math.min(100,v.speedKph/1.6).toFixed(0)+'%';
+  const fb=$("vtFuelBar");if(fb){fb.style.width=(v.fuelLevelPct??0).toFixed(0)+'%';fb.style.background=fuelColor(v.fuelLevelPct);}
+  const tb=$("vtTempBar");if(tb){tb.style.width=Math.max(0,Math.min(100,(((v.engineTempC??70)-60)/60*100))).toFixed(0)+'%';tb.style.background=v.engineTempC>=105?'var(--red)':'var(--amber)';}
+  const bb=$("vtBattBar");if(bb)bb.style.width=Math.min(100,(((v.batteryVoltage??0)-20)/10*100)).toFixed(0)+'%';
+  set("vtUpd",v.lastSeen?new Date(v.lastSeen).toLocaleString([],{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'-');
 }
+function renderTelemetry(v){
+  return '<div class="prow" style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);font-size:12.5px"><span class="muted">⚡ Ignition</span><b>'+(v.status==='MOVING'?'ON':v.status==='IDLE'?'ON (idle)':'-')+'</b></div>'+
+    '<div class="prow" style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);font-size:12.5px"><span class="muted">🔩 RPM</span><b>'+fmt(v.rpm)+'</b></div>'+
+    '<div class="prow" style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);font-size:12.5px"><span class="muted">🌡 Engine Temp</span><b>'+fmt(v.engineTempC)+' °C</b></div>'+
+    '<div class="prow" style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);font-size:12.5px"><span class="muted">⛽ Fuel</span><b>'+fmt(v.fuelLevelPct)+' %</b></div>'+
+    '<div class="prow" style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);font-size:12.5px"><span class="muted">🔋 Battery</span><b>'+fmt(v.batteryVoltage)+' V</b></div>'+
+    '<div class="prow" style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);font-size:12.5px"><span class="muted">🧭 Odometer</span><b>'+(v.odometerKm?Math.round(v.odometerKm).toLocaleString()+' km':'-')+'</b></div>';
+}
+/* tab content for non-overview tabs, re-rendered live */
+const _baseDetail=renderDetail;
+renderDetail=function(){
+  if(!selected)return;
+  const v=live.find(x=>x.vehicleId===selected);
+  const meta=vehicles.get(selected)||{};
+  if(!v){_baseDetail();return;}
+  if(tab==='overview'){_baseDetail();return;}
+  const b=$('dBody');
+  if(tab==='telemetry'){b.innerHTML=renderTelemetry(v);}
+  else if(tab==='trips'){b.innerHTML='<div class="prow" style="display:flex;justify-content:space-between;padding:6px 0;font-size:12.5px"><span class="muted">🛣️ Corridor</span><b>'+(v.routeId&&routeLabels[v.routeId]?esc(routeLabels[v.routeId]):'-')+'</b></div>'+
+    '<div class="note">Persisted trip history arrives with the trips module.</div><button class="btn" style="width:100%" onclick="location.href=\'trips.html\'">Open Trips</button>';}
+  else if(tab==='driver'){const e=driverEvents(selected);
+    b.innerHTML='<div class="prow" style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);font-size:12.5px"><span class="muted">👤 Name</span><b>'+esc(v.driverName||'-')+'</b></div>'+
+      '<div class="prow" style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);font-size:12.5px"><span class="muted">🆔 Driver ID</span><b>'+esc(v.driverId||'-')+'</b></div>'+
+      '<div class="prow" style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);font-size:12.5px"><span class="muted">💨 Speeding 24h</span><b>'+e.spd+'</b></div>'+
+      '<div class="prow" style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);font-size:12.5px"><span class="muted">🛑 Harsh braking</span><b>'+e.brk+'</b></div>'+
+      '<div class="prow" style="display:flex;justify-content:space-between;padding:6px 0;font-size:12.5px"><span class="muted">🚀 Harsh accel</span><b>'+e.acc+'</b></div>';}
+  else if(tab==='maint'){const docs=docsByVehicle.get(selected)||[];
+    b.innerHTML='<div class="prow" style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);font-size:12.5px"><span class="muted">🧾 Next Service</span><b>'+esc(docs[0]||'-')+'</b></div>'+
+      '<div class="prow" style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);font-size:12.5px"><span class="muted">🛡 Insurance Expiry</span><b>'+esc(docs[1]||'-')+'</b></div>'+
+      '<div class="prow" style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);font-size:12.5px"><span class="muted">📋 Inspection</span><b>'+esc(docs[2]||'-')+'</b></div>'+
+      '<div class="prow" style="display:flex;justify-content:space-between;padding:6px 0;font-size:12.5px"><span class="muted">🧭 Mileage</span><b>'+(v.odometerKm?Math.round(v.odometerKm).toLocaleString()+' km':'-')+'</b></div>'+
+      '<div class="note">Full service history arrives with the maintenance module.</div>';}
+};
 
 /* ================= geofences overlay ================= */
 (async()=>{try{
@@ -548,28 +559,9 @@ function alertsByDriverEvents(vid){
 }catch(e){}})();
 
 load();setInterval(load,5000);
-
-/* ================= live patch for detail tiles ================= */
-function patchOverviewLive(){
-  if(!selected||tab!=='overview')return;
-  const v=live.find(x=>x.vehicleId===selected);if(!v)return;
-  const st=v.status;
-  $("dStatus").innerHTML='<span class="schip '+st+'">'+st+'</span>';
-  const set=(id,val)=>{const el=document.getElementById(id);if(el)el.textContent=val;};
-  set("vtSpeed",fmt(v.speedKph)+' km/h');
-  set("vtFuel",fmt(v.fuelLevelPct)+'%');
-  set("vtTemp",fmt(v.engineTempC)+'\u00b0C');
-  set("vtBatt",fmt(v.batteryVoltage)+' V');
-  const sb=$('vtSpeedBar');if(sb)sb.style.width=Math.min(100,v.speedKph/1.6).toFixed(0)+'%';
-  const fb=$('vtFuelBar');if(fb){fb.style.width=(v.fuelLevelPct??0).toFixed(0)+'%';fb.style.background=fuelColor(v.fuelLevelPct);}
-  const tb=$('vtTempBar');if(tb){tb.style.width=Math.max(0,Math.min(100,(((v.engineTempC??70)-60)/60*100))).toFixed(0)+'%';tb.style.background=v.engineTempC>=105?'var(--red)':'var(--amber)';}
-  const bb=$('vtBattBar');if(bb)bb.style.width=Math.min(100,(((v.batteryVoltage??0)-20)/10*100)).toFixed(0)+'%';
-  set("vtUpd",v.lastSeen?new Date(v.lastSeen).toLocaleString([],{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'-');
-  set("dCoords",v.latitude.toFixed(4)+'\u00b0 S, '+v.longitude.toFixed(4)+'\u00b0 E');
-}
-const _trackingLoad=load;
-load=async function(){ const r=await _trackingLoad.apply(this,arguments);
-  try{patchOverviewLive();}catch(e){console.error('patchOverviewLive:',e);} return r; };
+const autoSel=setInterval(()=>{ if(live.length&&!selected){ 
+  const first=live.find(v=>v.status==='MOVING')||live[0];
+  selectVehicle(first.vehicleId); clearInterval(autoSel); } },1000);
 </script>
 </body>
 </html>
