@@ -416,6 +416,16 @@ const ROUTE_CATALOG_F={
  "NBO-GSA":[[-1.286,36.817],[-1.233,37.100],[-1.000,37.500],[-0.700,38.300],[-0.453,39.646]]};
 const fmap=L.map('fmap',{zoomControl:false}).setView([-1.4,37.2],7);
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap'}).addTo(fmap);
+L.control.zoom({position:'bottomleft'}).addTo(fmap);
+const FLayersCtl=L.Control.extend({onAdd(){const d=L.DomUtil.create('div','leaflet-bar');
+  const a=L.DomUtil.create('a','',d);a.href='#';a.title='Toggle map style';
+  a.innerHTML="<svg viewBox='0 0 24 24' width='14' height='14' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polygon points='12 2 2 7 12 12 22 7 12 2'/><polyline points='2 17 12 22 22 17'/><polyline points='2 12 12 17 22 12'/></svg>";
+  L.DomEvent.on(a,'click',e=>{L.DomEvent.stop(e);
+    const p=document.querySelector('#fmap .leaflet-tile-pane');
+    p.style.filter=(p.style.filter==='none'?'':'none');
+    a.title=(p.style.filter==='none'?'Light style':'Original colors');});
+  return d;}});
+new FLayersCtl({position:'bottomleft'}).addTo(fmap);
 Object.entries(ROUTE_CATALOG_F).forEach(function(kv){
   L.polyline(kv[1],{color:'#2563eb',weight:4,opacity:.75}).addTo(fmap);});
 const refuelLayer=L.layerGroup().addTo(fmap);
