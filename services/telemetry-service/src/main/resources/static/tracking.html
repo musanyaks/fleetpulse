@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Live Tracking · FleetPulse</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root{--bg:#f4f6fb;--panel:#fff;--line:#e6eaf2;--text:#1e293b;--muted:#64748b;--blue:#2563eb;--blue2:#3b82f6;--green:#10b981;--amber:#f59e0b;--red:#ef4444;--navy:#0d2b57}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font:14px/1.5 "Segoe UI",system-ui,sans-serif}
+.layout{display:flex;min-height:100vh}
+aside{width:212px;background:var(--navy);color:#cdd9ee;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;flex:none}
+.logo{display:flex;align-items:center;gap:10px;padding:20px 18px;font-size:17px;font-weight:700;color:#fff}
+.logo .sq{width:30px;height:30px;border-radius:8px;background:var(--blue2);display:grid;place-items:center;font-size:15px}
+nav{flex:1;padding:6px 10px;overflow-y:auto}
+nav a{display:flex;align-items:center;gap:11px;padding:9px 12px;margin:2px 0;border-radius:9px;color:#c3d2e8;text-decoration:none;font-size:13px}
+nav a .ic{width:18px;text-align:center}
+nav a:hover{background:rgba(255,255,255,.06);color:#fff}
+nav a.active{background:var(--blue2);color:#fff;font-weight:600}
+main{flex:1;min-width:0;display:flex;flex-direction:column}
+.topbar{display:flex;align-items:center;gap:12px;padding:12px 24px;background:var(--panel);border-bottom:1px solid var(--line)}
+.gsearch{flex:1;max-width:300px;display:flex;align-items:center;gap:8px;background:#f1f5fb;border:1px solid var(--line);border-radius:10px;padding:8px 14px}
+.gsearch input{border:0;background:transparent;outline:none;font:inherit;width:100%}
+.spacer{flex:1}
+.tbell{position:relative;font-size:18px;background:#f1f5fb;border-radius:10px;padding:8px 12px;text-decoration:none}
+.tbadge{position:absolute;top:-6px;right:-6px;background:var(--red);color:#fff;font-size:10px;font-weight:700;border-radius:99px;padding:2px 6px}
+.fbtn{border:1px solid var(--line);background:#fff;border-radius:9px;padding:7px 11px;cursor:pointer;font-size:15px}
+.tchipuser{display:flex;align-items:center;gap:9px}
+.upic{width:34px;height:34px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-size:11px;font-weight:700}
+.uname{font-weight:700;font-size:13px}.urole{font-size:11px;color:var(--muted)}
+.content{padding:18px 24px;display:flex;flex-direction:column;gap:16px}
+.pagehead{display:flex;align-items:center;gap:14px}
+.pagehead .ic{font-size:26px}
+.pagehead h1{font-size:22px;font-weight:800}
+.pagehead .sub{color:var(--muted);font-size:12.5px}
+.pagehead .spacer{flex:1}
+.datechip{font-size:12.5px;font-weight:600;background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:8px 14px}
+.autoref{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:var(--text);background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:8px 14px}
+.autoref i{width:8px;height:8px;border-radius:50%;background:var(--green)}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;gap:12px;align-items:center}
+.kpi .bub{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:20px;flex:none}
+.kpi .label{color:var(--muted);font-size:12px}.kpi .value{font-size:22px;font-weight:700}
+.kpi .trend{font-size:11px;font-weight:600;color:var(--muted)}
+.trend.up{color:var(--green)}.trend.down{color:var(--red)}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px 14px}
+.toolbar select{border:1px solid var(--line);border-radius:9px;padding:8px 10px;font:inherit;background:#fff}
+.tgl{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--muted);cursor:pointer;user-select:none}
+.tgl .sw{width:34px;height:18px;border-radius:99px;background:#cbd5e1;position:relative;transition:.2s}
+.tgl .sw::after{content:'';position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;transition:.2s}
+.tgl.on .sw{background:var(--blue2)}.tgl.on .sw::after{left:18px}
+.tgl.dis{opacity:.45;cursor:not-allowed}
+.mseg{display:flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;margin-left:auto}
+.mseg button{border:0;padding:8px 16px;font:inherit;font-size:12.5px;font-weight:600;cursor:pointer;background:#fff;color:var(--muted)}
+.mseg button.on{background:var(--blue);color:#fff}
+.cols{display:grid;grid-template-columns:1fr 340px;gap:16px;align-items:start}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.card>h3{font-size:13px;font-weight:700;padding:12px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}
+.card>h3 .view{margin-left:auto;font-size:12px;color:var(--blue);font-weight:600;text-decoration:none}
+#map{height:470px}
+#map .leaflet-tile-pane{filter:saturate(.6) brightness(1.08)}
+.tmarker{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;border:2.5px solid #fff;box-shadow:0 2px 8px rgba(2,6,23,.35)}
+.tmarker svg{display:block}
+.vlabel{background:#fff;border:1px solid var(--line);border-radius:8px;padding:2px 8px;font-weight:700;font-size:11.5px;box-shadow:0 2px 6px rgba(2,6,23,.2);color:var(--text)}
+.mlegend{position:absolute;left:8px;bottom:8px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:11.5px;z-index:500;box-shadow:0 4px 14px rgba(2,6,23,.12)}
+.mlegend div{display:flex;align-items:center;gap:7px;margin:3px 0}
+.mlegend i{width:9px;height:9px;border-radius:50%}
+.mlegend .ln{display:inline-block;width:16px;height:0;border-top:3px solid #2563eb}
+.mlegend .dash{display:inline-block;width:16px;height:0;border-top:2px dashed #ef4444}
+.rcol{display:flex;flex-direction:column;gap:16px}
+.phead{display:flex;gap:10px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line)}
+.phead .thumb{width:48px;height:48px;border-radius:10px;background:#eef4ff;display:grid;place-items:center;overflow:hidden;font-size:22px}
+.phead .thumb img{width:100%;height:100%;object-fit:cover;border-radius:10px}
+.phead .x{margin-left:auto;border:0;background:none;font-size:16px;color:var(--muted);cursor:pointer}
+.ptabs{display:flex;gap:2px;padding:0 10px;border-bottom:1px solid var(--line)}
+.ptabs button{border:0;background:transparent;padding:9px 10px;font:inherit;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent}
+.ptabs button.on{color:var(--blue);border-bottom-color:var(--blue)}
+.pbody{padding:12px 14px;max-height:430px;overflow-y:auto}
+.prow{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid var(--line);font-size:12.5px}
+.prow:last-child{border-bottom:0}
+.prow .k{color:var(--muted)}
+.pbar{width:70px;height:6px;border-radius:99px;background:#eef2f9;overflow:hidden;display:inline-block;vertical-align:middle}
+.pbar i{display:block;height:100%;border-radius:99px}
+.tile{border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-bottom:8px}
+.tile .k{font-size:11px;color:var(--muted)}.tile .v{font-size:15px;font-weight:700;margin-top:2px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.schip{font-size:10px;font-weight:700;padding:2px 9px;border-radius:99px}
+.schip.MOVING{background:#d1fae5;color:#065f46}.schip.IDLE{background:#e0e7ff;color:#3730a3}.schip.OFFLINE{background:#fee2e2;color:#991b1b}
+.bottom{display:grid;grid-template-columns:1.2fr 1.2fr 1fr;gap:16px;align-items:start}
+.tblwrap{overflow:auto;max-height:260px}
+table{width:100%;border-collapse:collapse;font-size:12.3px;white-space:nowrap}
+th{text-align:left;color:var(--muted);font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;padding:7px 10px;border-bottom:1px solid var(--line);background:#fafbfe;position:sticky;top:0}
+td{padding:7px 10px;border-bottom:1px solid var(--line)}
+tbody tr:hover td{background:#f8fafc;cursor:pointer}
+tr.sel td{background:#eff6ff}
+.plate{font-weight:700;letter-spacing:.3px}
+.schip2{font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:99px}
+.schip2.MOVING{background:#d1fae5;color:#065f46}.schip2.IDLE{background:#e0e7ff;color:#3730a3}.schip2.OFFLINE{background:#fee2e2;color:#991b1b}
+.fbar{width:44px;height:5px;border-radius:99px;background:#eef2f9;display:inline-block;vertical-align:middle;margin-right:5px}
+.fbar i{display:block;height:100%;border-radius:99px}
+.evrow{display:flex;gap:9px;padding:7px 14px;border-bottom:1px solid var(--line);font-size:12px}
+.evrow time{color:var(--muted);width:40px;flex:none}
+.evrow .tx{flex:1}
+.evrow .chip{font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:99px;align-self:center}
+.chip.High,.chip.CRITICAL{background:#fee2e2;color:#991b1b}.chip.Medium,.chip.WARNING{background:#fef3c7;color:#92400e}.chip.Info,.chip.INFO{background:#dbeafe;color:#1e40af}
+.qa{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:12px 14px}
+.qa button{border:1px solid var(--line);background:#fff;border-radius:10px;padding:12px 6px;font:inherit;font-size:11.5px;font-weight:600;color:var(--text);cursor:pointer;display:flex;flex-direction:column;gap:6px;align-items:center}
+.qa button:hover{border-color:var(--blue2);color:var(--blue)}
+.qa button .ic{font-size:18px}
+.note{background:#fffbeb;border:1px solid #fde68a;color:#92400e;border-radius:10px;padding:7px 10px;font-size:10.5px;margin:8px 14px}
+.muted{color:var(--muted)}.small{font-size:12px}
+#toast{position:fixed;bottom:20px;right:20px;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;display:none;box-shadow:0 8px 24px rgba(2,6,23,.2);background:#d1fae5;color:#065f46;z-index:3000}
+@media (max-width:1200px){.cols{grid-template-columns:1fr}.bottom{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside>
+  <div class="logo"><span class="sq">🛰️</span> FleetPulse</div>
+  <nav>
+    <a href="index.html"><span class="ic">🏠</span> Overview</a>
+    <a href="vehicles.html"><span class="ic">🚚</span> Vehicles</a>
+    <a class="active" href="tracking.html"><span class="ic">📍</span> Live Tracking</a>
+    <a href="trips.html"><span class="ic">🛣️</span> Trips</a>
+    <a href="drivers.html"><span class="ic">🧑‍✈️</span> Drivers</a>
+    <a href="fuel.html"><span class="ic">⛽</span> Fuel</a>
+    <a href="maintenance.html"><span class="ic">🔧</span> Maintenance</a>
+    <a href="alerts.html"><span class="ic">🔔</span> Alerts</a>
+    <a href="geofences.html"><span class="ic">🎯</span> Geofences</a>
+    <a href="reports.html"><span class="ic">📊</span> Analytics</a>
+    <a href="reports.html"><span class="ic">📄</span> Reports</a>
+    <a href="alerts.html"><span class="ic">🔔</span> Notifications</a>
+    <a href="settings.html"><span class="ic">👥</span> Users &amp; Roles</a>
+    <a href="settings.html"><span class="ic">⚙️</span> Settings</a>
+  </nav>
+</aside>
+<main>
+  <div class="topbar">
+    <div class="gsearch">🔍<input id="gq" placeholder="Search vehicles, registration no, driver..."/></div>
+    <span class="spacer"></span>
+    <a href="alerts.html" class="tbell" title="Alerts">🔔<span class="tbadge" id="topBell" style="display:none">0</span></a>
+    <button class="fbtn" id="fsBtn">⛶</button>
+    <div class="tchipuser" id="userChip"><div class="upic" id="uInit">?</div>
+      <div><div class="uname" id="uName">Sign in</div><div class="urole" id="uRole">-</div></div></div>
+  </div>
+
+  <div class="content">
+    <div class="pagehead"><span class="ic">📍</span>
+      <div><h1>Live Tracking</h1><div class="sub">Real-time location and status of your fleet</div></div>
+      <span class="spacer"></span>
+      <span class="datechip" id="dateChip">📅 -</span>
+      <span class="autoref"><i></i> Auto refresh: 5s</span>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi"><div class="bub" style="background:#e8f0fe">🚙</div>
+        <div><div class="label">Total Vehicles</div><div class="value" id="kTotal">–</div><div class="trend">registered fleet</div></div></div>
+      <div class="kpi"><div class="bub" style="background:#dcfce7">📈</div>
+        <div><div class="label">Moving</div><div class="value" id="kMove">–</div><div class="trend" id="kMoveT"></div></div></div>
+      <div class="kpi"><div class="bub" style="background:#fef3c7">🕐</div>
+        <div><div class="label">Idle</div><div class="value" id="kIdle">–</div><div class="trend">at stop now</div></div></div>
+      <div class="kpi"><div class="bub" style="background:#fee2e2">🔴</div>
+        <div><div class="label">Offline</div><div class="value" id="kOff">–</div><div class="trend">silent &gt; 60s</div></div></div>
+    </div>
+
+    <div class="toolbar">
+      <select id="fVeh"><option value="">All Vehicles</option></select>
+      <select id="fStatus"><option value="">All Status</option><option>MOVING</option><option>IDLE</option><option>OFFLINE</option></select>
+      <select id="fType"><option value="">All Types</option><option>Truck</option><option>Bus</option><option>Pickup</option></select>
+      <select id="fDrv"><option value="">All Drivers</option></select>
+      <span class="tgl on" id="tgRoutes"><span class="sw"></span> Routes</span>
+      <span class="tgl on" id="tgGeo"><span class="sw"></span> Geofences</span>
+      <span class="tgl dis" id="tgTraffic" title="Traffic data needs a provider - roadmap">◯ Traffic</span>
+      <div class="mseg"><button class="on" id="btnMap">Map</button><button id="btnSat">Satellite</button></div>
+    </div>
+
+    <div class="cols">
+      <div class="card">
+        <div style="position:relative">
+          <div id="map"></div>
+          <div class="mlegend">
+            <div><i style="background:var(--green)"></i> Moving</div>
+            <div><i style="background:var(--blue2)"></i> Idle</div>
+            <div><i style="background:var(--red)"></i> Offline</div>
+            <div><span class="ln"></span> Route</div>
+            <div><span class="dash"></span> Geofence</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="phead">
+          <span class="thumb" id="dThumb">🚚</span>
+          <div><div style="display:flex;gap:8px;align-items:center"><b id="dPlate">–</b><span id="dStatus"></span></div>
+          <div class="muted small" id="dSub">select a vehicle</div></div>
+          <button class="x" id="dClose">✕</button>
+        </div>
+        <div class="ptabs" id="dTabs">
+          <button class="on" data-t="overview">Overview</button>
+          <button data-t="telemetry">Telemetry</button>
+          <button data-t="trips">Trips</button>
+          <button data-t="driver">Driver</button>
+          <button data-t="maint">Maintenance</button>
+        </div>
+        <div class="pbody" id="dBody"><span class="muted small">Click a truck or fleet-list row.</span></div>
+      </div>
+    </div>
+
+    <div class="bottom">
+      <div class="card">
+        <h3>Live Fleet List <a class="view" href="vehicles.html">View all</a></h3>
+        <div class="tblwrap"><table>
+          <thead><tr><th>Vehicle</th><th>Driver</th><th>Status</th><th>Speed</th><th>Fuel</th><th>Location</th></tr></thead>
+          <tbody id="fleetRows"><tr><td colspan="6" class="muted">Loading…</td></tr></tbody>
+        </table></div>
+      </div>
+      <div class="card">
+        <h3>Recent Events <a class="view" href="alerts.html">View all</a></h3>
+        <div style="max-height:260px;overflow-y:auto" id="events"></div>
+      </div>
+      <div class="card">
+        <h3>Quick Actions</h3>
+        <div class="qa">
+          <button onclick="location.href='vehicles.html'"><span class="ic">🚙</span>View All Vehicles</button>
+          <button onclick="toast('Route planning arrives with the trips module',false)"><span class="ic">🧭</span>Plan Route</button>
+          <button onclick="location.href='geofences.html'"><span class="ic">📍</span>Create Geofence</button>
+          <button onclick="toast('Alert broadcasting arrives with the notification module',false)"><span class="ic">🔔</span>Send Alert</button>
+          <button onclick="trackSelected()"><span class="ic">🎯</span>Track Vehicle</button>
+          <button onclick="exportLive()"><span class="ic">⬇</span>Export Data</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+</div>
+<div id="toast"></div>
+
+<script>
+/* ================= helpers ================= */
+const $=id=>document.getElementById(id);
+const esc=s=>(s??'').replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+const fmt=n=>n==null?'–':Number(n).toFixed(0);
+const fmtPlate=id=>{const m=/^(K[A-Z]{2})(\d{3}[A-Z])$/.exec(id||'');return m?m[1]+' '+m[2]:id||'';};
+const api=async p=>{const r=await fetch(p);if(!r.ok)throw new Error('HTTP '+r.status);return r.json();};
+const toast=(m,ok)=>{const t=$('toast');t.textContent=m;
+  t.style.background=ok===false?'#fee2e2':'#d1fae5';t.style.color=ok===false?'#991b1b':'#065f46';
+  t.style.display='block';setTimeout(()=>t.style.display='none',2600);};
+const initials=n=>(n||'?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+function vClass(mk,mo){const m=`${mk??''} ${mo??''}`;
+  if(/Hiace|Coaster|Rosa|Matatu|Bus/i.test(m))return 'Bus';
+  if(/Hilux|Ranger|H1/i.test(m))return 'Pickup';return 'Truck';}
+const TRUCK_SVG='<svg viewBox="0 0 24 24" width="22" height="22"><rect x="2" y="7" width="11" height="8" rx="1" fill="#3b82f6"/><path d="M13 9h4.2c.5 0 .96.25 1.24.66L20.5 12.5V15H13V9Z" fill="#60a5fa"/><circle cx="6" cy="16.8" r="1.8" fill="#1e293b"/><circle cx="16.5" cy="16.8" r="1.8" fill="#1e293b"/></svg>';
+function photoClass(mk,mo){const m=`${mk??''} ${mo??''}`;
+  if(/Hiace|Coaster|Rosa|Matatu|Bus/i.test(m))return 'bus';
+  if(/Canter|Dyna|ELF|Hino 300|NPR|NQR|Kuzer/i.test(m))return 'light';
+  if(/FRR|FVR|Fighter|Hino 500|Croner|P280|FTS/i.test(m))return 'medium';return 'heavy';}
+function vThumb(v){const cls=photoClass(v.make,v.model);
+  return '<img src="img/'+encodeURIComponent(v.vehicleId)+'.jpg" data-cls="'+cls+'" alt="" onerror="window.__thumbErr(this)">';}
+window.__thumbErr=function(img){if(!img.dataset.step){img.dataset.step='2';img.src='img/'+img.dataset.cls+'.jpg';}
+  else{const s=document.createElement('span');s.style.display='grid';s.style.placeItems='center';s.innerHTML=TRUCK_SVG;img.replaceWith(s);}};
+const CITIES=[["Nairobi",-1.286,36.817],["Thika",-1.039,37.090],["Limuru",-1.112,36.640],["Machakos",-1.518,37.265],["Naivasha",-0.717,36.433],["Nakuru",-0.303,36.080],["Nanyuki",0.017,37.070],["Meru",0.047,37.645],["Eldoret",0.514,35.270],["Kisumu",-0.091,34.768],["Voi",-3.396,38.556],["Mombasa",-4.043,39.668],["Malindi",-3.220,40.117],["Garissa",-0.453,39.646]];
+function nearestCity(lat,lon){let b="En route",bd=Infinity;
+  for(const[n,la,lo]of CITIES){const d=(la-lat)**2+(lo-lon)**2;if(d<bd){bd=d;b=n;}}return b;}
+const routeLabels={"NBO-MSA":"Nairobi - Mombasa","NBO-KSM":"Nairobi - Kisumu","NBO-ELD":"Nairobi - Eldoret","NBO-NKR":"Nairobi - Nakuru","NBO-GSA":"Nairobi - Garissa"};
+
+/* ================= state ================= */
+let live=[],vehicles=new Map(),docsByVehicle=new Map(),alerts=[];
+let selected=null,tab='overview',lastSeen=new Map(),known=new Set();
+const markers=new Map();
+
+/* ================= map ================= */
+const OSM=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap'});
+const SAT=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Esri'});
+const map=L.map('map',{zoomControl:false}).setView([-0.9,36.9],7);
+OSM.addTo(map);
+L.control.zoom({position:'topright'}).addTo(map);
+L.control.scale({position:'bottomright',imperial:false}).addTo(map);
+
+const ROUTE_CATALOG={
+ "NBO-MSA":[[-1.286,36.817],[-1.370,36.902],[-1.450,36.966],[-1.497,37.050],[-1.582,37.235],[-1.617,37.455],[-1.900,37.550],[-2.007,37.628],[-2.414,38.019],[-2.911,38.300],[-3.396,38.556],[-3.530,38.750],[-3.865,39.470],[-4.043,39.668]],
+ "NBO-KSM":[[-1.286,36.817],[-1.112,36.640],[-0.717,36.433],[-0.303,36.080],[-0.280,35.700],[-0.367,35.283],[-0.250,35.100],[-0.091,34.768]],
+ "NBO-ELD":[[-1.286,36.817],[-1.112,36.640],[-0.717,36.433],[-0.303,36.080],[-0.100,35.550],[0.150,35.420],[0.350,35.300],[0.514,35.270]],
+ "NBO-NKR":[[-1.286,36.817],[-1.112,36.640],[-0.900,36.550],[-0.717,36.433],[-0.520,36.320],[-0.303,36.080]],
+ "NBO-GSA":[[-1.286,36.817],[-1.233,37.100],[-1.000,37.500],[-0.700,38.300],[-0.453,39.646]]};
+const routeLayer=L.layerGroup().addTo(map);
+Object.entries(ROUTE_CATALOG).forEach(([id,pts])=>{
+  L.polyline(pts,{color:'#2563eb',weight:4,opacity:.75}).bindTooltip('Corridor: '+routeLabels[id]).addTo(routeLayer);});
+const geoLayer=L.layerGroup();
+
+/* toggles */
+ $('tgRoutes').onclick=()=>{const t=$('tgRoutes');
+  if(map.hasLayer(routeLayer)){map.removeLayer(routeLayer);t.classList.remove('on');}
+  else{routeLayer.addTo(map);t.classList.add('on');}};
+ $('tgGeo').onclick=()=>{const t=$('tgGeo');
+  if(map.hasLayer(geoLayer)){map.removeLayer(geoLayer);t.classList.remove('on');}
+  else{geoLayer.addTo(map);t.classList.add('on');}};
+ $('btnMap').onclick=()=>{map.removeLayer(SAT);OSM.addTo(map);
+  $('btnMap').classList.add('on');$('btnSat').classList.remove('on');};
+ $('btnSat').onclick=()=>{map.removeLayer(OSM);SAT.addTo(map);
+  $('btnSat').classList.add('on');$('btnMap').classList.remove('on');};
+
+/* ================= session / bell / fullscreen / date ================= */
+(async()=>{try{
+  const r=await fetch('/api/v1/me',{headers:{'Accept':'application/json'}});
+  const ct=r.headers.get('content-type')||'';
+  if(!r.ok||!ct.includes('application/json'))throw 0;
+  const me=await r.json();
+  $('uInit').textContent=initials(me.username);
+  $('uName').textContent=me.username;$('uRole').textContent=me.roles.join(', ');
+}catch(e){$('uName').textContent='Sign in';$('uRole').textContent='session expired';
+  $('userChip').onclick=()=>location.href='/login.html';}})();
+ $('dateChip').textContent='📅 '+new Date().toLocaleDateString([],{day:'numeric',month:'short',year:'numeric'})+' · '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+ $('fsBtn').onclick=()=>document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();
+function refreshBell(){fetch('/api/v1/alerts/recent?limit=100').then(r=>r.ok?r.json():[])
+  .then(al=>{const n=al.filter(a=>new Date(a.ts).getTime()>Date.now()-36e5).length;
+    const b=$('topBell');b.textContent=n;b.style.display=n?'block':'none';}).catch(()=>{});}
+refreshBell();setInterval(refreshBell,5000);
+
+/* ================= marker factory ================= */
+const BADGE='<svg viewBox="0 0 24 24" width="15" height="15"><rect x="1.5" y="6.5" width="11" height="8" rx="1" fill="#fff"/><path d="M12.5 8.5h4.4c.5 0 .96.25 1.24.66L20.5 12.5V15h-8V8.5Z" fill="#dbeafe"/><circle cx="5.8" cy="16.6" r="1.7" fill="#fff"/><circle cx="16.4" cy="16.6" r="1.7" fill="#fff"/></svg>';
+function badgeIcon(st){const c=st==='MOVING'?'#10b981':st==='IDLE'?'#3b82f6':'#ef4444';
+  return L.divIcon({className:'',html:'<div class="tmarker" style="background:'+c+'">'+BADGE+'</div>',iconSize:[30,30],iconAnchor:[15,15]});}
+
+/* ================= load ================= */
+async function load(){
+  try{
+    const [lv,vp,al]=await Promise.all([
+      api('/api/v1/vehicles/live'),
+      api('/api/v1/vehicles?size=200'),
+      api('/api/v1/alerts/recent?limit=200').catch(()=>[])]);
+    live=lv;
+    vehicles=new Map(vp.map(v=>[v.vehicleId,v]));
+    docsByVehicle=new Map(vp.filter(v=>v.nextService||v.insuranceExpiry||v.inspectionExpiry)
+      .map(v=>[v.vehicleId,[v.nextService,v.insuranceExpiry,v.inspectionExpiry].filter(Boolean)]));
+    alerts=al;
+
+    /* KPIs */
+    lv.forEach(v=>{lastSeen.set(v.vehicleId,Date.now());known.add(v.vehicleId);});
+    const now=Date.now();
+    const offline=[...known].filter(id=>now-(lastSeen.get(id)||0)>60_000&&!lv.some(v=>v.vehicleId===id)).length;
+    const moving=lv.filter(v=>v.status==='MOVING').length;
+    $('kTotal').textContent=vehicles.length;
+    $('kMove').textContent=moving;
+    $('kMoveT').textContent=vehicles.length?Math.round(moving/vehicles.length*100)+'% of fleet':'';
+    $('kIdle').textContent=lv.length-moving;
+    $('kOff').textContent=offline;
+
+    /* markers + labels */
+    const seen=new Set();
+    lv.forEach(v=>{
+      seen.add(v.vehicleId);
+      let m=markers.get(v.vehicleId);
+      if(!m){
+        m=L.marker([v.latitude,v.longitude],{icon:badgeIcon(v.status)}).addTo(map);
+        markers.set(v.vehicleId,m);
+        m.bindTooltip(fmtPlate(v.vehicleId),{permanent:true,direction:'right',offset:[16,0],
+          className:'vlabel'});
+        m.on('click',()=>selectVehicle(v.vehicleId));
+      }
+      m.setLatLng([v.latitude,v.longitude]);
+      if(m._st!==v.status){m.setIcon(badgeIcon(v.status));m._st=v.status;}
+    });
+    markers.forEach((m,id)=>{if(!seen.has(id)){map.removeLayer(m);markers.delete(id);}});
+
+    renderFleet();renderEvents();
+    if(selected)renderDetail();
+  }catch(e){
+    $('fleetRows').innerHTML='<tr><td colspan="6" class="muted">Load failed: '+esc(e.message)+' - if HTTP 401/302, sign in again.</td></tr>';
+  }
+}
+
+/* ================= fleet list + events ================= */
+function statusOf(id){const L=live.find(v=>v.vehicleId===id);
+  return L?L.status:'OFFLINE';}
+function fuelColor(f){return f==null?'#94a3b8':f<15?'var(--red)':f<35?'var(--amber)':'var(--green)';}
+function renderFleet(){
+  const q=$('gq').value.toUpperCase(),fs=$('fStatus').value,ft=$('fType').value,fd=$('fDrv').value,fv=$('fVeh').value;
+  const rows=live.filter(v=>{
+    const ty=vClass(v.make,v.model);
+    const hay=(v.vehicleId+' '+(v.make||'')+' '+(v.model||'')+' '+(v.driverName||'')).toUpperCase();
+    return(!q||hay.includes(q))&&(!fs||v.status===fs)&&(!ft||ty===ft)&&(!fd||v.driverName===fd)&&(!fv||v.vehicleId===fv);});
+  $('fleetRows').innerHTML=rows.map(v=>{
+    const f=v.fuelLevelPct;
+    return '<tr class="'+(selected===v.vehicleId?'sel':'')+'" onclick="selectVehicle(\''+esc(v.vehicleId)+'\')">'+
+      '<td><span class="plate">'+fmtPlate(v.vehicleId)+'</span></td>'+
+      '<td>'+esc(v.driverName||'-')+'</td>'+
+      '<td><span class="schip2 '+v.status+'">'+v.status+'</span></td>'+
+      '<td>'+fmt(v.speedKph)+' km/h</td>'+
+      '<td><span class="fbar"><i style="width:'+(f==null?0:f.toFixed(0))+'%;background:'+fuelColor(f)+'"></i></span>'+(f==null?'-':f.toFixed(0)+'%')+'</td>'+
+      '<td>'+nearestCity(v.latitude,v.longitude)+'</td></tr>';}).join('')
+    ||'<tr><td colspan="6" class="muted">No vehicles match.</td></tr>';
+}
+const TYPE_ICON={ENGINE_OVERHEATING:'🔥',LOW_FUEL:'⛽',SPEEDING:'💨',HARSH_BRAKING:'🛑',HARSH_ACCELERATION:'🚀',GEOFENCE:'🎯'};
+function renderEvents(){
+  const map={'CRITICAL':'High','WARNING':'Medium','INFO':'Info'};
+  $('events').innerHTML=alerts.slice(0,12).map(a=>'<div class="evrow">'+
+    '<time>'+new Date(a.ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})+'</time>'+
+    '<div class="tx"><b>'+(TYPE_ICON[a.type]||'⚠️')+' '+esc(a.message)+'</b>'+
+    '<div class="muted small">'+fmtPlate(esc(a.vehicle_id))+'</div></div>'+
+    '<span class="chip '+esc(map[a.severity]||'Info')+'">'+esc(map[a.severity]||a.severity)+'</span></div>').join('')
+    ||'<div class="evrow"><span class="muted">No recent events.</span></div>';
+}
+
+/* ================= detail panel ================= */
+function selectVehicle(id){
+  selected=id;
+  document.querySelectorAll('#dTabs button').forEach(b=>b.classList.toggle('on',b.dataset.t==='overview'));
+  tab='overview';renderDetail();
+  const L=live.find(v=>v.vehicleId===id);
+  if(L)map.setView([L.latitude,L.longitude],10);
+}
+ $('dClose').onclick=()=>{$('dBody').innerHTML='<span class="muted small">Click a truck or fleet-list row.</span>';
+  $('dPlate').textContent='-';$('dSub').textContent='select a vehicle';$('dStatus').innerHTML='';$('dThumb').textContent='🚚';selected=null;};
+document.querySelectorAll('#dTabs button').forEach(b=>b.onclick=()=>{
+  tab=b.dataset.t;
+  document.querySelectorAll('#dTabs button').forEach(x=>x.classList.toggle('on',x===b));
+  renderDetail();});
+function trackSelected(){if(!selected){toast('Select a vehicle first',false);return;}
+  const L=live.find(v=>v.vehicleId===selected);
+  if(L)map.setView([L.latitude,L.longitude],13);}
+function exportLive(){
+  const csv=['plate,status,speed_kph,fuel_pct,engine_c,driver,lat,lon',
+    ...live.map(v=>[fmtPlate(v.vehicleId),v.status,v.speedKph,v.fuelLevelPct,v.engineTempC,v.driverName||'',v.latitude,v.longitude].map(x=>'"'+(x??'')+'"').join(','))].join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download='fleetpulse-live.csv';a.click();toast('Exported fleetpulse-live.csv',true);}
+
+function renderDetail(){
+  if(!selected)return;
+  const v=live.find(x=>x.vehicleId===selected);
+  const meta=vehicles.get(selected);
+  if(!v){renderStaticDetail('OFFLINE');return;}
+  const st=v.status;
+  $('dThumb').innerHTML=vThumb(meta||{vehicleId:selected,make:v.make,model:v.model});
+  $('dPlate').textContent=fmtPlate(selected);
+  $('dStatus').innerHTML='<span class="schip '+st+'">'+st+'</span>';
+  $('dSub').textContent=(v.make||'')+' '+(v.model||'')+' · '+vClass(v.make,v.model)+(meta&&meta.year?' · '+meta.year:'');
+  const b=$('dBody');
+  if(tab==='overview'){
+    b.innerHTML=
+      '<div class="prow"><span class="k">📍 Current Location</span><b>'+nearestCity(v.latitude,v.longitude)+'</b></div>'+
+      '<div class="prow"><span class="k">🌐 Coordinates</span><b class="small">'+v.latitude.toFixed(4)+', '+v.longitude.toFixed(4)+'</b></div>'+
+      '<button class="btn" style="width:100%;margin:8px 0" onclick="trackSelected()">View on Map</button>'+
+      '<div class="grid2">'+
+      '<div class="tile"><div class="k">⏱ Speed</div><div class="v">'+fmt(v.speedKph)+' km/h</div></div>'+
+      '<div class="tile"><div class="k">⛽ Fuel Level</div><div class="v">'+fmt(v.fuelLevelPct)+'% <span class="pbar"><i style="width:'+(v.fuelLevelPct??0).toFixed(0)+'%;background:'+fuelColor(v.fuelLevelPct)+'"></i></span></div></div>'+
+      '<div class="tile"><div class="k">🌡 Engine Temp</div><div class="v">'+fmt(v.engineTempC)+'°C</div></div>'+
+      '<div class="tile"><div class="k">🔋 Battery Voltage</div><div class="v">'+fmt(v.batteryVoltage)+' V</div></div>'+
+      '</div>'+
+      '<div class="prow"><span class="k">👤 Driver</span><b>'+esc(v.driverName||'-')+'</b></div>'+
+      '<div class="prow"><span class="k">🧭 Corridor</span><b>'+(v.routeId&&routeLabels[v.routeId]?esc(routeLabels[v.routeId]):'-')+'</b></div>'+
+      '<div class="prow"><span class="k">🕒 Last Update</span><b>'+(v.lastSeen?new Date(v.lastSeen).toLocaleString():'-')+'</b></div>';
+  } else if(tab==='telemetry'){
+    b.innerHTML='<div class="prow"><span class="k">⚡ Ignition</span><b>'+(v.status==='MOVING'?'ON':v.status==='IDLE'?'ON (idle)':'-')+'</b></div>'+
+      '<div class="prow"><span class="k">🔩 RPM</span><b>'+fmt(v.rpm)+'</b></div>'+
+      '<div class="prow"><span class="k">🌡 Engine Temp</span><b>'+fmt(v.engineTempC)+' °C</b></div>'+
+      '<div class="prow"><span class="k">⛽ Fuel</span><b>'+fmt(v.fuelLevelPct)+' %</b></div>'+
+      '<div class="prow"><span class="k">🔋 Battery</span><b>'+fmt(v.batteryVoltage)+' V</b></div>'+
+      '<div class="prow"><span class="k">🧭 Odometer</span><b>'+(v.odometerKm?Math.round(v.odometerKm).toLocaleString()+' km':'-')+'</b></div>';
+  } else if(tab==='trips'){
+    b.innerHTML='<div class="prow"><span class="k">🛣️ Corridor</span><b>'+(v.routeId&&routeLabels[v.routeId]?esc(routeLabels[v.routeId]):'-')+'</b></div>'+
+      '<div class="prow"><span class="k">State</span><b>'+st+'</b></div>'+
+      '<div class="note">Persisted trip history arrives with the trips module. See the Trips tab for live progress and schedule.</div>'+
+      '<button class="btn" style="width:100%" onclick="location.href=\'trips.html\'">Open Trips</button>';
+  } else if(tab==='driver'){
+    const e=alertsByDriverEvents(selected);
+    b.innerHTML='<div class="prow"><span class="k">👤 Name</span><b>'+esc(v.driverName||'-')+'</b></div>'+
+      '<div class="prow"><span class="k">🆔 Driver ID</span><b>'+esc(v.driverId||'-')+'</b></div>'+
+      '<div class="prow"><span class="k">💨 Speeding 24h</span><b>'+e.spd+'</b></div>'+
+      '<div class="prow"><span class="k">🛑 Harsh braking</span><b>'+e.brk+'</b></div>'+
+      '<div class="prow"><span class="k">🚀 Harsh accel</span><b>'+e.acc+'</b></div>';
+  } else if(tab==='maint'){
+    const docs=docsByVehicle.get(selected)||[];
+    b.innerHTML='<div class="prow"><span class="k">🧾 Next Service</span><b>'+esc(docs[0]||meta&&meta.nextService||'-')+'</b></div>'+
+      '<div class="prow"><span class="k">🛡 Insurance Expiry</span><b>'+esc(docs[1]||'-')+'</b></div>'+
+      '<div class="prow"><span class="k">📋 Inspection</span><b>'+esc(docs[2]||'-')+'</b></div>'+
+      '<div class="prow"><span class="k">🧭 Mileage</span><b>'+(v.odometerKm?Math.round(v.odometerKm).toLocaleString()+' km':'-')+'</b></div>'+
+      '<div class="note">Full service history arrives with the maintenance module.</div>';
+  }
+}
+function renderStaticDetail(st){
+  const meta=vehicles.get(selected)||{};
+  $('dPlate').textContent=fmtPlate(selected);
+  $('dStatus').innerHTML='<span class="schip OFFLINE">OFFLINE</span>';
+  $('dSub').textContent=(meta.make||'')+' '+(meta.model||'');
+  $('dBody').innerHTML='<div class="prow"><span class="k">Signal</span><b>OFFLINE - last packet &gt; 60s ago</b></div>'+
+    '<div class="note">This vehicle is registered but not reporting. It goes live when a device is installed and assigned.</div>';
+}
+function alertsByDriverEvents(vid){
+  const e={spd:0,brk:0,acc:0};
+  alerts.forEach(a=>{if(a.vehicle_id!==vid)return;
+    if(a.type==='SPEEDING')e.spd++;if(a.type==='HARSH_BRAKING')e.brk++;if(a.type==='HARSH_ACCELERATION')e.acc++;});
+  return e;
+}
+
+/* ================= geofences overlay ================= */
+(async()=>{try{
+  const zones=await api('/api/v1/geofences');
+  zones.filter(z=>z.active).forEach(z=>{
+    const col=(z.type==='RESTRICTED'||z.type==='DANGER')?'#ef4444':z.type==='DEPOT'?'#2563eb':'#10b981';
+    L.circle([z.lat,z.lon],{radius:z.radiusM,color:col,weight:2,dashArray:'6 4',fillOpacity:.08})
+      .bindTooltip('🎯 '+z.name+' ('+z.type+')').addTo(geoLayer);});
+}catch(e){}})();
+
+/* ================= wiring ================= */
+ $('gq').oninput=renderFleet;
+ $('fStatus').onchange=renderFleet;$('fType').onchange=renderFleet;
+ $('fDrv').onchange=renderFleet;$('fVeh').onchange=renderFleet;
+(async()=>{try{
+  const lv=await api('/api/v1/vehicles/live');
+  const ds=[...new Set(lv.map(v=>v.driverName).filter(Boolean))].sort();
+  $('fDrv').innerHTML='<option value="">All Drivers</option>'+ds.map(d=>'<option>'+esc(d)+'</option>').join('');
+}catch(e){}})();
+
+load();setInterval(load,5000);
+</script>
+</body>
+</html>
