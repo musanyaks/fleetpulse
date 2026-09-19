@@ -112,6 +112,24 @@ tr.sel td{background:#eff6ff}
 .muted{color:var(--muted)}.small{font-size:12px}
 #toast{position:fixed;bottom:20px;right:20px;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;display:none;box-shadow:0 8px 24px rgba(2,6,23,.2);background:#d1fae5;color:#065f46;z-index:3000}
 @media (max-width:1200px){.cols{grid-template-columns:1fr}.bottom{grid-template-columns:1fr}}
+  .vtile{border:1px solid var(--line);border-radius:10px;padding:9px 11px}
+  .vtile .h{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--muted)}
+  .vtile .ic{width:22px;height:22px;border-radius:8px;display:grid;place-items:center;font-size:12px;flex:none}
+  .vtile .v{font-size:15px;font-weight:700;margin:3px 0 5px}
+  .vtile .pbar{width:100%}
+  .live{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;
+    padding:2px 9px;border-radius:99px;background:#d1fae5;color:#065f46}
+  .live::before{content:'';width:6px;height:6px;border-radius:50%;background:#10b981}
+  .locrow2{display:flex;gap:9px;align-items:flex-start}
+  .lpin2{width:26px;height:26px;border-radius:50%;background:#e8f0fe;display:grid;place-items:center;flex:none}
+  .locbtn{margin-left:auto;border:0;border-radius:8px;padding:6px 12px;font:inherit;font-size:11.5px;
+    font-weight:700;background:var(--blue);color:#fff;cursor:pointer}
+  .davatar{width:34px;height:34px;border-radius:50%;background:var(--navy);color:#fff;
+    display:inline-grid;place-items:center;font-size:11px;font-weight:700;margin-right:8px;vertical-align:middle}
+  .duo{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .duo .cell{border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+  .duo .cell .k{font-size:11px;color:var(--muted)}
+  .duo .cell .v{font-weight:700;font-size:12.8px;margin-top:2px}
 </style>
 </head>
 <body>
@@ -437,19 +455,36 @@ function renderDetail(){
   $('dSub').textContent=(v.make||'')+' '+(v.model||'')+' · '+vClass(v.make,v.model)+(meta&&meta.year?' · '+meta.year:'');
   const b=$('dBody');
   if(tab==='overview'){
+    const docs=docsByVehicle.get(selected)||[];
+    const nextSvc=docs[0]||(meta&&meta.nextService)||null;
+    const days=nextSvc?Math.ceil((new Date(nextSvc)-Date.now())/864e5):null;
+    const mi=meta?meta.vin:null;
     b.innerHTML=
-      '<div class="prow"><span class="k">📍 Current Location</span><b>'+nearestCity(v.latitude,v.longitude)+'</b></div>'+
-      '<div class="prow"><span class="k">🌐 Coordinates</span><b class="small">'+v.latitude.toFixed(4)+', '+v.longitude.toFixed(4)+'</b></div>'+
-      '<button class="btn" style="width:100%;margin:8px 0" onclick="trackSelected()">View on Map</button>'+
-      '<div class="grid2">'+
-      '<div class="tile"><div class="k">⏱ Speed</div><div class="v">'+fmt(v.speedKph)+' km/h</div></div>'+
-      '<div class="tile"><div class="k">⛽ Fuel Level</div><div class="v">'+fmt(v.fuelLevelPct)+'% <span class="pbar"><i style="width:'+(v.fuelLevelPct??0).toFixed(0)+'%;background:'+fuelColor(v.fuelLevelPct)+'"></i></span></div></div>'+
-      '<div class="tile"><div class="k">🌡 Engine Temp</div><div class="v">'+fmt(v.engineTempC)+'°C</div></div>'+
-      '<div class="tile"><div class="k">🔋 Battery Voltage</div><div class="v">'+fmt(v.batteryVoltage)+' V</div></div>'+
+      '<div class="locrow2"><span class="lpin2">\ud83d\udccd</span>'+
+      '<div><div class="muted small">Current Location</div>'+
+      '<div style="font-weight:700;font-size:12.8px">'+nearestCity(v.latitude,v.longitude)+', Kenya</div>'+
+      '<div class="muted small" id="dCoords">'+v.latitude.toFixed(4)+'\u00b0 S, '+v.longitude.toFixed(4)+'\u00b0 E</div></div>'+
+      '<button class="locbtn" onclick="trackSelected()">View on Map</button></div>'+
+      '<div class="grid2" style="margin:10px 0">'+
+      '<div class="vtile"><div class="h"><span class="ic" style="background:#e8f0fe;color:var(--blue)">\u23f1</span> Speed</div>'+
+        '<div class="v" id="vtSpeed">'+fmt(v.speedKph)+' km/h</div>'+
+        '<span class="pbar"><i id="vtSpeedBar" style="width:'+Math.min(100,v.speedKph/1.6).toFixed(0)+'%;background:var(--blue2)"></i></span></div>'+
+      '<div class="vtile"><div class="h"><span class="ic" style="background:#d1fae5;color:var(--green)">\u26fd</span> Fuel Level</div>'+
+        '<div class="v" id="vtFuel">'+fmt(v.fuelLevelPct)+'%</div>'+
+        '<span class="pbar"><i id="vtFuelBar" style="width:'+(v.fuelLevelPct??0).toFixed(0)+'%;background:'+fuelColor(v.fuelLevelPct)+'"></i></span></div>'+
+      '<div class="vtile"><div class="h"><span class="ic" style="background:#ffedd5;color:#ea580c">\ud83c\udf21</span> Engine Temp</div>'+
+        '<div class="v" id="vtTemp">'+fmt(v.engineTempC)+'\u00b0C</div>'+
+        '<span class="pbar"><i id="vtTempBar" style="width:'+Math.max(0,Math.min(100,(((v.engineTempC??70)-60)/60*100))).toFixed(0)+'%;background:'+(v.engineTempC>=105?'var(--red)':'var(--amber)')+'"></i></span></div>'+
+      '<div class="vtile"><div class="h"><span class="ic" style="background:#dbeafe;color:var(--blue)">\ud83d\udd0b</span> Battery Voltage</div>'+
+        '<div class="v" id="vtBatt">'+fmt(v.batteryVoltage)+' V</div>'+
+        '<span class="pbar"><i id="vtBattBar" style="width:'+Math.min(100,(((v.batteryVoltage??0)-20)/10*100)).toFixed(0)+'%;background:var(--blue2)"></i></span></div>'+
       '</div>'+
-      '<div class="prow"><span class="k">👤 Driver</span><b>'+esc(v.driverName||'-')+'</b></div>'+
-      '<div class="prow"><span class="k">🧭 Corridor</span><b>'+(v.routeId&&routeLabels[v.routeId]?esc(routeLabels[v.routeId]):'-')+'</b></div>'+
-      '<div class="prow"><span class="k">🕒 Last Update</span><b>'+(v.lastSeen?new Date(v.lastSeen).toLocaleString():'-')+'</b></div>';
+      '<div class="duo">'+
+      '<div class="cell"><div class="k">\ud83d\udc64 Driver</div><div class="v"><span class="davatar">'+initials(v.driverName)+'</span>'+esc(v.driverName||'-')+'</div></div>'+
+      '<div class="cell"><div class="k">Last Update</div><div class="v"><span id="vtUpd">'+(v.lastSeen?new Date(v.lastSeen).toLocaleString([],{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'-')+'</span> <span class="live">Live</span></div></div>'+
+      '<div class="cell"><div class="k">\ud83d\udcc5 Next Service</div><div class="v">'+esc(nextSvc||'-')+(days!=null?' <span class="muted small">(in '+days+' days)</span>':'')+'</div></div>'+
+      '<div class="cell"><div class="k">\ud83e\ude9b Total Mileage</div><div class="v">'+(v.odometerKm?Math.round(v.odometerKm).toLocaleString()+' km':'-')+'</div></div>'+
+      '</div>';
   } else if(tab==='telemetry'){
     b.innerHTML='<div class="prow"><span class="k">⚡ Ignition</span><b>'+(v.status==='MOVING'?'ON':v.status==='IDLE'?'ON (idle)':'-')+'</b></div>'+
       '<div class="prow"><span class="k">🔩 RPM</span><b>'+fmt(v.rpm)+'</b></div>'+
@@ -513,6 +548,28 @@ function alertsByDriverEvents(vid){
 }catch(e){}})();
 
 load();setInterval(load,5000);
+
+/* ================= live patch for detail tiles ================= */
+function patchOverviewLive(){
+  if(!selected||tab!=='overview')return;
+  const v=live.find(x=>x.vehicleId===selected);if(!v)return;
+  const st=v.status;
+  $("dStatus").innerHTML='<span class="schip '+st+'">'+st+'</span>';
+  const set=(id,val)=>{const el=document.getElementById(id);if(el)el.textContent=val;};
+  set("vtSpeed",fmt(v.speedKph)+' km/h');
+  set("vtFuel",fmt(v.fuelLevelPct)+'%');
+  set("vtTemp",fmt(v.engineTempC)+'\u00b0C');
+  set("vtBatt",fmt(v.batteryVoltage)+' V');
+  const sb=$('vtSpeedBar');if(sb)sb.style.width=Math.min(100,v.speedKph/1.6).toFixed(0)+'%';
+  const fb=$('vtFuelBar');if(fb){fb.style.width=(v.fuelLevelPct??0).toFixed(0)+'%';fb.style.background=fuelColor(v.fuelLevelPct);}
+  const tb=$('vtTempBar');if(tb){tb.style.width=Math.max(0,Math.min(100,(((v.engineTempC??70)-60)/60*100))).toFixed(0)+'%';tb.style.background=v.engineTempC>=105?'var(--red)':'var(--amber)';}
+  const bb=$('vtBattBar');if(bb)bb.style.width=Math.min(100,(((v.batteryVoltage??0)-20)/10*100)).toFixed(0)+'%';
+  set("vtUpd",v.lastSeen?new Date(v.lastSeen).toLocaleString([],{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'-');
+  set("dCoords",v.latitude.toFixed(4)+'\u00b0 S, '+v.longitude.toFixed(4)+'\u00b0 E');
+}
+const _trackingLoad=load;
+load=async function(){ const r=await _trackingLoad.apply(this,arguments);
+  try{patchOverviewLive();}catch(e){console.error('patchOverviewLive:',e);} return r; };
 </script>
 </body>
 </html>
