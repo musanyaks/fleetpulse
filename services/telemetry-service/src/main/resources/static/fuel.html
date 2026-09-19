@@ -88,6 +88,10 @@ tbody tr:hover td{background:#f8fafc}
   .flegend .dash{display:inline-block;width:16px;height:0;border-top:2px dashed #ef4444}
   .refuel-pin{width:16px;height:16px;border-radius:50%;background:var(--green);border:2.5px solid #fff;
     box-shadow:0 2px 6px rgba(2,6,23,.35);display:grid;place-items:center;color:#fff;font-size:9px;font-weight:800}
+  .fthumb{width:34px;height:34px;border-radius:8px;background:#eef4ff;display:inline-grid;
+    place-items:center;overflow:hidden;vertical-align:middle;margin-right:8px}
+  .fthumb img{width:100%;height:100%;object-fit:cover;border-radius:8px;display:block}
+  .fcell{display:flex;align-items:center}
 </style>
 </head>
 <body>
@@ -205,12 +209,29 @@ const api=async p=>{const r=await fetch(p);if(!r.ok)throw new Error('HTTP '+r.st
 const toast=(m,ok)=>{const t=$('toast');t.textContent=m;
   t.style.background=ok===false?'#fee2e2':'#d1fae5';t.style.color=ok===false?'#991b1b':'#065f46';
   t.style.display='block';setTimeout(function(){t.style.display='none';},2600);};
+
+function photoClass(mk,mo){const m=`${mk??''} ${mo??''}`;
+  if(/Hiace|Coaster|Rosa|Matatu|Bus/i.test(m))return 'bus';
+  if(/Canter|Dyna|ELF|Hino 300|NPR|NQR|Kuzer/i.test(m))return 'light';
+  if(/FRR|FVR|Fighter|Hino 500|Croner|P280|FTS/i.test(m))return 'medium';
+  return 'heavy';}
+const FTRUCK='<svg viewBox="0 0 24 24" width="20" height="20"><rect x="2" y="7" width="11" height="8" rx="1" fill="#3b82f6"/><path d="M13 9h4.2c.5 0 .96.25 1.24.66L20.5 12.5V15H13V9Z" fill="#60a5fa"/><circle cx="6" cy="16.8" r="1.8" fill="#1e293b"/><circle cx="16.5" cy="16.8" r="1.8" fill="#1e293b"/></svg>';
+function fuelThumb(vid){
+  const meta=(window.__vmap&&window.__vmap.get)?window.__vmap.get(vid):null;
+  const cls=meta?photoClass(meta.make,meta.model):'heavy';
+  return '<span class="fthumb"><img src="img/'+encodeURIComponent(vid)+'.jpg" data-cls="'+cls+'" alt="" onerror="window.__fthumbErr(this)"></span>';
+}
+window.__fthumbErr=function(img){
+  if(!img.dataset.step){img.dataset.step='2';img.src='img/'+img.dataset.cls+'.jpg';}
+  else{const s=document.createElement('span');s.style.display='grid';s.style.placeItems='center';s.innerHTML=FTRUCK;img.replaceWith(s);}
+};
+
 const TANK=200, PRICE=180;
 const localISO=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 const routeLabels={"NBO-MSA":"Nairobi - Mombasa","NBO-KSM":"Nairobi - Kisumu","NBO-ELD":"Nairobi - Eldoret","NBO-NKR":"Nairobi - Nakuru","NBO-GSA":"Nairobi - Garissa"};
 
 /* ================= state ================= */
-let fuelRows=[],live=[],routeByVeh={},alerts=[],detFiltered=[];
+let fuelRows=[],live=[];window.__vmap=new Map(),routeByVeh={},alerts=[],detFiltered=[];
 
 /* ================= charts (inline SVG) ================= */
 function barChart(el, data, color){
@@ -273,6 +294,7 @@ async function load(){
       api('/api/v1/vehicles/live'),
       api('/api/v1/alerts/recent?limit=300').catch(function(){return [];})]);
     fuelRows=fuel.rows;
+    window.vehicles=(typeof vehicles!=='undefined')?vehicles:new Map(vp.map(v=>[v.vehicleId,v]));
     live=lv;
     routeByVeh={};lv.forEach(function(v){routeByVeh[v.vehicleId]=v.routeId;});
     lv.forEach(function(v){
@@ -391,7 +413,7 @@ function renderDetails(){
     const f=L.fuelLevelPct;
     const st=(f!=null&&f<15)?'LowFuel':'Normal';
     const col=f==null?'#94a3b8':f<15?'var(--red)':f<35?'var(--amber)':'var(--green)';
-    return '<tr><td><b>'+fmtPlate(r.vehicle_id)+'</b></td>'+
+    return '<tr><td><span class="fcell">'+fuelThumb(r.vehicle_id)+'<b>'+fmtPlate(r.vehicle_id)+'</b></span></td>'+
       '<td><span class="fbar"><i style="width:'+(f==null?0:f.toFixed(0))+'%;background:'+col+'"></i></span>'+(f==null?'-':f.toFixed(0)+'%')+'</td>'+
       '<td>'+fmt(r.fuel_used_pct)+' pts</td>'+
       '<td>'+(r.km_per_fuel_pct?r.km_per_fuel_pct.toFixed(2):'-')+'</td>'+
