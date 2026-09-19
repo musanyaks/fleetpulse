@@ -11,9 +11,10 @@ import java.util.Random;
 
 /**
  * Vehicle driving along a Route corridor: position = interpolation over the
- * waypoint list, advanced by distance each tick. Speed behaviour (cruising,
- * red-light stops, speeding bursts, overheating) unchanged. Reaches the end
- * of the corridor and drives back (ping-pong).
+ * waypoint list, advanced by distance each tick.
+ * Scatter behaviour: each vehicle gets its own start offset, cruise-speed
+ * personality, and optional reverse direction - so the fleet spreads along
+ * the corridor instead of clumping.
  */
 public final class VehicleSimulator {
 
@@ -30,17 +31,21 @@ public final class VehicleSimulator {
     private final Random rnd;
     private final ObjectMapper mapper = new ObjectMapper();
 
-    private double speed = 0;          // km/h
+    private final double cruiseFloor;    // per-vehicle speed personality
+    private final double cruiseCeil;
+    private double speed = 0;
     private double engineTemp;
     private double fuelLevel;
     private double odometer;
-    private double distanceKm;         // position along the corridor
+    private double distanceKm;          // position along the corridor
+    private int direction = 1;          // +1 outbound, -1 returning
     private int speedingTicks;
     private int overheatTicks;
     private boolean warmedUp = false;
 
     public VehicleSimulator(String vehicleId, String make, String model,
                             String driverId, String driverName, Route route,
+                            double startFraction, boolean reverse,
                             SimulatorProperties props, MqttAsyncClient client, Random rnd) {
         this.vehicleId = vehicleId;
         this.make = make;
@@ -51,10 +56,12 @@ public final class VehicleSimulator {
         this.props = props;
         this.client = client;
         this.rnd = rnd;
-        // start at a random point along the corridor, mid-route
-        this.distanceKm = rnd.nextDouble() * route.totalKm();
+        this.distanceKm = startFraction * route.totalKm();   // spread along corridor
+        if (reverse) { this.direction = -1; }
+        this.cruiseFloor = 38 + rnd.nextDouble() * 22;       // 38-60
+        this.cruiseCeil  = cruiseFloor + 25 + rnd.nextDouble() * 25;  // up to 110
         this.engineTemp = 82 + rnd.nextDouble() * 8;
-        this.fuelLevel = 35 + rnd.nextDouble() * 60;
+        this.fuelLevel = 15 + rnd.nextDouble() * 80;
         this.odometer = 10_000 + rnd.nextDouble() * 150_000;
     }
 
@@ -72,16 +79,17 @@ public final class VehicleSimulator {
     }
 
     private void stepBehaviour() {
-        if (!warmedUp) {                       // first tick: start moving from cruise speed
-            speed = 45 + rnd.nextDouble() * 45;
+        if (!warmedUp) {
+            speed = cruiseFloor + rnd.nextDouble() * (cruiseCeil - cruiseFloor);
             warmedUp = true;
             return;
         }
         if (speedingTicks == 0 && rnd.nextDouble() < 0.02) speedingTicks = 3 + rnd.nextInt(6);
-        double target = speedingTicks > 0 ? 115 + rnd.nextDouble() * 45 : 45 + rnd.nextDouble() * 50;
+        double target = speedingTicks > 0 ? cruiseCeil + 20 + rnd.nextDouble() * 30
+                                          : cruiseFloor + rnd.nextDouble() * (cruiseCeil - cruiseFloor);
         speed += Math.max(-12, Math.min(12, target - speed));
         if (speedingTicks > 0) speedingTicks--;
-        if (rnd.nextDouble() < 0.03) speed = 0;                       // red light / jam
+        if (rnd.nextDouble() < 0.03) speed = 0;              // red light / jam
 
         if (overheatTicks == 0 && rnd.nextDouble() < 0.004) overheatTicks = 10 + rnd.nextInt(10);
         double drift = (speed > 105 ? 0.5 : speed > 1 ? 0.05 : -0.15)
@@ -92,12 +100,18 @@ public final class VehicleSimulator {
 
     private void advanceAlongRoute(double km) {
         if (km <= 0) return;
-        distanceKm += km;
-        if (distanceKm >= route.totalKm()) distanceKm = 0;   // loop: reached destination, restart corridor
+        distanceKm += direction * km;
+        if (distanceKm >= route.totalKm()) {          // reached end -> turn around
+            distanceKm = route.totalKm();
+            direction = -1;
+        } else if (distanceKm <= 0) {                  // reached start -> head out again
+            distanceKm = 0;
+            direction = 1;
+        }
     }
 
     private void publish() throws Exception {
-        double[] ll = route.positionAtKm(distanceKm);
+        double[] ll = route.positionAtKm(Math.max(0, Math.min(route.totalKm(), distanceKm)));
 
         ObjectNode json = mapper.createObjectNode();
         json.put("vehicleId", vehicleId);

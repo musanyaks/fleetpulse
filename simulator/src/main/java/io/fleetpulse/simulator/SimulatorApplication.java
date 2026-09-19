@@ -101,8 +101,11 @@ public class SimulatorApplication {
             for (int i = 0; i < size; i++) {
                 FleetVehicle v = MANIFEST.get(i);
                 Route route = ROUTES.get(i % ROUTES.size());     // spread the fleet across corridors
+                double startFraction = (double) i / size + rnd.nextDouble() * 0.08;  // scatter along corridor
+                boolean reverse = (i % 2) == 1;                                       // mixed directions
                 var sim = new VehicleSimulator(v.plate(), v.make(), v.model(),
-                        v.driverId(), v.driverName(), route, props, client, rnd);
+                        v.driverId(), v.driverName(), route, Math.min(0.95, startFraction),
+                        reverse, props, client, rnd);
                 pool.scheduleAtFixedRate(sim::tick, rnd.nextInt(props.intervalMs()),
                         props.intervalMs(), TimeUnit.MILLISECONDS);
             }
