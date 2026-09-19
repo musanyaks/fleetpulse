@@ -41,6 +41,7 @@ public final class VehicleSimulator {
     private int direction = 1;          // +1 outbound, -1 returning
     private int speedingTicks;
     private int overheatTicks;
+    private int refuelTicks;
     private boolean warmedUp = false;
 
     public VehicleSimulator(String vehicleId, String make, String model,
@@ -89,7 +90,13 @@ public final class VehicleSimulator {
                                           : cruiseFloor + rnd.nextDouble() * (cruiseCeil - cruiseFloor);
         speed += Math.max(-12, Math.min(12, target - speed));
         if (speedingTicks > 0) speedingTicks--;
-        if (rnd.nextDouble() < 0.03) speed = 0;              // red light / jam
+        if (rnd.nextDouble() < 0.03) speed = 0;
+        if (refuelTicks == 0 && fuelLevel < 55 && rnd.nextDouble() < 0.003) refuelTicks = 8;
+        if (refuelTicks > 0) {
+            speed = 0;
+            fuelLevel = Math.min(96, fuelLevel + 11);
+            refuelTicks--;
+        }              // red light / jam
 
         if (overheatTicks == 0 && rnd.nextDouble() < 0.004) overheatTicks = 10 + rnd.nextInt(10);
         double drift = (speed > 105 ? 0.5 : speed > 1 ? 0.05 : -0.15)

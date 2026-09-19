@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Fuel Tracking · FleetPulse</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
 :root{--bg:#f4f6fb;--panel:#fff;--line:#e6eaf2;--text:#1e293b;--muted:#64748b;--blue:#2563eb;--blue2:#3b82f6;--green:#10b981;--amber:#f59e0b;--red:#ef4444;--navy:#0d2b57}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -75,6 +77,17 @@ tbody tr:hover td{background:#f8fafc}
 #toast{position:fixed;bottom:20px;right:20px;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;display:none;box-shadow:0 8px 24px rgba(2,6,23,.2);background:#d1fae5;color:#065f46;z-index:3000}
 @media (max-width:1300px){.r1,.r2{grid-template-columns:1fr 1fr}}
 @media (max-width:900px){.r1,.r2,.kpis{grid-template-columns:1fr}}
+  .fbot{grid-template-columns:1.9fr 1fr}
+  #fmap{height:300px}
+  #fmap .leaflet-tile-pane{filter:saturate(.6) brightness(1.08)}
+  .flegend{position:absolute;left:8px;top:8px;background:#fff;border:1px solid var(--line);
+    border-radius:10px;padding:7px 10px;font-size:11px;z-index:500;box-shadow:0 4px 14px rgba(2,6,23,.12)}
+  .flegend div{display:flex;align-items:center;gap:6px;margin:2px 0}
+  .flegend i{width:9px;height:9px;border-radius:50%}
+  .flegend .ln{display:inline-block;width:16px;height:0;border-top:3px solid #2563eb}
+  .flegend .dash{display:inline-block;width:16px;height:0;border-top:2px dashed #ef4444}
+  .refuel-pin{width:16px;height:16px;border-radius:50%;background:var(--green);border:2.5px solid #fff;
+    box-shadow:0 2px 6px rgba(2,6,23,.35);display:grid;place-items:center;color:#fff;font-size:9px;font-weight:800}
 </style>
 </head>
 <body>
@@ -154,12 +167,28 @@ tbody tr:hover td{background:#f8fafc}
         </div></div>
     </div>
 
+    <div class="grid fbot">
     <div class="card">
       <h3>Vehicle Fuel Details <span class="muted small" id="detRange"></span>
         <input id="fq" placeholder="Search vehicle..." style="margin-left:auto;border:1px solid var(--line);border-radius:8px;padding:5px 10px;font:inherit"/></h3>
       <div class="tblwrap"><table>
         <thead><tr><th>Vehicle</th><th>Fuel Level now</th><th>Used in range (pts)</th><th>Efficiency (km/pt)</th><th>Efficiency (km/L est.)</th><th>Status</th></tr></thead>
         <tbody id="detRows"><tr><td colspan="6" class="muted">Loading...</td></tr></tbody></table></div>
+    </div>
+
+    <div class="card">
+      <h3>Fuel Stations &amp; Refuel Locations <span class="muted small">- refuels detected live</span></h3>
+      <div style="position:relative">
+        <div id="fmap"></div>
+        <div class="flegend">
+          <div><i style="background:var(--green)"></i> Refuel event (detected)</div>
+          <div><i style="background:var(--blue2)"></i> Vehicle</div>
+          <div><span class="ln"></span> Vehicle Route</div>
+          <div><span class="dash"></span> Geofence</div>
+        </div>
+      </div>
+      <div class="note">Refuel events are detected when a tank level rises between polls - real telemetry. "Fuel Stations" as a POI database arrives with the fuel-service module.</div>
+    </div>
     </div>
   </div>
 </main>
@@ -246,6 +275,16 @@ async function load(){
     fuelRows=fuel.rows;
     live=lv;
     routeByVeh={};lv.forEach(function(v){routeByVeh[v.vehicleId]=v.routeId;});
+    lv.forEach(function(v){
+      const last=window.__lastFuel[v.vehicleId];
+      if(last!=null&&v.fuelLevelPct!=null&&v.fuelLevelPct>last+3){
+        window.__refuels.push({vehicleId:v.vehicleId,lat:v.latitude,lon:v.longitude,
+          ts:Date.now(),gain:v.fuelLevelPct-last});
+        if(window.__refuels.length>60)window.__refuels.shift();
+        renderRefuels();toast('Refuel detected: '+fmtPlate(v.vehicleId)+' +'+(v.fuelLevelPct-last).toFixed(0)+' pts',true);
+      }
+      window.__lastFuel[v.vehicleId]=v.fuelLevelPct;
+    });
 
     /* KPIs */
     const liters=fuelRows.reduce(function(a,r){return a+(r.fuel_used_pct||0)/100*TANK;},0);
@@ -365,6 +404,51 @@ refreshBell();setInterval(refreshBell,5000);
   $('to').value=localISO(to);$('from').value=localISO(from);})();
  $('from').onchange=load;$('to').onchange=load;
 load();setInterval(load,60000);
+
+
+/* ================= fuel map + refuel detection (end-of-script) ================= */
+window.__lastFuel = window.__lastFuel || {}; window.__refuels = [];
+const fmap=L.map('fmap',{zoomControl:false}).setView([-1.4,37.2],7);
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap'}).addTo(fmap);
+const ROUTE_CATALOG_F={
+ "NBO-MSA":[[-1.286,36.817],[-1.370,36.902],[-1.450,36.966],[-1.497,37.050],[-1.582,37.235],[-1.617,37.455],[-1.900,37.550],[-2.007,37.628],[-2.414,38.019],[-2.911,38.300],[-3.396,38.556],[-3.530,38.750],[-3.865,39.470],[-4.043,39.668]],
+ "NBO-KSM":[[-1.286,36.817],[-1.112,36.640],[-0.717,36.433],[-0.303,36.080],[-0.280,35.700],[-0.367,35.283],[-0.250,35.100],[-0.091,34.768]],
+ "NBO-ELD":[[-1.286,36.817],[-1.112,36.640],[-0.717,36.433],[-0.303,36.080],[-0.100,35.550],[0.150,35.420],[0.350,35.300],[0.514,35.270]],
+ "NBO-NKR":[[-1.286,36.817],[-1.112,36.640],[-0.900,36.550],[-0.717,36.433],[-0.520,36.320],[-0.303,36.080]],
+ "NBO-GSA":[[-1.286,36.817],[-1.233,37.100],[-1.000,37.500],[-0.700,38.300],[-0.453,39.646]]};
+Object.entries(ROUTE_CATALOG_F).forEach(function(kv){
+  L.polyline(kv[1],{color:'#2563eb',weight:4,opacity:.75}).addTo(fmap);});
+const refuelLayer=L.layerGroup().addTo(fmap);
+const vehLayerF=L.layerGroup().addTo(fmap);
+const geoLayerF=L.layerGroup().addTo(fmap);
+fetch('/api/v1/geofences').then(function(r){return r.ok?r.json():[];}).then(function(zones){
+  zones.filter(function(z){return z.active;}).forEach(function(z){
+    var col=(z.type==='RESTRICTED'||z.type==='DANGER')?'#ef4444':z.type==='DEPOT'?'#2563eb':'#10b981';
+    L.circle([z.lat,z.lon],{radius:z.radiusM,color:col,weight:2,dashArray:'6 4',fillOpacity:.08})
+      .bindTooltip('Geofence: '+z.name).addTo(geoLayerF);});
+}).catch(function(){});
+function renderRefuels(){
+  refuelLayer.clearLayers();
+  window.__refuels.forEach(function(r){
+    L.marker([r.lat,r.lon],{icon:L.divIcon({className:'',iconSize:[18,18],iconAnchor:[9,9],
+      html:'<div class="refuel-pin">R</div>'})})
+      .bindTooltip('<b>Refuel: '+fmtPlate(r.vehicleId)+'</b><br/>+'+r.gain.toFixed(0)+' pts (est. +'+(r.gain/100*200).toFixed(0)+' L)<br/>'+
+        new Date(r.ts).toLocaleTimeString()).addTo(refuelLayer);});
+}
+function refreshFuelMap(){
+  live.forEach(function(v){
+    if(v.latitude==null)return;
+    fmap._vehicles=fmap._vehicles||{};
+    const key='m_'+v.vehicleId;
+    if(!fmap._vehicles[key]){fmap._vehicles[key]=L.circleMarker([v.latitude,v.longitude],
+      {radius:5,color:'#fff',weight:2,fillColor:'#3b82f6',fillOpacity:.95})
+      .bindTooltip(fmtPlate(v.vehicleId)).addTo(vehLayerF);}
+    else fmap._vehicles[key].setLatLng([v.latitude,v.longitude]);
+  });
+}
+setTimeout(function(){refreshFuelMap();fmap.invalidateSize();},300);
+setInterval(refreshFuelMap,10000);
+
 </script>
 </body>
 </html>
