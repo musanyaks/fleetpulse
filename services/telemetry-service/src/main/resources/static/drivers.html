@@ -97,6 +97,16 @@ tr.sel td{background:#eff6ff}
 #toast{position:fixed;bottom:20px;right:20px;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;display:none;box-shadow:0 8px 24px rgba(2,6,23,.2);background:#d1fae5;color:#065f46;z-index:3000}
 @media (max-width:1280px){.g-top,.g-bot{grid-template-columns:1fr 1fr}.g-top>.dcol,.g-bot>.dcol{grid-column:1/-1}}
 @media (max-width:900px){.g-top,.g-bot{grid-template-columns:1fr}}
+  .drow2{display:grid;grid-template-columns:1fr auto;gap:4px 12px;padding:7px 0;
+    border-bottom:1px solid var(--line);font-size:12.5px;align-items:center}
+  .drow2:last-child{border-bottom:0}
+  .drow2 .k{color:var(--muted);display:flex;align-items:center;gap:7px}
+  .drow2 .v{text-align:right;font-weight:600}
+  .vt{border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-bottom:8px}
+  .vt .h{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--muted)}
+  .vt .ic{width:22px;height:22px;border-radius:8px;display:grid;place-items:center;font-size:12px;flex:none}
+  .vt .v{font-size:15px;font-weight:700;margin-top:2px}
+  .vt .pbar{width:100%;margin-top:5px}
 </style>
 </head>
 <body>
@@ -412,30 +422,42 @@ function renderDetail(){
   const v=live.get(pid);
   const evs=d.speeding+d.harshBraking+d.harshAccel;
   if(tab==='overview'){
+    const docs=docsByVehicle.get(pid)||[];
+    const nextSvc=docs[0]||null;
+    const days=nextSvc?Math.ceil((new Date(nextSvc)-Date.now())/864e5):null;
+    const dist=__distByVeh&&__distByVeh[pid]!=null?fmt(__distByVeh[pid])+' km':'-';
+    const row=(k,v)=>'<div class="drow2"><span class="k">'+k+'</span><span class="v">'+v+'</span></div>';
     b.innerHTML=
-      '<div class="drow"><span class="k">🚚 Assigned Vehicle</span><b>'+(pid?fmtPlate(pid):'-')+'</b></div>'+
-      '<div class="drow"><span class="k">🛣️ Corridor</span><b>'+(v&&v.routeId&&routeLabels[v.routeId]?esc(routeLabels[v.routeId]):'-')+'</b></div>'+
-      '<div class="drow"><span class="k">📍 Current Location</span><b>'+(v?nearestCity(v.latitude,v.longitude):'-')+'</b></div>'+
-      '<div class="drow"><span class="k">🕒 Last Update</span><b>'+(v&&v.lastSeen?new Date(v.lastSeen).toLocaleString([],{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'-')+'</b></div>'+
-      '<div class="drow"><span class="k">⏱ Current Speed</span><b>'+(v?fmt(v.speedKph)+' km/h':'-')+'</b></div>'+
-      '<div class="drow"><span class="k">⛽ Fuel Level</span><b>'+(v&&v.fuelLevelPct!=null?v.fuelLevelPct.toFixed(0)+'%':'-')+'</b></div>'+
-      '<div class="drow"><span class="k">🧾 Vehicle Mileage</span><b>'+(v&&v.odometerKm?Math.round(v.odometerKm).toLocaleString()+' km':'-')+'</b></div>'+
-      '<div class="drow"><span class="k">🛣 Distance (7d)</span><b>'+(pid&&__distByVeh[pid]!=null?fmt(__distByVeh[pid])+' km':'-')+'</b></div>'+
-      '<div class="drow"><span class="k">📄 Documents due</span><b>'+(pid&&docsByVehicle.get(pid)&&docsByVehicle.get(pid)[0]?esc(docsByVehicle.get(pid)[0]):'-')+'</b></div>'+
-      '<div class="note">Joining date, branch, experience and license expiry are not tracked yet - the driver-service module owns them.</div>'+
-      '<b class="small">Performance Summary (24h)</b>'+
-      '<div class="drow"><span class="k">🛡 Safety Score</span><span><span class="pbar"><i style="width:'+d.score.toFixed(0)+'%;background:'+(d.score>=80?'var(--green)':d.score>=60?'var(--amber)':'var(--red)')+'"></i></span> '+d.score.toFixed(0)+'%</span></div>'+
-      '<div class="drow"><span class="k">💨 Speeding</span><b>'+d.speeding+'</b></div>'+
-      '<div class="drow"><span class="k">🛑 Harsh braking</span><b>'+d.harshBraking+'</b></div>'+
-      '<div class="drow"><span class="k">🚀 Harsh acceleration</span><b>'+d.harshAccel+'</b></div>'+
-      '<div class="drow"><span class="k">⚠️ Total events</span><b>'+evs+'</b></div>';
+      '<div class="vt"><div class="h"><span class="ic" style="background:#e8f0fe;color:var(--blue)">⚙</span> Performance Summary (24h)</div>'+
+        '<div class="v" style="color:'+(d.score>=80?'var(--green)':d.score>=60?'var(--amber)':'var(--red)')+'">Safety Score '+d.score.toFixed(0)+'%</div>'+
+        '<span class="pbar"><i style="width:'+d.score.toFixed(0)+'%;background:'+(d.score>=80?'var(--green)':d.score>=60?'var(--amber)':'var(--red)')+'"></i></span></div>'+
+      '<b class="small" style="display:block;margin:10px 0 4px">Driver Information</b>'+
+      row('🚚 Assigned Vehicle', pid?fmtPlate(pid):'-')+
+      row('🛣 Corridor', (v&&v.routeId&&routeLabels[v.routeId])?routeLabels[v.routeId]:'-')+
+      row('📍 Current Location', v?nearestCity(v.latitude,v.longitude):'-')+
+      row('🕒 Last Update', (v&&v.lastSeen)?new Date(v.lastSeen).toLocaleString([],{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'-')+
+      row('📅 Documents due', nextSvc?nextSvc+(days!=null?' (in '+days+' days)':''):'-')+
+      '<b class="small" style="display:block;margin:10px 0 4px">Live Telemetry</b>'+
+      row('⏱ Speed', v?fmt(v.speedKph)+' km/h':'-')+
+      row('⛽ Fuel Level', (v&&v.fuelLevelPct!=null)?v.fuelLevelPct.toFixed(0)+'%':'-')+
+      row('🌡 Engine Temp', v?fmt(v.engineTempC)+'°C':'-')+
+      row('🔋 Battery', v?fmt(v.batteryVoltage)+' V':'-')+
+      row('🧾 Vehicle Mileage', (v&&v.odometerKm)?Math.round(v.odometerKm).toLocaleString()+' km':'-')+
+      row('🛣 Distance (7d)', dist)+
+      '<b class="small" style="display:block;margin:10px 0 4px">Events (24h)</b>'+
+      row('💨 Speeding', d.speeding)+
+      row('🛑 Harsh braking', d.harshBraking)+
+      row('🚀 Harsh acceleration', d.harshAccel)+
+      '<div class="note">Joining date, branch, experience and license expiry are not tracked yet - the driver-service module owns them.</div>';
   } else if(tab==='perf'){
-    b.innerHTML='<div class="drow"><span class="k">🛡 Safety Score</span><b>'+d.score.toFixed(0)+'%</b></div>'+
-      '<div class="drow"><span class="k">💨 Speeding</span><b>'+d.speeding+'</b></div>'+
-      '<div class="drow"><span class="k">🛑 Harsh braking</span><b>'+d.harshBraking+'</b></div>'+
-      '<div class="drow"><span class="k">🚀 Harsh acceleration</span><b>'+d.harshAccel+'</b></div>'+
-      '<div class="drow"><span class="k">⚠️ Total events</span><b>'+evs+'</b></div>'+
-      '<div class="note">Score = 100 - event penalties (24h alert window). Per-trip scoring arrives with the trips module.</div>';
+    const row=(k,v)=>'<div class="drow2"><span class="k">'+k+'</span><span class="v">'+v+'</span></div>';
+    b.innerHTML=
+      row('🛟 Safety Score', d.score.toFixed(0)+'%')+
+      row('💨 Speeding', d.speeding)+
+      row('🛑 Harsh braking', d.harshBraking)+
+      row('🚀 Harsh acceleration', d.harshAccel)+
+      row('⚠️ Total events', d.speeding+d.harshBraking+d.harshAccel)+
+      '<div class="note">Score = 100 - event penalties (24h window).</div>';
   } else if(tab==='docs'){
     const docs=docsByVehicle.get(pid)||[];
     b.innerHTML='<div class="drow"><span class="k">🧾 Next Service (vehicle '+fmtPlate(pid)+')</span><b>'+esc(docs[0]||'-')+'</b></div>'+
