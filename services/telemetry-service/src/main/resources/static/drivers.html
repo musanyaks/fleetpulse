@@ -150,7 +150,13 @@ tr.sel td{background:#eff6ff}
     <div class="pagehead"><span class="ic">🧑‍✈️</span>
       <div><h1>Drivers</h1><div class="sub">Manage your drivers, track performance and monitor safety</div></div>
       <span class="spacer"></span>
+      <div style="position:relative">
       <span class="datechip" id="dateChip">📅 -</span>
+      <div class="dropdown" id="dateMenu" style="min-width:220px;padding:8px">
+        <input type="date" id="datePick" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:7px 8px;font:inherit"/>
+        <div class="muted small" style="margin-top:6px">Range view arrives with daily rollups</div>
+      </div>
+    </div>
       <button class="btn" id="addDrv">＋ Add Driver</button>
     </div>
 
@@ -249,6 +255,31 @@ tr.sel td{background:#eff6ff}
   </div>
 </main>
 </div>
+<div class="modal" id="drvModal" style="position:fixed;inset:0;background:rgba(2,6,23,.55);display:none;place-items:center;z-index:2600">
+  <div style="background:#fff;border-radius:16px;max-width:480px;width:92%;padding:22px 24px;position:relative">
+    <button onclick="closeDrv()" style="position:absolute;top:14px;right:16px;border:0;background:none;font-size:18px;cursor:pointer;color:var(--muted)">✕</button>
+    <h2 style="font-size:18px;margin-bottom:4px">Add Driver</h2>
+    <div class="muted small" style="margin-bottom:12px">Registers the driver in the fleet roster.</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div style="grid-column:1/-1"><label class="muted small">Full name *</label>
+        <input id="nvName" placeholder="Grace Wanjiku" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit"/></div>
+      <div><label class="muted small">Driver ID * (D + digits)</label>
+        <input id="nvId" placeholder="D026" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit"/></div>
+      <div><label class="muted small">Phone</label>
+        <input id="nvPhone" placeholder="+254 7XX XXX XXX" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit"/></div>
+      <div><label class="muted small">Branch</label>
+        <input id="nvBranch" placeholder="Nairobi" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit"/></div>
+      <div><label class="muted small">License expiry</label>
+        <input id="nvLic" type="date" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit"/></div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:14px">
+      <button class="btn" style="flex:1" id="nvSave">Register Driver</button>
+      <button class="btn ghost" style="flex:1;background:#fff;color:var(--text);border:1px solid var(--line)" onclick="closeDrv()">Cancel</button>
+    </div>
+    <div class="muted small" id="nvMsg" style="margin-top:8px;min-height:16px"></div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <script>
@@ -543,6 +574,37 @@ function renderBehav(){
 const _drvLoad=load;
 load=async function(){ const r=await _drvLoad.apply(this,arguments);
   try{renderBehav();}catch(e){console.error('renderBehav:',e);} return r; };
+
+/* ================= date dropdown + add driver (end-of-script) ================= */
+(function(){
+  const chip=$("dateChip"), menu=$("dateMenu");
+  if(chip&&menu){
+    chip.style.cursor="pointer";
+    chip.addEventListener("click",e=>{e.stopPropagation();menu.classList.toggle("open");});
+    document.addEventListener("click",e=>{if(!menu.parentElement.contains(e.target))menu.classList.remove("open");});
+  }
+})();
+function openDrv(){ $("drvModal").style.display="grid"; $("nvName").focus(); }
+function closeDrv(){ $("drvModal").style.display="none"; }
+ $("addDrv").onclick=openDrv;
+ $("drvModal").addEventListener("click",e=>{if(e.target.id==="drvModal")closeDrv();});
+ $("nvSave").onclick=async()=>{
+  const body={ name:$("nvName").value.trim(), driverId:$("nvId").value.trim().toUpperCase(),
+    phone:$("nvPhone").value.trim(), branch:$("nvBranch").value.trim(),
+    licenseExp:$("nvLic").value||null };
+  const msg=$("nvMsg");
+  try{
+    const r=await fetch('/api/v1/drivers',{method:'POST',
+      headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    if(r.status===201){
+      msg.style.color='var(--green)';msg.textContent='✅ Driver registered';
+      setTimeout(()=>{closeDrv();msg.textContent='';load();},800);
+    } else if(r.status===403){msg.style.color='var(--red)';msg.textContent='⛔ ADMIN or FLEET_MANAGER required';}
+    else if(r.status===409){msg.style.color='var(--red)';msg.textContent='❌ Driver ID already exists';}
+    else if(r.status===400){const t=await r.text();msg.style.color='var(--red)';msg.textContent='❌ '+t.slice(0,120);}
+    else{msg.style.color='var(--red)';msg.textContent='❌ Failed ('+r.status+')';}
+  }catch(e){msg.style.color='var(--red)';msg.textContent='❌ Network error';}
+};
 </script>
 </body>
 </html>
