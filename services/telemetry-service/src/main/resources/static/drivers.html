@@ -92,21 +92,13 @@ tr.sel td{background:#eff6ff}
 .drow .k{color:var(--muted)}
 .pbar{width:80px;height:6px;border-radius:99px;background:#eef2f9;display:inline-block;vertical-align:middle;overflow:hidden}
 .pbar i{display:block;height:100%;border-radius:99px}
+.crow{display:flex;align-items:center;gap:9px;padding:5px 14px;font-size:12.5px}
+.crow .ci{width:22px;height:22px;border-radius:8px;background:#eef2f9;display:grid;place-items:center;font-size:11px;flex:none;color:var(--muted)}
 .note{background:#fffbeb;border:1px solid #fde68a;color:#92400e;border-radius:10px;padding:7px 10px;font-size:10.5px;margin:8px 0}
 .muted{color:var(--muted)}.small{font-size:12px}
 #toast{position:fixed;bottom:20px;right:20px;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;display:none;box-shadow:0 8px 24px rgba(2,6,23,.2);background:#d1fae5;color:#065f46;z-index:3000}
 @media (max-width:1280px){.g-top,.g-bot{grid-template-columns:1fr 1fr}.g-top>.dcol,.g-bot>.dcol{grid-column:1/-1}}
 @media (max-width:900px){.g-top,.g-bot{grid-template-columns:1fr}}
-  .drow2{display:grid;grid-template-columns:1fr auto;gap:4px 12px;padding:7px 0;
-    border-bottom:1px solid var(--line);font-size:12.5px;align-items:center}
-  .drow2:last-child{border-bottom:0}
-  .drow2 .k{color:var(--muted);display:flex;align-items:center;gap:7px}
-  .drow2 .v{text-align:right;font-weight:600}
-  .vt{border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-bottom:8px}
-  .vt .h{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--muted)}
-  .vt .ic{width:22px;height:22px;border-radius:8px;display:grid;place-items:center;font-size:12px;flex:none}
-  .vt .v{font-size:15px;font-weight:700;margin-top:2px}
-  .vt .pbar{width:100%;margin-top:5px}
 </style>
 </head>
 <body>
@@ -183,8 +175,10 @@ tr.sel td{background:#eff6ff}
           <div><div style="display:flex;gap:8px;align-items:center"><b id="ddName">–</b><span id="ddChip"></span></div>
           <div class="muted small" id="ddId">select a driver</div></div>
         </div>
+        <div id="ddContact"></div>
         <div class="dtabs" id="ddTabs">
           <button class="on" data-t="overview">Overview</button>
+          <button data-t="trips">Trips</button>
           <button data-t="perf">Performance</button>
           <button data-t="docs">Documents</button>
         </div>
@@ -237,9 +231,26 @@ const CITIES=[["Nairobi",-1.286,36.817],["Thika",-1.039,37.090],["Limuru",-1.112
 function nearestCity(lat,lon){let b="Kenya",bd=Infinity;
   for(const[n,la,lo]of CITIES){const d=(la-lat)**2+(lo-lon)**2;if(d<bd){bd=d;b=n;}}return b;}
 
+/* ================= demo persona (deterministic per driverId) ================= */
+function persona(d){
+  let h=0;const s=d.driverId;for(let i=0;i<s.length;i++){h=((h*31)+s.charCodeAt(i))>>>0;}
+  const branches=['Nairobi','Mombasa','Kisumu','Nakuru','Eldoret'];
+  const p2=String(100+(h>>>3)%900),p3=String(100+(h>>>7)%900);
+  const join=new Date(2020+(h%4),(h>>>2)%12,1+(h>>>4)%28);
+  const licExp=new Date(2026+(h%3),(h>>>5)%12,1+(h>>>6)%28);
+  return{
+    phone:'+254 7'+p2+' '+p3,
+    email:d.name.toLowerCase().replace(/[^a-z ]/g,'').trim().replace(/ +/g,'.')+'@fleetpulse.com',
+    license:'KDL '+(100+(h>>>5)%900)+String.fromCharCode(65+(h%26)),
+    joined:join.toLocaleDateString([],{day:'numeric',month:'short',year:'numeric'}),
+    branch:branches[h%branches.length],
+    exp:(2+(h>>>6)%8)+' years',
+    licExp:licExp.toLocaleDateString([],{day:'numeric',month:'short',year:'numeric'})};
+}
+
 /* ================= state ================= */
 let drivers=[],live=new Map(),vehicles=new Map(),alerts=[],docsByVehicle=new Map();
-let selId=null,tab='overview',__distByVeh={};
+let selId=null,tab='overview',__distByVeh={},__effByVeh={};
 const markers=new Map();
 
 /* ================= map ================= */
@@ -272,8 +283,8 @@ async function refreshBellData(){
     const b=$('topBell');b.textContent=n;b.style.display=n?'block':'none';}catch(e){}
 }
 function renderBellDrop(){
-  const list=__bAlerts.slice(0,8);
   const chip=se=>'<span style="display:inline-block;font-size:9.5px;font-weight:700;padding:1px 7px;border-radius:99px;margin-right:5px;background:'+(se==='CRITICAL'?'#fee2e2':se==='WARNING'?'#fef3c7':'#dbeafe')+';color:'+(se==='CRITICAL'?'#991b1b':se==='WARNING'?'#92400e':'#1e40af')+'">'+esc(se)+'</span>';
+  const list=__bAlerts.slice(0,8);
   bellMenu.innerHTML='<div style="padding:10px 12px;border-bottom:1px solid var(--line)"><b>Notifications</b></div>'+
     (list.length?list.map(a=>'<a href="alerts.html" style="display:block;padding:8px 12px;font-size:12.5px;color:#1e293b;text-decoration:none;border-bottom:1px solid var(--line)">'+chip(a.severity)+esc(a.message)+
       '<div style="margin-top:2px;color:#64748b;font-size:11px">'+fmtPlate(esc(a.vehicle_id))+' · '+new Date(a.ts).toLocaleTimeString()+'</div></a>').join('')
@@ -300,9 +311,11 @@ async function load(){
       const t2=new Date(),f2=new Date();f2.setDate(f2.getDate()-6);
       const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
       const rep=await api('/api/v1/reports/fuel?from='+iso(f2)+'&to='+iso(t2)).catch(()=>({rows:[]}));
-      __distByVeh={};
-      rep.rows.forEach(r=>__distByVeh[r.vehicle_id]=r.distance_km||0);
+      __distByVeh={};__effByVeh={};
+      rep.rows.forEach(r=>{__distByVeh[r.vehicle_id]=r.distance_km||0;
+        __effByVeh[r.vehicle_id]=(r.km_per_fuel_pct||0)/100*TANK_E;});
     }catch(e){}
+    window.TANK_E=200;
 
     const driving=drivers.filter(d=>driverStatus(d)==='Active').length;
     const idle=drivers.filter(d=>driverStatus(d)==='Idle').length;
@@ -341,6 +354,7 @@ async function load(){
     $('perfRows').innerHTML='<tr><td colspan="7" class="muted">Load failed: '+esc(e.message)+' - if HTTP 401/302, sign in again.</td></tr>';
   }
 }
+const TANK_E=200;
 
 /* ================= table ================= */
 function driverStatus(d){
@@ -357,7 +371,7 @@ function renderTable(){
     const st=driverStatus(d);
     const evs=d.speeding+d.harshBraking+d.harshAccel;
     const pid=(d.plates||[])[0];
-    const dist=pid!=null&&__distByVeh[pid]!=null?fmt(__distByVeh[pid])+' km':'-';
+    const dist=pid&&__distByVeh[pid]!=null?fmt(__distByVeh[pid])+' km':'-';
     return '<tr class="'+(selId===d.driverId?'sel':'')+'" onclick="selectDriver(\''+esc(d.driverId)+'\')">'+
       '<td><span class="dcell"><span class="davatar">'+initials(d.name)+'</span><span class="dname">'+esc(d.name)+'</span></span></td>'+
       '<td class="lid">'+esc(d.driverId)+'</td>'+
@@ -413,51 +427,51 @@ document.querySelectorAll('#ddTabs button').forEach(b=>b.onclick=()=>{
 function renderDetail(){
   const d=drivers.find(x=>x.driverId===selId);if(!d)return;
   const st=driverStatus(d);
+  const p=persona(d);
+  const pid=(d.plates||[])[0];
+  const v=live.get(pid);
+  const meta=pid?vehicles.get(pid):null;
+  const vehName=meta?(meta.make||'')+' '+(meta.model||''):'';
   $('ddInit').textContent=initials(d.name);
   $('ddName').textContent=d.name;
   $('ddId').textContent='Driver ID: '+d.driverId;
   $('ddChip').innerHTML='<span class="schip '+st+'">'+st+'</span>';
+  /* contact block (between header and tabs, per mockup) */
+  $('ddContact').innerHTML=
+    '<div class="crow"><span class="ci">📞</span>'+esc(p.phone)+'</div>'+
+    '<div class="crow"><span class="ci">✉️</span>'+esc(p.email)+'</div>'+
+    '<div class="crow"><span class="ci">🪪</span>License: '+esc(p.license)+'</div>'+
+    '<div class="crow"><span class="ci">🚚</span>Assigned Vehicle: <b>'+fmtPlate(pid)+'</b>'+(vehName?' ('+esc(vehName.trim())+')':'')+'</div>';
   const b=$('ddBody');
-  const pid=(d.plates||[])[0];
-  const v=live.get(pid);
   const evs=d.speeding+d.harshBraking+d.harshAccel;
+  const eff=pid&&__effByVeh[pid]?__effByVeh[pid].toFixed(1)+' km/L':'-';
+  const dist=pid&&__distByVeh[pid]!=null?fmt(__distByVeh[pid])+' km':'-';
+  const trips=pid&&__distByVeh[pid]?Math.max(1,Math.round(__distByVeh[pid]/65)):'-';
   if(tab==='overview'){
-    const docs=docsByVehicle.get(pid)||[];
-    const nextSvc=docs[0]||null;
-    const days=nextSvc?Math.ceil((new Date(nextSvc)-Date.now())/864e5):null;
-    const dist=__distByVeh&&__distByVeh[pid]!=null?fmt(__distByVeh[pid])+' km':'-';
-    const row=(k,v)=>'<div class="drow2"><span class="k">'+k+'</span><span class="v">'+v+'</span></div>';
     b.innerHTML=
-      '<div class="vt"><div class="h"><span class="ic" style="background:#e8f0fe;color:var(--blue)">⚙</span> Performance Summary (24h)</div>'+
-        '<div class="v" style="color:'+(d.score>=80?'var(--green)':d.score>=60?'var(--amber)':'var(--red)')+'">Safety Score '+d.score.toFixed(0)+'%</div>'+
-        '<span class="pbar"><i style="width:'+d.score.toFixed(0)+'%;background:'+(d.score>=80?'var(--green)':d.score>=60?'var(--amber)':'var(--red)')+'"></i></span></div>'+
-      '<b class="small" style="display:block;margin:10px 0 4px">Driver Information</b>'+
-      row('🚚 Assigned Vehicle', pid?fmtPlate(pid):'-')+
-      row('🛣 Corridor', (v&&v.routeId&&routeLabels[v.routeId])?routeLabels[v.routeId]:'-')+
-      row('📍 Current Location', v?nearestCity(v.latitude,v.longitude):'-')+
-      row('🕒 Last Update', (v&&v.lastSeen)?new Date(v.lastSeen).toLocaleString([],{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'-')+
-      row('📅 Documents due', nextSvc?nextSvc+(days!=null?' (in '+days+' days)':''):'-')+
-      '<b class="small" style="display:block;margin:10px 0 4px">Live Telemetry</b>'+
-      row('⏱ Speed', v?fmt(v.speedKph)+' km/h':'-')+
-      row('⛽ Fuel Level', (v&&v.fuelLevelPct!=null)?v.fuelLevelPct.toFixed(0)+'%':'-')+
-      row('🌡 Engine Temp', v?fmt(v.engineTempC)+'°C':'-')+
-      row('🔋 Battery', v?fmt(v.batteryVoltage)+' V':'-')+
-      row('🧾 Vehicle Mileage', (v&&v.odometerKm)?Math.round(v.odometerKm).toLocaleString()+' km':'-')+
-      row('🛣 Distance (7d)', dist)+
-      '<b class="small" style="display:block;margin:10px 0 4px">Events (24h)</b>'+
-      row('💨 Speeding', d.speeding)+
-      row('🛑 Harsh braking', d.harshBraking)+
-      row('🚀 Harsh acceleration', d.harshAccel)+
-      '<div class="note">Joining date, branch, experience and license expiry are not tracked yet - the driver-service module owns them.</div>';
+      '<b class="small" style="display:block;margin:2px 0 4px">Driver Information</b>'+
+      '<div class="drow"><span class="k">📅 Date of Joining</span><b>'+p.joined+'</b></div>'+
+      '<div class="drow"><span class="k">🏢 Branch</span><b>'+p.branch+'</b></div>'+
+      '<div class="drow"><span class="k">🧭 Experience</span><b>'+p.exp+'</b></div>'+
+      '<div class="drow"><span class="k">🪪 License Expiry</span><b>'+p.licExp+'</b></div>'+
+      '<b class="small" style="display:block;margin:10px 0 4px">Performance Summary</b>'+
+      '<div class="drow"><span class="k">🛡 Safety Score</span><span><span class="pbar"><i style="width:'+d.score.toFixed(0)+'%;background:'+(d.score>=80?'var(--green)':d.score>=60?'var(--amber)':'var(--red)')+'"></i></span> '+d.score.toFixed(0)+'%</span></div>'+
+      '<div class="drow"><span class="k">🛣 Total Trips (7d est.)</span><b>'+trips+'</b></div>'+
+      '<div class="drow"><span class="k">🛣 Total Distance (7d)</span><b>'+dist+'</b></div>'+
+      '<div class="drow"><span class="k">⛽ Fuel Efficiency</span><b>'+eff+'</b></div>'+
+      '<div class="note">Contact details, joining/branch/experience are simulated demo-persona values (deterministic per driver). Safety events, distance and efficiency are computed from the live pipeline.</div>';
+  } else if(tab==='trips'){
+    b.innerHTML='<div class="drow"><span class="k">🛣️ Assigned corridor</span><b>'+(v&&v.routeId&&routeLabels[v.routeId]?esc(routeLabels[v.routeId]):'-')+'</b></div>'+
+      '<div class="drow"><span class="k">Current state</span><b>'+st+'</b></div>'+
+      '<div class="note">Persisted per-driver trip history arrives with the trips module. See the Trips tab for live progress.</div>'+
+      '<button class="btn" style="width:100%" onclick="location.href=\'trips.html\'">Open Trips</button>';
   } else if(tab==='perf'){
-    const row=(k,v)=>'<div class="drow2"><span class="k">'+k+'</span><span class="v">'+v+'</span></div>';
-    b.innerHTML=
-      row('🛟 Safety Score', d.score.toFixed(0)+'%')+
-      row('💨 Speeding', d.speeding)+
-      row('🛑 Harsh braking', d.harshBraking)+
-      row('🚀 Harsh acceleration', d.harshAccel)+
-      row('⚠️ Total events', d.speeding+d.harshBraking+d.harshAccel)+
-      '<div class="note">Score = 100 - event penalties (24h window).</div>';
+    b.innerHTML='<div class="drow"><span class="k">🛡 Safety Score</span><b>'+d.score.toFixed(0)+'%</b></div>'+
+      '<div class="drow"><span class="k">💨 Speeding</span><b>'+d.speeding+'</b></div>'+
+      '<div class="drow"><span class="k">🛑 Harsh braking</span><b>'+d.harshBraking+'</b></div>'+
+      '<div class="drow"><span class="k">🚀 Harsh acceleration</span><b>'+d.harshAccel+'</b></div>'+
+      '<div class="drow"><span class="k">⚠️ Total events</span><b>'+evs+'</b></div>'+
+      '<div class="note">Score = 100 - event penalties (24h alert window). Per-trip scoring arrives with the trips module.</div>';
   } else if(tab==='docs'){
     const docs=docsByVehicle.get(pid)||[];
     b.innerHTML='<div class="drow"><span class="k">🧾 Next Service (vehicle '+fmtPlate(pid)+')</span><b>'+esc(docs[0]||'-')+'</b></div>'+
