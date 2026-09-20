@@ -98,3 +98,4 @@ services:
 
 volumes:
   timescale-data:
+  sessiondata:
