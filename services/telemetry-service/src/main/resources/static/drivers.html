@@ -150,7 +150,10 @@ tr.sel td{background:#eff6ff}
     <div class="pagehead"><span class="ic">🧑‍✈️</span>
       <div><h1>Drivers</h1><div class="sub">Manage your drivers, track performance and monitor safety</div></div>
       <span class="spacer"></span>
-      <div style="position:relative">
+      <select id="fBranch" style="border:1px solid var(--line);border-radius:9px;padding:8px 12px;font:inherit;background:#fff">
+        <option value="">All Branches</option>
+      </select>
+    <div style="position:relative">
       <span class="datechip" id="dateChip">📅 -</span>
       <div class="dropdown" id="dateMenu" style="min-width:220px;padding:8px">
         <input type="date" id="datePick" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:7px 8px;font:inherit"/>
@@ -437,9 +440,11 @@ function driverStatus(d){
   const moving=(d.plates||[]).some(p=>{const v=live.get(p);return v&&v.status==='MOVING';});
   return moving?'Active':'Idle';
 }
+let fBranchSel='';
 function renderTable(){
   const q=$('gq').value.toUpperCase();
-  const rows=drivers.filter(d=>!q||(d.name+' '+d.driverId+' '+(d.plates||[]).join(' ')).toUpperCase().includes(q));
+  fBranchSel=$('fBranch')?$('fBranch').value:'';
+  const rows=drivers.filter(d=>{const b=persona(d).branch;return (!q||(d.name+' '+d.driverId+' '+(d.plates||[]).join(' ')).toUpperCase().includes(q))&&(!fBranchSel||b===fBranchSel);});
   $('perfRows').innerHTML=rows.map(d=>{
     const col=d.score>=80?'var(--green)':d.score>=60?'var(--amber)':'var(--red)';
     const st=driverStatus(d);
@@ -605,6 +610,19 @@ function closeDrv(){ $("drvModal").style.display="none"; }
     else{msg.style.color='var(--red)';msg.textContent='❌ Failed ('+r.status+')';}
   }catch(e){msg.style.color='var(--red)';msg.textContent='❌ Network error';}
 };
+
+/* ================= branch filter (end-of-script) ================= */
+function renderBranchFilter(){
+  const sel=$("fBranch");if(!sel)return;
+  const cur=sel.value;
+  const branches=new Set();
+  drivers.forEach(d=>{const p=persona(d);if(p.branch)branches.add(p.branch);});
+  // registered drivers also carry branch via V7
+  const opts='<option value="">All Branches</option>'+
+    [...branches].sort().map(b=>'<option'+(b===cur?' selected':'')+' value="'+esc(b)+'">'+esc(b)+'</option>').join('');
+  if(sel.innerHTML!==opts)sel.innerHTML=opts;
+}
+ $("fBranch").onchange=()=>{page=0;renderTable();};
 </script>
 </body>
 </html>
