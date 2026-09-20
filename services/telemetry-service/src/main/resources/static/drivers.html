@@ -43,7 +43,7 @@ main{flex:1;min-width:0;display:flex;flex-direction:column}
 .kpi .label{color:var(--muted);font-size:12px}.kpi .value{font-size:22px;font-weight:700}
 .kpi .trend{font-size:11px;font-weight:600;color:var(--muted)}
 .grid{display:grid;gap:16px;align-items:start}
-.g-top{grid-template-columns:1.5fr 1fr 1.05fr}
+.g-top{grid-template-columns:1.45fr 1fr 1fr}
 .g-bot{grid-template-columns:1fr 1.15fr 1.15fr}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
 .card>h3{font-size:13px;font-weight:700;padding:12px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}
@@ -180,8 +180,7 @@ tr.sel td{background:#eff6ff}
           </div>
         </div>
       </div>
-      </div>
-    <div class="card" id="behavCard">
+<div class="card" id="behavCard">
       <h3>Driving Behaviour <span class="muted small">fleet totals, 24h</span></h3>
       <div class="btiles">
         <div class="btile"><div class="h"><span class="ic" style="background:#fee2e2;color:var(--red)">🛑</span> Harsh Braking</div>
@@ -199,6 +198,8 @@ tr.sel td{background:#eff6ff}
       </div>
       <div class="note" style="margin:0 16px 12px">Seatbelt &amp; fatigue sensors are not part of the telemetry payload — they arrive with the driver-service module. Braking/acceleration/overspeeding are fleet totals from the live alert stream.</div>
     </div>
+      </div>
+    
     </div>
     <div class="card dcol">
         <h3>Driver Details</h3>
