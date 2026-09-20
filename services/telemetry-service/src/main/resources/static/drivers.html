@@ -109,6 +109,10 @@ tr.sel td{background:#eff6ff}
   .trend.up{color:var(--red)}
   .crow .ci{width:22px;height:22px;border-radius:8px;display:grid;place-items:center;font-size:11px;flex:none}
   .ci.phone{background:#d1fae5}.ci.mail{background:#dbeafe}.ci.lic{background:#fef3c7}.ci.veh{background:#ede9fe}
+  .davatar{position:relative;overflow:hidden}
+  .davatar .dinit{position:absolute;inset:0;display:grid;place-items:center}
+  .davatar img,.dhead .av img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .dhead .av{position:relative;overflow:hidden}
 </style>
 </head>
 <body>
@@ -284,6 +288,12 @@ function persona(d){
 let drivers=[],live=new Map(),vehicles=new Map(),alerts=[],docsByVehicle=new Map();
 let selId=null,tab='overview',__distByVeh={},__effByVeh={};
 const markers=new Map();
+function drvAvatar(d){
+  const ini=initials(d.name);
+  const img='<img src="img/drv/'+encodeURIComponent(d.driverId)+'.jpg" data-svg="img/drv/'+encodeURIComponent(d.driverId)+'.svg" onerror="if(!this.dataset.f){this.dataset.f=1;this.src=this.dataset.svg;}else{this.remove();}" alt="">';
+  return '<span class="dinit">'+ini+'</span>'+img;
+}
+
 
 /* ================= map ================= */
 const map=L.map('dmap',{zoomControl:false}).setView([-0.9,36.9],7);
@@ -406,7 +416,7 @@ function renderTable(){
     const pid=(d.plates||[])[0];
     const dist=pid&&__distByVeh[pid]!=null?fmt(__distByVeh[pid])+' km':'-';
     return '<tr class="'+(selId===d.driverId?'sel':'')+'" onclick="selectDriver(\''+esc(d.driverId)+'\')">'+
-      '<td><span class="dcell"><span class="davatar">'+initials(d.name)+'</span><span class="dname">'+esc(d.name)+'</span></span></td>'+
+      '<td><span class="dcell"><span class="davatar">'+drvAvatar(d)+'</span><span class="dname">'+esc(d.name)+'</span></span></td>'+
       '<td class="lid">'+esc(d.driverId)+'</td>'+
       '<td>'+(d.plates||[]).map(p=>'<span class="plate">'+fmtPlate(p)+'</span>').join(', ')+'</td>'+
       '<td><span class="sbar"><i style="width:'+d.score.toFixed(0)+'%;background:'+col+'"></i></span><span class="spct" style="color:'+col+'">'+d.score.toFixed(0)+'%</span></td>'+
@@ -465,7 +475,7 @@ function renderDetail(){
   const v=live.get(pid);
   const meta=pid?vehicles.get(pid):null;
   const vehName=meta?(meta.make||'')+' '+(meta.model||''):'';
-  $('ddInit').textContent=initials(d.name);
+  $('ddInit').innerHTML=drvAvatar(d);
   $('ddName').textContent=d.name;
   $('ddId').textContent='Driver ID: '+d.driverId;
   $('ddChip').innerHTML='<span class="schip '+st+'">'+st+'</span>';
