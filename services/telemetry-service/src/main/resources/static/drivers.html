@@ -23,7 +23,7 @@ main{flex:1;min-width:0;display:flex;flex-direction:column}
 .gsearch{flex:1;max-width:300px;display:flex;align-items:center;gap:8px;background:#f1f5fb;border:1px solid var(--line);border-radius:10px;padding:8px 14px}
 .gsearch input{border:0;background:transparent;outline:none;font:inherit;width:100%}
 .spacer{flex:1}
-.tbell{position:relative;font-size:18px;background:#f1f5fb;border-radius:10px;padding:8px 12px;text-decoration:none}
+.tbell{position:relative;font-size:18px;background:#f1f5fb;border-radius:10px;padding:8px 12px;text-decoration:none;cursor:pointer}
 .tbadge{position:absolute;top:-6px;right:-6px;background:var(--red);color:#fff;font-size:10px;font-weight:700;border-radius:99px;padding:2px 6px}
 .fbtn{border:1px solid var(--line);background:#fff;border-radius:9px;padding:7px 11px;cursor:pointer;font-size:15px}
 .tchipuser{display:flex;align-items:center;gap:9px}
@@ -83,7 +83,6 @@ tr.sel td{background:#eff6ff}
 .evrow .tx{flex:1}
 .dhead{display:flex;gap:10px;align-items:center;padding:12px 14px;border-bottom:1px solid var(--line)}
 .dhead .av{width:42px;height:42px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-size:13px;font-weight:700}
-.dhead .x{margin-left:auto;border:0;background:none;font-size:16px;color:var(--muted);cursor:pointer}
 .dtabs{display:flex;gap:2px;padding:0 10px;border-bottom:1px solid var(--line)}
 .dtabs button{border:0;background:transparent;padding:9px 9px;font:inherit;font-size:11.5px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent}
 .dtabs button.on{color:var(--blue);border-bottom-color:var(--blue)}
@@ -143,7 +142,7 @@ tr.sel td{background:#eff6ff}
       <div class="kpi"><div class="bub" style="background:#e8f0fe">👥</div>
         <div><div class="label">Total Drivers</div><div class="value" id="kTotal">–</div><div class="trend">with live assignments</div></div></div>
       <div class="kpi"><div class="bub" style="background:#dcfce7">🧑‍✈️</div>
-        <div><div class="label">Active Drivers</div><div class="value" id="kActive">–</div><div class="trend" id="kActiveT">driving now</div></div></div>
+        <div><div class="label">Active Drivers</div><div class="value" id="kActive">–</div><div class="trend">driving now</div></div></div>
       <div class="kpi"><div class="bub" style="background:#fef3c7">🕐</div>
         <div><div class="label">Idle Drivers</div><div class="value" id="kIdle">–</div><div class="trend">at stop now</div></div></div>
       <div class="kpi"><div class="bub" style="background:#fee2e2">🔴</div>
@@ -154,8 +153,8 @@ tr.sel td{background:#eff6ff}
       <div class="card">
         <h3>Driver Performance <span class="view" id="perfAll">View all</span></h3>
         <div class="tblwrap"><table>
-          <thead><tr><th>Driver</th><th>License No.</th><th>Vehicle</th><th>Safety Score</th><th>Events (24h)</th><th>Status</th></tr></thead>
-          <tbody id="perfRows"><tr><td colspan="6" class="muted">Loading…</td></tr></tbody></table></div>
+          <thead><tr><th>Driver</th><th>License No.</th><th>Vehicle</th><th>Safety Score</th><th>Distance (7d)</th><th>Events</th><th>Status</th></tr></thead>
+          <tbody id="perfRows"><tr><td colspan="7" class="muted">Loading…</td></tr></tbody></table></div>
       </div>
       <div class="card">
         <h3>Driver Safety Overview</h3>
@@ -168,7 +167,7 @@ tr.sel td{background:#eff6ff}
           </div>
         </div>
       </div>
-      <div class="card dcol" id="detailsCard">
+      <div class="card dcol">
         <h3>Driver Details</h3>
         <div class="dhead"><div class="av" id="ddInit">–</div>
           <div><div style="display:flex;gap:8px;align-items:center"><b id="ddName">–</b><span id="ddChip"></span></div>
@@ -204,7 +203,7 @@ tr.sel td{background:#eff6ff}
         <div style="max-height:260px;overflow-y:auto"><table>
           <thead><tr><th>Document</th><th>Driver</th><th>Expiry Date</th><th>Status</th></tr></thead>
           <tbody id="docRows"><tr><td colspan="4" class="muted">Loading…</td></tr></tbody></table></div>
-        <div class="note" style="margin:8px 14px">Vehicle documents (service/insurance/inspection) shown per driver's assigned vehicle — driver-license documents arrive with the driver-service module.</div>
+        <div class="note" style="margin:8px 14px">Vehicle documents shown per driver's assigned vehicle — driver-license documents arrive with the driver-service module.</div>
       </div>
     </div>
   </div>
@@ -223,10 +222,14 @@ const toast=(m,ok)=>{const t=$('toast');t.textContent=m;
   t.style.background=ok===false?'#fee2e2':'#d1fae5';t.style.color=ok===false?'#991b1b':'#065f46';
   t.style.display='block';setTimeout(()=>t.style.display='none',2600);};
 const initials=n=>(n||'?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+const routeLabels={"NBO-MSA":"Nairobi - Mombasa","NBO-KSM":"Nairobi - Kisumu","NBO-ELD":"Nairobi - Eldoret","NBO-NKR":"Nairobi - Nakuru","NBO-GSA":"Nairobi - Garissa"};
+const CITIES=[["Nairobi",-1.286,36.817],["Thika",-1.039,37.090],["Limuru",-1.112,36.640],["Machakos",-1.518,37.265],["Naivasha",-0.717,36.433],["Nakuru",-0.303,36.080],["Nanyuki",0.017,37.070],["Meru",0.047,37.645],["Eldoret",0.514,35.270],["Kisumu",-0.091,34.768],["Voi",-3.396,38.556],["Mombasa",-4.043,39.668],["Malindi",-3.220,40.117],["Garissa",-0.453,39.646]];
+function nearestCity(lat,lon){let b="Kenya",bd=Infinity;
+  for(const[n,la,lo]of CITIES){const d=(la-lat)**2+(lo-lon)**2;if(d<bd){bd=d;b=n;}}return b;}
 
 /* ================= state ================= */
 let drivers=[],live=new Map(),vehicles=new Map(),alerts=[],docsByVehicle=new Map();
-let selId=null,tab='overview';
+let selId=null,tab='overview',__distByVeh={};
 const markers=new Map();
 
 /* ================= map ================= */
@@ -246,12 +249,6 @@ L.control.zoom({position:'bottomleft'}).addTo(map);
   $('userChip').onclick=()=>location.href='/login.html';}})();
  $('dateChip').textContent='📅 '+new Date().toLocaleDateString([],{day:'numeric',month:'short',year:'numeric'});
  $('fsBtn').onclick=()=>document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();
-function refreshBell(){fetch('/api/v1/alerts/recent?limit=100').then(r=>r.ok?r.json():[])
-  .then(al=>{const n=al.filter(a=>new Date(a.ts).getTime()>Date.now()-36e5).length;
-    const b=$('topBell');b.textContent=n;b.style.display=n?'block':'none';}).catch(()=>{});}
-refreshBell();setInterval(refreshBell,5000);
-
-/* ================= bell dropdown ================= */
 const bellMenu=document.createElement('div');
 bellMenu.style.cssText='position:absolute;top:calc(100% + 6px);right:0;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 32px rgba(2,6,23,.18);min-width:300px;z-index:1500;display:none';
  $('bell').parentElement.style.position='relative';
@@ -259,15 +256,21 @@ bellMenu.style.cssText='position:absolute;top:calc(100% + 6px);right:0;backgroun
 let __bAlerts=[];
  $('bell').addEventListener('click',e=>{e.preventDefault();e.stopPropagation();renderBellDrop();bellMenu.style.display=bellMenu.style.display==='block'?'none':'block';});
 document.addEventListener('click',e=>{if(!bellMenu.parentElement.contains(e.target))bellMenu.style.display='none';});
+async function refreshBellData(){
+  try{const r=await fetch('/api/v1/alerts/recent?limit=30');__bAlerts=r.ok?await r.json():[];
+    const n=__bAlerts.filter(a=>new Date(a.ts).getTime()>Date.now()-36e5).length;
+    const b=$('topBell');b.textContent=n;b.style.display=n?'block':'none';}catch(e){}
+}
 function renderBellDrop(){
   const list=__bAlerts.slice(0,8);
-  bellMenu.innerHTML='<div class="vbell-head" style="padding:10px 12px;border-bottom:1px solid var(--line)"><b>Notifications</b></div>'+
-    (list.length?list.map(a=>'<a class="vbell-item" href="alerts.html" style="display:block;padding:8px 12px;font-size:12.5px;color:#1e293b;text-decoration:none;border-bottom:1px solid var(--line)">'+
-      '<span class="chip '+(a.severity==='CRITICAL'?'High':a.severity==='WARNING'?'Medium':'Info')+'" style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:99px;background:'+(a.severity==='CRITICAL'?'#fee2e2':a.severity==='WARNING'?'#fef3c7':'#dbeafe')+';color:'+(a.severity==='CRITICAL'?'#991b1b':a.severity==='WARNING'?'#92400e':'#1e40af')+'">'+esc(a.severity)+'</span> '+esc(a.message)+
-      '<div class="muted small" style="margin-top:2px">'+fmtPlate(esc(a.vehicle_id))+' · '+new Date(a.ts).toLocaleTimeString()+'</div></a>').join('')
-    :'<div class="vbell-empty" style="padding:14px 12px;color:#64748b;font-size:12.5px">No alerts in the latest window.</div>')+
-    '<a class="vbell-foot" href="alerts.html" style="display:block;padding:10px 12px;text-align:center;font-size:12px;font-weight:600;color:#2563eb;text-decoration:none;background:#fafbfe">See all</a>';
+  const chip=se=>'<span style="display:inline-block;font-size:9.5px;font-weight:700;padding:1px 7px;border-radius:99px;margin-right:5px;background:'+(se==='CRITICAL'?'#fee2e2':se==='WARNING'?'#fef3c7':'#dbeafe')+';color:'+(se==='CRITICAL'?'#991b1b':se==='WARNING'?'#92400e':'#1e40af')+'">'+esc(se)+'</span>';
+  bellMenu.innerHTML='<div style="padding:10px 12px;border-bottom:1px solid var(--line)"><b>Notifications</b></div>'+
+    (list.length?list.map(a=>'<a href="alerts.html" style="display:block;padding:8px 12px;font-size:12.5px;color:#1e293b;text-decoration:none;border-bottom:1px solid var(--line)">'+chip(a.severity)+esc(a.message)+
+      '<div style="margin-top:2px;color:#64748b;font-size:11px">'+fmtPlate(esc(a.vehicle_id))+' · '+new Date(a.ts).toLocaleTimeString()+'</div></a>').join('')
+    :'<div style="padding:14px 12px;color:#64748b;font-size:12.5px">No alerts in the latest window.</div>')+
+    '<a href="alerts.html" style="display:block;padding:10px 12px;text-align:center;font-size:12px;font-weight:600;color:#2563eb;text-decoration:none;background:#fafbfe">See all</a>';
 }
+refreshBellData();setInterval(refreshBellData,5000);
 
 /* ================= load ================= */
 async function load(){
@@ -283,28 +286,32 @@ async function load(){
     alerts=al;
     docsByVehicle=new Map(vp.filter(v=>v.nextService||v.insuranceExpiry||v.inspectionExpiry)
       .map(v=>[v.vehicleId,[v.nextService,v.insuranceExpiry,v.inspectionExpiry].filter(Boolean)]));
+    try{
+      const t2=new Date(),f2=new Date();f2.setDate(f2.getDate()-6);
+      const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+      const rep=await api('/api/v1/reports/fuel?from='+iso(f2)+'&to='+iso(t2)).catch(()=>({rows:[]}));
+      __distByVeh={};
+      rep.rows.forEach(r=>__distByVeh[r.vehicle_id]=r.distance_km||0);
+    }catch(e){}
 
-    /* KPIs */
-    const driving=drivers.filter(d=>d.status==='In Transit'||d.status==='MOVING').length;
-    const byLive=lv.filter(v=>v.driverId&&v.status==='MOVING').length;
-    const idle=drivers.length-driving;
+    const driving=drivers.filter(d=>driverStatus(d)==='Active').length;
+    const idle=drivers.filter(d=>driverStatus(d)==='Idle').length;
+    const off=drivers.filter(d=>driverStatus(d)==='Offline').length;
     $('kTotal').textContent=drivers.length;
-    $('kActive').textContent=byLive;
-    $('kIdle').textContent=drivers.filter(d=>d.status!=='In Transit'&&d.status!=='MOVING'&&live.has((d.plates[0]||''))).length;
-    $('kOff').textContent=drivers.filter(d=>!live.has(d.plates[0]||'')).length;
+    $('kActive').textContent=driving;
+    $('kIdle').textContent=idle;
+    $('kOff').textContent=off;
 
-    /* safety donut */
     const safe=drivers.filter(d=>d.score>=80).length;
     const risk=drivers.filter(d=>d.score>=60&&d.score<80).length;
     const high=drivers.filter(d=>d.score<60).length;
     const tot=drivers.length||1;
-    $('safeDonut').style.background='conic-gradient(var(--green) '+(safe/tot*100)+'%, var(--amber) '+(safe/tot*100)+'% '+((safe+risk)/tot*100)+'%, var(--red) '+(safe+risk)/tot*100+'%, var(--red) 100%)';
+    $('safeDonut').style.background='conic-gradient(var(--green) '+(safe/tot*100)+'%, var(--amber) '+(safe/tot*100)+'% '+((safe+risk)/tot*100)+'%, var(--red) '+((safe+risk)/tot*100)+'%, var(--red) 100%)';
     $('safePct').textContent=Math.round(safe/tot*100)+'%';
     $('lgSafe').textContent=Math.round(safe/tot*100)+'% ('+safe+')';
     $('lgRisk').textContent=Math.round(risk/tot*100)+'% ('+risk+')';
     $('lgHigh').textContent=Math.round(high/tot*100)+'% ('+high+')';
 
-    /* markers */
     const seen=new Set();
     lv.forEach(v=>{
       if(!v.driverId)return;
@@ -321,11 +328,17 @@ async function load(){
     renderTable();renderFeed();renderDocs();
     if(selId)renderDetail();
   }catch(e){
-    $('perfRows').innerHTML='<tr><td colspan="6" class="muted">Load failed: '+esc(e.message)+' - if HTTP 401/302, sign in again.</td></tr>';
+    $('perfRows').innerHTML='<tr><td colspan="7" class="muted">Load failed: '+esc(e.message)+' - if HTTP 401/302, sign in again.</td></tr>';
   }
 }
 
-/* ================= performance table ================= */
+/* ================= table ================= */
+function driverStatus(d){
+  const anyLive=(d.plates||[]).some(p=>live.has(p));
+  if(!anyLive)return 'Offline';
+  const moving=(d.plates||[]).some(p=>{const v=live.get(p);return v&&v.status==='MOVING';});
+  return moving?'Active':'Idle';
+}
 function renderTable(){
   const q=$('gq').value.toUpperCase();
   const rows=drivers.filter(d=>!q||(d.name+' '+d.driverId+' '+(d.plates||[]).join(' ')).toUpperCase().includes(q));
@@ -333,21 +346,17 @@ function renderTable(){
     const col=d.score>=80?'var(--green)':d.score>=60?'var(--amber)':'var(--red)';
     const st=driverStatus(d);
     const evs=d.speeding+d.harshBraking+d.harshAccel;
+    const pid=(d.plates||[])[0];
+    const dist=pid!=null&&__distByVeh[pid]!=null?fmt(__distByVeh[pid])+' km':'-';
     return '<tr class="'+(selId===d.driverId?'sel':'')+'" onclick="selectDriver(\''+esc(d.driverId)+'\')">'+
       '<td><span class="dcell"><span class="davatar">'+initials(d.name)+'</span><span class="dname">'+esc(d.name)+'</span></span></td>'+
       '<td class="lid">'+esc(d.driverId)+'</td>'+
       '<td>'+(d.plates||[]).map(p=>'<span class="plate">'+fmtPlate(p)+'</span>').join(', ')+'</td>'+
       '<td><span class="sbar"><i style="width:'+d.score.toFixed(0)+'%;background:'+col+'"></i></span><span class="spct" style="color:'+col+'">'+d.score.toFixed(0)+'%</span></td>'+
-      '<td>'+(d.plates.length&&live.has(d.plates[0])?fmt((live.get(d.plates[0])||{}).odometerKm)+' km':'-')+'</td>'+
+      '<td>'+dist+'</td>'+
       '<td>'+evs+'</td>'+
       '<td><span class="schip '+st+'">'+st+'</span></td></tr>';}).join('')
-    ||'<tr><td colspan="6" class="muted">No drivers match.</td></tr>';
-}
-function driverStatus(d){
-  const anyLive=(d.plates||[]).some(p=>live.has(p));
-  if(!anyLive)return 'Offline';
-  const moving=(d.plates||[]).some(p=>{const v=live.get(p);return v&&v.status==='MOVING';});
-  return moving?'Active':'Idle';
+    ||'<tr><td colspan="7" class="muted">No drivers match.</td></tr>';
 }
 
 /* ================= feed + docs ================= */
@@ -366,23 +375,21 @@ function renderDocs(){
     const pid=(d.plates||[])[0];
     if(!pid)return;
     const docs=docsByVehicle.get(pid)||[];
-    const meta=vehicles.get(pid)||{};
-    if(docs[0])rows.push(['Next Service',d.name,docs[0],meta]);
-    if(docs[1])rows.push(['Insurance',d.name,docs[1],meta]);
-    if(docs[2])rows.push(['Inspection',d.name,docs[2],meta]);
+    if(docs[0])rows.push(['Next Service',d.name,docs[0]]);
+    if(docs[1])rows.push(['Insurance',d.name,docs[1]]);
+    if(docs[2])rows.push(['Inspection',d.name,docs[2]]);
   });
   rows.sort((a,b)=>a[2].localeCompare(b[2]));
   $('docRows').innerHTML=rows.slice(0,12).map(r=>{
     const days=Math.ceil((new Date(r[2])-Date.now())/864e5);
     const st=days<0?'Expired':days<=30?'Expiring Soon':'Valid';
-    const cls=days<0?'CRITICAL':days<=30?'Medium':'INFO';
     return '<tr><td>'+esc(r[0])+'</td><td><b>'+esc(r[1])+'</b></td>'+
       '<td>'+new Date(r[2]).toLocaleDateString([],{day:'numeric',month:'short',year:'numeric'})+'</td>'+
-      '<td><span class="schip '+cls+'" style="background:'+(days<0?'#fee2e2':days<=30?'#fef3c7':'#d1fae5')+';color:'+(days<0?'#991b1b':days<=30?'#92400e':'#065f46')+'">'+st+'</span></td></tr>';}).join('')
+      '<td><span class="schip" style="background:'+(days<0?'#fee2e2':days<=30?'#fef3c7':'#d1fae5')+';color:'+(days<0?'#991b1b':days<=30?'#92400e':'#065f46')+'">'+st+'</span></td></tr>';}).join('')
     ||'<tr><td colspan="4" class="muted">No document data.</td></tr>';
 }
 
-/* ================= details panel ================= */
+/* ================= details ================= */
 function selectDriver(id){
   selId=id;tab='overview';
   document.querySelectorAll('#ddTabs button').forEach(b=>b.classList.toggle('on',b.dataset.t==='overview'));
@@ -407,16 +414,21 @@ function renderDetail(){
   if(tab==='overview'){
     b.innerHTML=
       '<div class="drow"><span class="k">🚚 Assigned Vehicle</span><b>'+(pid?fmtPlate(pid):'-')+'</b></div>'+
-      '<div class="drow"><span class="k">🛣️ Corridor</span><b>'+(v&&v.routeId&&routeLabels?routeLabels[v.routeId]||'-':'-')+'</b></div>'+
+      '<div class="drow"><span class="k">🛣️ Corridor</span><b>'+(v&&v.routeId&&routeLabels[v.routeId]?esc(routeLabels[v.routeId]):'-')+'</b></div>'+
       '<div class="drow"><span class="k">📍 Current Location</span><b>'+(v?nearestCity(v.latitude,v.longitude):'-')+'</b></div>'+
-      '<div class="drow"><span class="k">🧾 Driver-license documents</span><b>-</b></div>'+
-      '<div class="note">Joining date, branch, experience and license expiry are not tracked yet - the driver-service module owns them. Below is what the pipeline computes today.</div>'+
-      '<b class="small">Performance Summary</b>'+
+      '<div class="drow"><span class="k">🕒 Last Update</span><b>'+(v&&v.lastSeen?new Date(v.lastSeen).toLocaleString([],{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'-')+'</b></div>'+
+      '<div class="drow"><span class="k">⏱ Current Speed</span><b>'+(v?fmt(v.speedKph)+' km/h':'-')+'</b></div>'+
+      '<div class="drow"><span class="k">⛽ Fuel Level</span><b>'+(v&&v.fuelLevelPct!=null?v.fuelLevelPct.toFixed(0)+'%':'-')+'</b></div>'+
+      '<div class="drow"><span class="k">🧾 Vehicle Mileage</span><b>'+(v&&v.odometerKm?Math.round(v.odometerKm).toLocaleString()+' km':'-')+'</b></div>'+
+      '<div class="drow"><span class="k">🛣 Distance (7d)</span><b>'+(pid&&__distByVeh[pid]!=null?fmt(__distByVeh[pid])+' km':'-')+'</b></div>'+
+      '<div class="drow"><span class="k">📄 Documents due</span><b>'+(pid&&docsByVehicle.get(pid)&&docsByVehicle.get(pid)[0]?esc(docsByVehicle.get(pid)[0]):'-')+'</b></div>'+
+      '<div class="note">Joining date, branch, experience and license expiry are not tracked yet - the driver-service module owns them.</div>'+
+      '<b class="small">Performance Summary (24h)</b>'+
       '<div class="drow"><span class="k">🛡 Safety Score</span><span><span class="pbar"><i style="width:'+d.score.toFixed(0)+'%;background:'+(d.score>=80?'var(--green)':d.score>=60?'var(--amber)':'var(--red)')+'"></i></span> '+d.score.toFixed(0)+'%</span></div>'+
-      '<div class="drow"><span class="k">💨 Speeding (24h)</span><b>'+d.speeding+'</b></div>'+
-      '<div class="drow"><span class="k">🛑 Harsh braking (24h)</span><b>'+d.harshBraking+'</b></div>'+
-      '<div class="drow"><span class="k">🚀 Harsh accel (24h)</span><b>'+d.harshAccel+'</b></div>'+
-      '<div class="drow"><span class="k">🛣️ Distance (range)</span><b>-</b></div>';
+      '<div class="drow"><span class="k">💨 Speeding</span><b>'+d.speeding+'</b></div>'+
+      '<div class="drow"><span class="k">🛑 Harsh braking</span><b>'+d.harshBraking+'</b></div>'+
+      '<div class="drow"><span class="k">🚀 Harsh acceleration</span><b>'+d.harshAccel+'</b></div>'+
+      '<div class="drow"><span class="k">⚠️ Total events</span><b>'+evs+'</b></div>';
   } else if(tab==='perf'){
     b.innerHTML='<div class="drow"><span class="k">🛡 Safety Score</span><b>'+d.score.toFixed(0)+'%</b></div>'+
       '<div class="drow"><span class="k">💨 Speeding</span><b>'+d.speeding+'</b></div>'+
@@ -429,15 +441,14 @@ function renderDetail(){
     b.innerHTML='<div class="drow"><span class="k">🧾 Next Service (vehicle '+fmtPlate(pid)+')</span><b>'+esc(docs[0]||'-')+'</b></div>'+
       '<div class="drow"><span class="k">🛡 Insurance</span><b>'+esc(docs[1]||'-')+'</b></div>'+
       '<div class="drow"><span class="k">📋 Inspection</span><b>'+esc(docs[2]||'-')+'</b></div>'+
-      '<div class="note">These are the assigned vehicle documents. Driver-license documents arrive with driver-service.</div>';
+      '<div class="note">Assigned vehicle documents. Driver-license documents arrive with driver-service.</div>';
   }
 }
-function nearestCity(lat,lon){return 'Kenya';}
 
 /* ================= wiring ================= */
  $('gq').oninput=renderTable;
  $('addDrv').onclick=()=>toast('Driver registration arrives with the driver-service module',false);
- $('perfAll').onclick=()=>toast('All drivers are shown - full history scoring arrives with driver-service',true);
+ $('perfAll').onclick=()=>toast('All drivers shown - full history scoring arrives with driver-service',true);
 
 load();setInterval(load,5000);
 const autoSel=setInterval(()=>{if(drivers.length&&!selId){selectDriver(drivers[0].driverId);clearInterval(autoSel);}},800);
