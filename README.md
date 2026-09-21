@@ -1,6 +1,6 @@
 # 🛰️ FleetPulse — Real-Time IoT Fleet Analytics Platform
 
-![CI](https://github.com/<you>/fleetpulse/actions/workflows/ci.yml/badge.svg)
+![CI](https://github.com/musanyaks/fleetpulse/actions/workflows/ci.yml/badge.svg)
 ![Java](https://img.shields.io/badge/Java-21-blue)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.3-green)
 ![Kafka](https://img.shields.io/badge/Apache%20Kafka-3.7-black)
@@ -9,7 +9,6 @@
 
 > Production-shaped, event-driven fleet telemetry platform: **25 simulated vehicles on real Kenyan highway corridors → MQTT → Kafka → TimescaleDB → live rule engine, geofencing, driver scoring and an operations dashboard** — in one `docker compose up`.
 
-**Live demo:** https://your-demo-url.example *(or run locally — see Quick Start)*
 
 ---
 
@@ -57,7 +56,7 @@ fleetpulse/
 ## Quick Start
 
 ```bash
-git clone https://github.com/<you>/fleetpulse && cd fleetpulse
+git clone https://github.com/musanyaks/fleetpulse && cd fleetpulse
 docker compose up -d --build        # everything: brokers, DB, services, simulator, dashboard
 ```
 
