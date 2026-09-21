@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you use FleetPulse, please cite it as below."
+title: FleetPulse - Real-Time IoT Fleet Analytics Platform
+authors:
+  - family-names: <YourSurname>
+    given-names: <YourName>
+abstract: >-
+  Real-time fleet telemetry platform built with Java 21 and Spring Boot:
+  MQTT ingestion, Kafka streaming, TimescaleDB storage, rule-based alerting,
+  geofencing, driver scoring, and a live operations dashboard.
+keywords:
+  - iot
+  - fleet-management
+  - kafka
+  - spring-boot
+  - timescaledb
+license: MIT
