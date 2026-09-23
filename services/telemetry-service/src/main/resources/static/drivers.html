@@ -624,6 +624,22 @@ function renderBranchFilter(){
   if(sel.innerHTML!==opts)sel.innerHTML=opts;
 }
  $("fBranch").onchange=()=>{page=0;renderTable();};
+
+/* branch filter wrapper: filters drivers array before renderTable sees it */
+const _rtBranchWrapped=true;
+window.__branchSel="";
+const _renderTableBase=renderTable;
+renderTable=function(){
+  window.__branchSel=$("fBranch")?$("fBranch").value:"";
+  const saved=drivers;
+  if(window.__branchSel){
+    drivers=drivers.filter(d=>{
+      const rv=(window.__vbranch&&window.__vbranch.get(d.driverId))||persona(d).branch;
+      return rv===window.__branchSel;
+    });
+  }
+  try{ _renderTableBase(); } finally { drivers=saved; }
+};
 </script>
 </body>
 </html>
