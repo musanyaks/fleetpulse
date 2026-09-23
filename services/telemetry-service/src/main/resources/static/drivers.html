@@ -35,7 +35,9 @@ main{flex:1;min-width:0;display:flex;flex-direction:column}
 .pagehead h1{font-size:22px;font-weight:800}
 .pagehead .sub{color:var(--muted);font-size:12.5px}
 .pagehead .spacer{flex:1}
-.datechip{font-size:12.5px;font-weight:600;background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:8px 14px}
+.datechip{font-size:12.5px;font-weight:600;background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:8px 14px;cursor:pointer}
+.dropdown{position:absolute;top:calc(100% + 6px);right:0;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 32px rgba(2,6,23,.18);min-width:230px;z-index:1500;display:none;padding:10px}
+.dropdown.open{display:block}
 .btn{border:0;border-radius:9px;padding:9px 14px;font:inherit;font-weight:600;background:var(--blue);color:#fff;cursor:pointer}
 .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
 .kpi{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;gap:12px;align-items:center}
@@ -55,7 +57,9 @@ td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
 tbody tr:hover td{background:#f8fafc;cursor:pointer}
 tr.sel td{background:#eff6ff}
 .dcell{display:flex;align-items:center;gap:9px}
-.davatar{width:30px;height:30px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-size:10px;font-weight:700}
+.davatar{width:30px;height:30px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-size:10px;font-weight:700;position:relative;overflow:hidden}
+.davatar img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.davatar .dinit{position:absolute;inset:0;display:grid;place-items:center}
 .dname{font-weight:700}
 .lid{color:var(--muted)}
 .sbar{width:64px;height:6px;border-radius:99px;background:#eef2f9;display:inline-block;vertical-align:middle;margin-right:6px;overflow:hidden}
@@ -82,37 +86,30 @@ tr.sel td{background:#eff6ff}
 .evrow time{color:var(--muted);width:40px;flex:none}
 .evrow .tx{flex:1}
 .dhead{display:flex;gap:10px;align-items:center;padding:12px 14px;border-bottom:1px solid var(--line)}
-.dhead .av{width:42px;height:42px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-size:13px;font-weight:700}
+.dhead .av{width:42px;height:42px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-size:13px;font-weight:700;position:relative;overflow:hidden}
+.dhead .av img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .dtabs{display:flex;gap:2px;padding:0 10px;border-bottom:1px solid var(--line)}
 .dtabs button{border:0;background:transparent;padding:9px 9px;font:inherit;font-size:11.5px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent}
 .dtabs button.on{color:var(--blue);border-bottom-color:var(--blue)}
 .dbody{padding:10px 14px;max-height:380px;overflow-y:auto}
-.drow{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid var(--line);font-size:12.5px}
+.drow{display:grid;grid-template-columns:1fr auto;gap:4px 12px;padding:7px 0;border-bottom:1px solid var(--line);font-size:12.5px;align-items:center}
 .drow:last-child{border-bottom:0}
 .drow .k{color:var(--muted)}
+.drow .v{text-align:right;font-weight:600}
 .pbar{width:80px;height:6px;border-radius:99px;background:#eef2f9;display:inline-block;vertical-align:middle;overflow:hidden}
 .pbar i{display:block;height:100%;border-radius:99px}
-.crow{display:flex;align-items:center;gap:9px;padding:5px 14px;font-size:12.5px}
-.crow .ci{width:22px;height:22px;border-radius:8px;background:#eef2f9;display:grid;place-items:center;font-size:11px;flex:none;color:var(--muted)}
 .note{background:#fffbeb;border:1px solid #fde68a;color:#92400e;border-radius:10px;padding:7px 10px;font-size:10.5px;margin:8px 0}
+.btiles{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 16px}
+.btile{border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.btile .h{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--muted)}
+.btile .ic{width:24px;height:24px;border-radius:8px;display:grid;place-items:center;font-size:12px;flex:none}
+.btile .v{font-size:19px;font-weight:800;margin-top:3px}
+.btile .t{font-size:10.5px;font-weight:700}
+.trend.up{color:var(--red)}
 .muted{color:var(--muted)}.small{font-size:12px}
 #toast{position:fixed;bottom:20px;right:20px;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;display:none;box-shadow:0 8px 24px rgba(2,6,23,.2);background:#d1fae5;color:#065f46;z-index:3000}
-@media (max-width:1280px){.g-top,.g-bot{grid-template-columns:1fr 1fr}.g-top>.dcol,.g-bot>.dcol{grid-column:1/-1}}
+@media (max-width:1280px){.g-top,.g-bot{grid-template-columns:1fr 1fr}.g-top>.rcol,.g-bot>.dcol{grid-column:1/-1}}
 @media (max-width:900px){.g-top,.g-bot{grid-template-columns:1fr}}
-  .rcol{display:flex;flex-direction:column;gap:16px}
-  .btiles{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 16px}
-  .btile{border:1px solid var(--line);border-radius:10px;padding:10px 12px}
-  .btile .h{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--muted)}
-  .btile .ic{width:24px;height:24px;border-radius:8px;display:grid;place-items:center;font-size:12px;flex:none}
-  .btile .v{font-size:19px;font-weight:800;margin-top:3px}
-  .btile .t{font-size:10.5px;font-weight:700}
-  .trend.up{color:var(--red)}
-  .crow .ci{width:22px;height:22px;border-radius:8px;display:grid;place-items:center;font-size:11px;flex:none}
-  .ci.phone{background:#d1fae5}.ci.mail{background:#dbeafe}.ci.lic{background:#fef3c7}.ci.veh{background:#ede9fe}
-  .davatar{position:relative;overflow:hidden}
-  .davatar .dinit{position:absolute;inset:0;display:grid;place-items:center}
-  .davatar img,.dhead .av img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-  .dhead .av{position:relative;overflow:hidden}
 </style>
 </head>
 <body>
@@ -150,16 +147,16 @@ tr.sel td{background:#eff6ff}
     <div class="pagehead"><span class="ic">🧑‍✈️</span>
       <div><h1>Drivers</h1><div class="sub">Manage your drivers, track performance and monitor safety</div></div>
       <span class="spacer"></span>
-      <select id="fBranch" style="border:1px solid var(--line);border-radius:9px;padding:8px 12px;font:inherit;background:#fff">
+      <select id="fBranch" onchange="renderTable()" style="border:1px solid var(--line);border-radius:9px;padding:8px 12px;font:inherit;background:#fff">
         <option value="">All Branches</option>
       </select>
-    <div style="position:relative">
-      <span class="datechip" id="dateChip">📅 -</span>
-      <div class="dropdown" id="dateMenu" style="min-width:220px;padding:8px">
-        <input type="date" id="datePick" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:7px 8px;font:inherit"/>
-        <div class="muted small" style="margin-top:6px">Range view arrives with daily rollups</div>
+      <div style="position:relative">
+        <span class="datechip" id="dateChip">📅 -</span>
+        <div class="dropdown" id="dateMenu">
+          <input type="date" id="datePick" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:7px 8px;font:inherit"/>
+          <div class="muted small" style="margin-top:6px">Range view arrives with daily rollups</div>
+        </div>
       </div>
-    </div>
       <button class="btn" id="addDrv">＋ Add Driver</button>
     </div>
 
@@ -174,47 +171,45 @@ tr.sel td{background:#eff6ff}
         <div><div class="label">Offline Drivers</div><div class="value" id="kOff">–</div><div class="trend">silent &gt; 60s</div></div></div>
     </div>
 
-    <div class="grid g-top"><div class="card">
+    <div class="grid g-top">
+      <div class="card">
         <h3>Driver Performance <span class="view" id="perfAll">View all</span></h3>
         <div class="tblwrap"><table>
           <thead><tr><th>Driver</th><th>License No.</th><th>Vehicle</th><th>Safety Score</th><th>Distance (7d)</th><th>Events</th><th>Status</th></tr></thead>
           <tbody id="perfRows"><tr><td colspan="7" class="muted">Loading…</td></tr></tbody></table></div>
       </div>
-<div class="rcol">
-    <div class="card">
-        <h3>Driver Safety Overview</h3>
-        <div class="donutwrap">
-          <div class="donut" id="safeDonut"><div class="ctr"><div class="n" id="safePct">–</div><div class="l">Safe Drivers</div></div></div>
-          <div class="dlegend">
-            <div class="r"><i style="background:var(--green)"></i> Safe <b id="lgSafe">–</b></div>
-            <div class="r"><i style="background:var(--amber)"></i> At Risk <b id="lgRisk">–</b></div>
-            <div class="r"><i style="background:var(--red)"></i> High Risk <b id="lgHigh">–</b></div>
+      <div class="rcol">
+        <div class="card" style="margin-bottom:16px">
+          <h3>Driver Safety Overview</h3>
+          <div class="donutwrap">
+            <div class="donut" id="safeDonut"><div class="ctr"><div class="n" id="safePct">–</div><div class="l">Safe Drivers</div></div></div>
+            <div class="dlegend">
+              <div class="r"><i style="background:var(--green)"></i> Safe <b id="lgSafe">–</b></div>
+              <div class="r"><i style="background:var(--amber)"></i> At Risk <b id="lgRisk">–</b></div>
+              <div class="r"><i style="background:var(--red)"></i> High Risk <b id="lgHigh">–</b></div>
+            </div>
           </div>
         </div>
+        <div class="card">
+          <h3>Driving Behaviour <span class="muted small">fleet totals, 24h</span></h3>
+          <div class="btiles">
+            <div class="btile"><div class="h"><span class="ic" style="background:#fee2e2;color:var(--red)">🛑</span> Harsh Braking</div>
+              <div class="v" id="bhBrake">0</div><div class="t trend up">▲ events</div></div>
+            <div class="btile"><div class="h"><span class="ic" style="background:#dbeafe;color:var(--blue)">🚀</span> Harsh Acceleration</div>
+              <div class="v" id="bhAcc">0</div><div class="t trend up">▲ events</div></div>
+            <div class="btile"><div class="h"><span class="ic" style="background:#e8f0fe;color:var(--blue)">💨</span> Overspeeding</div>
+              <div class="v" id="bhSpd">0</div><div class="t trend up">▲ events</div></div>
+            <div class="btile"><div class="h"><span class="ic" style="background:#f1f5f9;color:var(--muted)">⏱</span> Idling Now</div>
+              <div class="v" id="bhIdle">0</div><div class="trend flat">drivers at stop</div></div>
+            <div class="btile"><div class="h"><span class="ic" style="background:#f1f5f9;color:var(--muted)">🔘</span> Seatbelt Violations</div>
+              <div class="v">–</div><div class="trend flat">sensor not in payload</div></div>
+            <div class="btile"><div class="h"><span class="ic" style="background:#f1f5f9;color:var(--muted)">😴</span> Fatigue Alerts</div>
+              <div class="v">–</div><div class="trend flat">sensor not in payload</div></div>
+          </div>
+          <div class="note" style="margin:0 16px 12px">Seatbelt &amp; fatigue sensors are not in the telemetry payload — they arrive with the driver-service module. Braking/acceleration/overspeeding are fleet totals from the live alert stream.</div>
+        </div>
       </div>
-
-<div class="card" id="behavCard">
-      <h3>Driving Behaviour <span class="muted small">fleet totals, 24h</span></h3>
-      <div class="btiles">
-        <div class="btile"><div class="h"><span class="ic" style="background:#fee2e2;color:var(--red)">🛑</span> Harsh Braking</div>
-          <div class="v" id="bhBrake">0</div><div class="t trend up">▲ events</div></div>
-        <div class="btile"><div class="h"><span class="ic" style="background:#dbeafe;color:var(--blue)">🚀</span> Harsh Acceleration</div>
-          <div class="v" id="bhAcc">0</div><div class="t trend up">▲ events</div></div>
-        <div class="btile"><div class="h"><span class="ic" style="background:#e8f0fe;color:var(--blue)">💨</span> Overspeeding</div>
-          <div class="v" id="bhSpd">0</div><div class="t trend up">▲ events</div></div>
-        <div class="btile"><div class="h"><span class="ic" style="background:#f1f5f9;color:var(--muted)">⏱</span> Idling Now</div>
-          <div class="v" id="bhIdle">0</div><div class="trend flat">drivers at stop</div></div>
-        <div class="btile"><div class="h"><span class="ic" style="background:#f1f5f9;color:var(--muted)">🔘</span> Seatbelt Violations</div>
-          <div class="v">–</div><div class="trend flat">sensor not in payload</div></div>
-        <div class="btile"><div class="h"><span class="ic" style="background:#f1f5f9;color:var(--muted)">😴</span> Fatigue Alerts</div>
-          <div class="v">–</div><div class="trend flat">sensor not in payload</div></div>
-      </div>
-      <div class="note" style="margin:0 16px 12px">Seatbelt &amp; fatigue sensors are not part of the telemetry payload — they arrive with the driver-service module. Braking/acceleration/overspeeding are fleet totals from the live alert stream.</div>
-    </div>
-
-
-      </div>
-<div class="card dcol">
+      <div class="card dcol">
         <h3>Driver Details</h3>
         <div class="dhead"><div class="av" id="ddInit">–</div>
           <div><div style="display:flex;gap:8px;align-items:center"><b id="ddName">–</b><span id="ddChip"></span></div>
@@ -228,8 +223,7 @@ tr.sel td{background:#eff6ff}
           <button data-t="docs">Documents</button>
         </div>
         <div class="dbody" id="ddBody"><span class="muted small">Click a driver row.</span></div>
-      </div></div>
-    
+      </div>
     </div>
 
     <div class="grid g-bot">
@@ -259,31 +253,6 @@ tr.sel td{background:#eff6ff}
   </div>
 </main>
 </div>
-<div class="modal" id="drvModal" style="position:fixed;inset:0;background:rgba(2,6,23,.55);display:none;place-items:center;z-index:2600">
-  <div style="background:#fff;border-radius:16px;max-width:480px;width:92%;padding:22px 24px;position:relative">
-    <button onclick="closeDrv()" style="position:absolute;top:14px;right:16px;border:0;background:none;font-size:18px;cursor:pointer;color:var(--muted)">✕</button>
-    <h2 style="font-size:18px;margin-bottom:4px">Add Driver</h2>
-    <div class="muted small" style="margin-bottom:12px">Registers the driver in the fleet roster.</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-      <div style="grid-column:1/-1"><label class="muted small">Full name *</label>
-        <input id="nvName" placeholder="Grace Wanjiku" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit"/></div>
-      <div><label class="muted small">Driver ID * (D + digits)</label>
-        <input id="nvId" placeholder="D026" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit"/></div>
-      <div><label class="muted small">Phone</label>
-        <input id="nvPhone" placeholder="+254 7XX XXX XXX" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit"/></div>
-      <div><label class="muted small">Branch</label>
-        <input id="nvBranch" placeholder="Nairobi" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit"/></div>
-      <div><label class="muted small">License expiry</label>
-        <input id="nvLic" type="date" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit"/></div>
-    </div>
-    <div style="display:flex;gap:10px;margin-top:14px">
-      <button class="btn" style="flex:1" id="nvSave">Register Driver</button>
-      <button class="btn ghost" style="flex:1;background:#fff;color:var(--text);border:1px solid var(--line)" onclick="closeDrv()">Cancel</button>
-    </div>
-    <div class="muted small" id="nvMsg" style="margin-top:8px;min-height:16px"></div>
-  </div>
-</div>
-
 <div id="toast"></div>
 
 <script>
@@ -302,33 +271,31 @@ const CITIES=[["Nairobi",-1.286,36.817],["Thika",-1.039,37.090],["Limuru",-1.112
 function nearestCity(lat,lon){let b="Kenya",bd=Infinity;
   for(const[n,la,lo]of CITIES){const d=(la-lat)**2+(lo-lon)**2;if(d<bd){bd=d;b=n;}}return b;}
 
-/* ================= demo persona (deterministic per driverId) ================= */
+/* ================= persona (deterministic demo data per driverId) ================= */
 function persona(d){
   let h=0;const s=d.driverId;for(let i=0;i<s.length;i++){h=((h*31)+s.charCodeAt(i))>>>0;}
   const branches=['Nairobi','Mombasa','Kisumu','Nakuru','Eldoret'];
-  const p2=String(100+(h>>>3)%900),p3=String(100+(h>>>7)%900);
-  const join=new Date(2020+(h%4),(h>>>2)%12,1+(h>>>4)%28);
-  const licExp=new Date(2026+(h%3),(h>>>5)%12,1+(h>>>6)%28);
   return{
-    phone:'+254 7'+p2+' '+p3,
+    phone:'+254 7'+String(100+(h>>>3)%900)+' '+String(100+(h>>>7)%900),
     email:d.name.toLowerCase().replace(/[^a-z ]/g,'').trim().replace(/ +/g,'.')+'@fleetpulse.com',
     license:'KDL '+(100+(h>>>5)%900)+String.fromCharCode(65+(h%26)),
-    joined:join.toLocaleDateString([],{day:'numeric',month:'short',year:'numeric'}),
+    joined:new Date(2020+(h%4),(h>>>2)%12,1+(h>>>4)%28).toLocaleDateString([],{day:'numeric',month:'short',year:'numeric'}),
     branch:branches[h%branches.length],
     exp:(2+(h>>>6)%8)+' years',
-    licExp:licExp.toLocaleDateString([],{day:'numeric',month:'short',year:'numeric'})};
+    licExp:new Date(2026+(h%3),(h>>>5)%12,1+(h>>>6)%28).toLocaleDateString([],{day:'numeric',month:'short',year:'numeric'})};
 }
 
-/* ================= state ================= */
-let drivers=[],live=new Map(),vehicles=new Map(),alerts=[],docsByVehicle=new Map();
-let selId=null,tab='overview',__distByVeh={},__effByVeh={};
-const markers=new Map();
+/* ================= avatars ================= */
 function drvAvatar(d){
   const ini=initials(d.name);
   const img='<img src="img/drv/'+encodeURIComponent(d.driverId)+'.jpg" data-svg="img/drv/'+encodeURIComponent(d.driverId)+'.svg" onerror="if(!this.dataset.f){this.dataset.f=1;this.src=this.dataset.svg;}else{this.remove();}" alt="">';
   return '<span class="dinit">'+ini+'</span>'+img;
 }
 
+/* ================= state ================= */
+let drivers=[],live=new Map(),vehicles=new Map(),alerts=[],docsByVehicle=new Map();
+let selId=null,tab='overview',__distByVeh={},__effByVeh={},__branchSel='';
+const markers=new Map();
 
 /* ================= map ================= */
 const map=L.map('dmap',{zoomControl:false}).setView([-0.9,36.9],7);
@@ -345,7 +312,6 @@ L.control.zoom({position:'bottomleft'}).addTo(map);
   $('uName').textContent=me.username;$('uRole').textContent=me.roles.join(', ');
 }catch(e){$('uName').textContent='Sign in';$('uRole').textContent='session expired';
   $('userChip').onclick=()=>location.href='/login.html';}})();
- $('dateChip').textContent='📅 '+new Date().toLocaleDateString([],{day:'numeric',month:'short',year:'numeric'});
  $('fsBtn').onclick=()=>document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();
 const bellMenu=document.createElement('div');
 bellMenu.style.cssText='position:absolute;top:calc(100% + 6px);right:0;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 32px rgba(2,6,23,.18);min-width:300px;z-index:1500;display:none';
@@ -370,6 +336,14 @@ function renderBellDrop(){
 }
 refreshBellData();setInterval(refreshBellData,5000);
 
+/* ================= date dropdown ================= */
+(function(){
+  const chip=$('dateChip'),menu=$('dateMenu');
+  if(!chip||!menu)return;
+  chip.addEventListener('click',e=>{e.stopPropagation();menu.classList.toggle('open');});
+  document.addEventListener('click',e=>{if(!menu.parentElement.contains(e.target))menu.classList.remove('open');});
+})();
+
 /* ================= load ================= */
 async function load(){
   try{
@@ -388,12 +362,10 @@ async function load(){
       const t2=new Date(),f2=new Date();f2.setDate(f2.getDate()-6);
       const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
       const rep=await api('/api/v1/reports/fuel?from='+iso(f2)+'&to='+iso(t2)).catch(()=>({rows:[]}));
-      __distByVeh={};__usedByVeh={};
+      __distByVeh={};__effByVeh={};
       rep.rows.forEach(r=>{__distByVeh[r.vehicle_id]=r.distance_km||0;
-        __usedByVeh[r.vehicle_id]=r.fuel_used_pct||0;
-        __effByVeh[r.vehicle_id]=(r.km_per_fuel_pct||0)/100*TANK_E;});
+        __effByVeh[r.vehicle_id]=(r.km_per_fuel_pct||0)/100*200;});
     }catch(e){}
-    window.TANK_E=200;
 
     const driving=drivers.filter(d=>driverStatus(d)==='Active').length;
     const idle=drivers.filter(d=>driverStatus(d)==='Idle').length;
@@ -426,13 +398,23 @@ async function load(){
       m.setLatLng([v.latitude,v.longitude]);
     });
 
-    renderTable();renderFeed();renderDocs();
+    renderTable();renderFeed();renderDocs();renderBranchFilter();
     if(selId)renderDetail();
   }catch(e){
     $('perfRows').innerHTML='<tr><td colspan="7" class="muted">Load failed: '+esc(e.message)+' - if HTTP 401/302, sign in again.</td></tr>';
   }
 }
-const TANK_E=200;
+
+/* ================= branch filter ================= */
+function renderBranchFilter(){
+  const sel=$('fBranch');if(!sel)return;
+  const cur=sel.value;
+  const branches=new Set();
+  (drivers||[]).forEach(d=>{try{branches.add(persona(d).branch);}catch(e){}});
+  const opts='<option value="">All Branches</option>'+
+    Array.from(branches).sort().map(b=>'<option'+(b===cur?' selected':'')+' value="'+esc(b)+'">'+esc(b)+'</option>').join('');
+  if(sel.innerHTML!==opts)sel.innerHTML=opts;
+}
 
 /* ================= table ================= */
 function driverStatus(d){
@@ -441,11 +423,13 @@ function driverStatus(d){
   const moving=(d.plates||[]).some(p=>{const v=live.get(p);return v&&v.status==='MOVING';});
   return moving?'Active':'Idle';
 }
-let fBranchSel='';
 function renderTable(){
   const q=$('gq').value.toUpperCase();
-  fBranchSel=$('fBranch')?$('fBranch').value:'';
-  const rows=drivers.filter(d=>{const b=persona(d).branch;return (!q||(d.name+' '+d.driverId+' '+(d.plates||[]).join(' ')).toUpperCase().includes(q))&&(!fBranchSel||b===fBranchSel);});
+  const fb=$('fBranch')?$('fBranch').value:'';
+  const rows=drivers.filter(d=>{
+    const b=persona(d).branch;
+    const hay=(d.name+' '+d.driverId+' '+(d.plates||[]).join(' ')).toUpperCase();
+    return(!q||hay.includes(q))&&(!fb||b===fb);});
   $('perfRows').innerHTML=rows.map(d=>{
     const col=d.score>=80?'var(--green)':d.score>=60?'var(--amber)':'var(--red)';
     const st=driverStatus(d);
@@ -511,20 +495,19 @@ function renderDetail(){
   const pid=(d.plates||[])[0];
   const v=live.get(pid);
   const meta=pid?vehicles.get(pid):null;
-  const vehName=meta?(meta.make||'')+' '+(meta.model||''):'';
-  $('ddInit').innerHTML=drvAvatar(d);
+  const vehName=meta?((meta.make||'')+' '+(meta.model||'')).trim():'';
+  $('ddInit').textContent=initials(d.name);
   $('ddName').textContent=d.name;
   $('ddId').textContent='Driver ID: '+d.driverId;
   $('ddChip').innerHTML='<span class="schip '+st+'">'+st+'</span>';
-  /* contact block (between header and tabs, per mockup) */
   $('ddContact').innerHTML=
-    '<div class="crow"><span class="ci phone">📞</span>'+esc(p.phone)+'</div>'+
-    '<div class="crow"><span class="ci mail">✉️</span>'+esc(p.email)+'</div>'+
-    '<div class="crow"><span class="ci lic">🪪</span>License: '+esc(p.license)+'</div>'+
-    '<div class="crow"><span class="ci veh">🚚</span>Assigned Vehicle: <b>'+fmtPlate(pid)+'</b>'+(vehName?' ('+esc(vehName.trim())+')':'')+'</div>';
+    '<div class="crow" style="display:flex;align-items:center;gap:9px;padding:5px 14px;font-size:12.5px"><span style="width:22px;height:22px;border-radius:8px;background:#d1fae5;display:grid;place-items:center;font-size:11px">📞</span>'+esc(p.phone)+'</div>'+
+    '<div class="crow" style="display:flex;align-items:center;gap:9px;padding:5px 14px;font-size:12.5px"><span style="width:22px;height:22px;border-radius:8px;background:#dbeafe;display:grid;place-items:center;font-size:11px">✉️</span>'+esc(p.email)+'</div>'+
+    '<div class="crow" style="display:flex;align-items:center;gap:9px;padding:5px 14px;font-size:12.5px"><span style="width:22px;height:22px;border-radius:8px;background:#fef3c7;display:grid;place-items:center;font-size:11px">🪪</span>License: '+esc(p.license)+'</div>'+
+    '<div class="crow" style="display:flex;align-items:center;gap:9px;padding:5px 14px 9px;font-size:12.5px;border-bottom:1px solid var(--line)"><span style="width:22px;height:22px;border-radius:8px;background:#ede9fe;display:grid;place-items:center;font-size:11px">🚚</span>Assigned Vehicle: <b>'+fmtPlate(pid)+'</b>'+(vehName?' ('+esc(vehName)+')':'')+'</div>';
   const b=$('ddBody');
   const evs=d.speeding+d.harshBraking+d.harshAccel;
-  const eff=(pid&&__distByVeh[pid]&&__usedByVeh[pid])?(__distByVeh[pid]/(__usedByVeh[pid]/100*200)).toFixed(1)+' km/L':'-';
+  const eff=pid&&__effByVeh[pid]?__effByVeh[pid].toFixed(1)+' km/L':'-';
   const dist=pid&&__distByVeh[pid]!=null?fmt(__distByVeh[pid])+' km':'-';
   const trips=pid&&__distByVeh[pid]?Math.max(1,Math.round(__distByVeh[pid]/65)):'-';
   if(tab==='overview'){
@@ -561,6 +544,15 @@ function renderDetail(){
   }
 }
 
+/* ================= behaviour tiles ================= */
+function renderBehav(){
+  let brk=0,acc=0,spd=0;
+  drivers.forEach(d=>{brk+=d.harshBraking;acc+=d.harshAccel;spd+=d.speeding;});
+  const idle=drivers.filter(d=>driverStatus(d)==='Idle').length;
+  const s=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  s('bhBrake',brk);s('bhAcc',acc);s('bhSpd',spd);s('bhIdle',idle);
+}
+
 /* ================= wiring ================= */
  $('gq').oninput=renderTable;
  $('addDrv').onclick=()=>toast('Driver registration arrives with the driver-service module',false);
@@ -568,78 +560,6 @@ function renderDetail(){
 
 load();setInterval(load,5000);
 const autoSel=setInterval(()=>{if(drivers.length&&!selId){selectDriver(drivers[0].driverId);clearInterval(autoSel);}},800);
-
-/* ================= driving behaviour tiles ================= */
-function renderBehav(){
-  let brk=0,acc=0,spd=0;
-  drivers.forEach(d=>{brk+=d.harshBraking;acc+=d.harshAccel;spd+=d.speeding;});
-  const idle=drivers.filter(d=>driverStatus(d)==='Idle').length;
-  const s=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
-  s("bhBrake",brk);s("bhAcc",acc);s("bhSpd",spd);s("bhIdle",idle);
-}
-const _drvLoad=load;
-load=async function(){ const r=await _drvLoad.apply(this,arguments);
-  try{renderBehav();}catch(e){console.error('renderBehav:',e);} return r; };
-
-/* ================= date dropdown + add driver (end-of-script) ================= */
-(function(){
-  const chip=$("dateChip"), menu=$("dateMenu");
-  if(chip&&menu){
-    chip.style.cursor="pointer";
-    chip.addEventListener("click",e=>{e.stopPropagation();menu.classList.toggle("open");});
-    document.addEventListener("click",e=>{if(!menu.parentElement.contains(e.target))menu.classList.remove("open");});
-  }
-})();
-function openDrv(){ $("drvModal").style.display="grid"; $("nvName").focus(); }
-function closeDrv(){ $("drvModal").style.display="none"; }
- $("addDrv").onclick=openDrv;
- $("drvModal").addEventListener("click",e=>{if(e.target.id==="drvModal")closeDrv();});
- $("nvSave").onclick=async()=>{
-  const body={ name:$("nvName").value.trim(), driverId:$("nvId").value.trim().toUpperCase(),
-    phone:$("nvPhone").value.trim(), branch:$("nvBranch").value.trim(),
-    licenseExp:$("nvLic").value||null };
-  const msg=$("nvMsg");
-  try{
-    const r=await fetch('/api/v1/drivers',{method:'POST',
-      headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-    if(r.status===201){
-      msg.style.color='var(--green)';msg.textContent='✅ Driver registered';
-      setTimeout(()=>{closeDrv();msg.textContent='';load();},800);
-    } else if(r.status===403){msg.style.color='var(--red)';msg.textContent='⛔ ADMIN or FLEET_MANAGER required';}
-    else if(r.status===409){msg.style.color='var(--red)';msg.textContent='❌ Driver ID already exists';}
-    else if(r.status===400){const t=await r.text();msg.style.color='var(--red)';msg.textContent='❌ '+t.slice(0,120);}
-    else{msg.style.color='var(--red)';msg.textContent='❌ Failed ('+r.status+')';}
-  }catch(e){msg.style.color='var(--red)';msg.textContent='❌ Network error';}
-};
-
-/* ================= branch filter (end-of-script) ================= */
-function renderBranchFilter(){
-  const sel=$("fBranch");if(!sel)return;
-  const cur=sel.value;
-  const branches=new Set();
-  drivers.forEach(d=>{const p=persona(d);if(p.branch)branches.add(p.branch);});
-  // registered drivers also carry branch via V7
-  const opts='<option value="">All Branches</option>'+
-    [...branches].sort().map(b=>'<option'+(b===cur?' selected':'')+' value="'+esc(b)+'">'+esc(b)+'</option>').join('');
-  if(sel.innerHTML!==opts)sel.innerHTML=opts;
-}
- $("fBranch").onchange=()=>{page=0;renderTable();};
-
-/* branch filter wrapper: filters drivers array before renderTable sees it */
-const _rtBranchWrapped=true;
-window.__branchSel="";
-const _renderTableBase=renderTable;
-renderTable=function(){
-  window.__branchSel=$("fBranch")?$("fBranch").value:"";
-  const saved=drivers;
-  if(window.__branchSel){
-    drivers=drivers.filter(d=>{
-      const rv=(window.__vbranch&&window.__vbranch.get(d.driverId))||persona(d).branch;
-      return rv===window.__branchSel;
-    });
-  }
-  try{ _renderTableBase(); } finally { drivers=saved; }
-};
 </script>
 </body>
 </html>
