@@ -160,9 +160,12 @@ tr.sel td{background:#eff6ff}
       </select>
       <div style="position:relative">
         <span class="hdr-pill" id="dateChip">📅 -</span>
-        <div class="dropdown" id="dateMenu">
-          <input type="date" id="datePick" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:7px 8px;font:inherit"/>
-          <div class="muted small" style="margin-top:6px">Range view arrives with daily rollups</div>
+        <div class="dropdown" id="dateMenu" style="min-width:240px">
+          <label class="muted small" style="display:block;margin-bottom:3px">From</label>
+          <input type="date" id="rangeFrom" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:7px 8px;font:inherit;margin-bottom:8px"/>
+          <label class="muted small" style="display:block;margin-bottom:3px">To</label>
+          <input type="date" id="rangeTo" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:7px 8px;font:inherit"/>
+          <div class="muted small" style="margin-top:8px">Range filtering arrives with daily rollups</div>
         </div>
       </div>
       <button class="btn" id="addDrv"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add Driver</button>
@@ -628,6 +631,22 @@ document.getElementById("nvSave").onclick=async function(){
     else{msg.style.color='#991b1b';msg.textContent='❌ Failed ('+r.status+')';}
   }catch(e){msg.style.color='#991b1b';msg.textContent='❌ Network error';}
 };
+
+/* range picker wiring */
+(function(){
+  const rf=document.getElementById("rangeFrom"), rt=document.getElementById("rangeTo");
+  const chip=document.getElementById("dateChip");
+  if(!rf||!rt||!chip)return;
+  function updateRangeText(){
+    const fd=rf.value?new Date(rf.value+"T00:00:00").toLocaleDateString([],{day:"numeric",month:"short",year:"numeric"}):null;
+    const td=rt.value?new Date(rt.value+"T00:00:00").toLocaleDateString([],{day:"numeric",month:"short",year:"numeric"}):null;
+    if(fd&&td) chip.textContent="\ud83d\udcc5 "+fd+" \u2013 "+td;
+    else if(fd) chip.textContent="\ud83d\udcc5 "+fd+" \u2192";
+    else chip.textContent="\ud83d\udcc5 "+new Date().toLocaleDateString([],{day:"numeric",month:"short",year:"numeric"})+" \u2013 "+new Date().toLocaleDateString([],{day:"numeric",month:"short",year:"numeric"});
+  }
+  rf.addEventListener("change",updateRangeText);
+  rt.addEventListener("change",updateRangeText);
+})();
 </script>
 </body>
 </html>
