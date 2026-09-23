@@ -603,7 +603,6 @@ async function loadDist(){
     }
     loadDist();setInterval(loadDist,60000);
     load();setInterval(load,5000);
-const _hv=loadHeavy;loadHeavy=async function(){try{await _hv()}catch(e){}};loadHeavy();setInterval(loadHeavy,30000);
 const autoSel=setInterval(()=>{if(drivers.length&&!selId){selectDriver(drivers[0].driverId);clearInterval(autoSel);}},800);
 
 /* add-driver canonical wiring */
