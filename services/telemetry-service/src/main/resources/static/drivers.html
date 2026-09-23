@@ -349,7 +349,7 @@ refreshBellData();setInterval(refreshBellData,5000);
   function setDateChipText(){
       const d=new Date();
       const t=d.toLocaleDateString([],{day:'numeric',month:'short',year:'numeric'});
-      chip.textContent='\ud83d\udcc5 '+t+' \u2013 '+t;
+      document.getElementById('dateChip').textContent='\ud83d\udcc5 '+t+' \u2013 '+t;
     }
     setDateChipText();
     const chip=$('dateChip'),menu=$('dateMenu');
