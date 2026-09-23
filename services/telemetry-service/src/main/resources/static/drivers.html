@@ -110,6 +110,14 @@ tr.sel td{background:#eff6ff}
 #toast{position:fixed;bottom:20px;right:20px;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;display:none;box-shadow:0 8px 24px rgba(2,6,23,.2);background:#d1fae5;color:#065f46;z-index:3000}
 @media (max-width:1280px){.g-top,.g-bot{grid-template-columns:1fr 1fr}.g-top>.rcol,.g-bot>.dcol{grid-column:1/-1}}
 @media (max-width:900px){.g-top,.g-bot{grid-template-columns:1fr}}
+  .hdr-pill{display:inline-flex;align-items:center;gap:7px;background:var(--panel);
+    border:1px solid var(--line);border-radius:10px;padding:9px 14px;font-size:12.5px;
+    font-weight:600;color:var(--text);white-space:nowrap;cursor:default}
+  .hdr-pill svg{flex:none}
+  #fBranch{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:9px 14px;font-size:12.5px;font-weight:600;color:var(--text);cursor:pointer}
+  #fBranch:focus{outline:2px solid var(--blue2);border-color:transparent}
+  #addDrv{display:inline-flex;align-items:center;gap:7px}
 </style>
 </head>
 <body>
@@ -147,17 +155,17 @@ tr.sel td{background:#eff6ff}
     <div class="pagehead"><span class="ic">🧑‍✈️</span>
       <div><h1>Drivers</h1><div class="sub">Manage your drivers, track performance and monitor safety</div></div>
       <span class="spacer"></span>
-      <select id="fBranch" onchange="renderTable()" style="border:1px solid var(--line);border-radius:9px;padding:8px 12px;font:inherit;background:#fff">
+      <span class="hdr-pill" id="branchWrap" style="padding:0 14px 0 0;cursor:pointer"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><select style="border:0;padding:0;font-weight:600;background:transparent;width:auto" id="fBranch" onchange="renderTable()" style="border:1px solid var(--line);border-radius:9px;padding:8px 12px;font:inherit;background:#fff"></span>
         <option value="">All Branches</option>
       </select>
       <div style="position:relative">
-        <span class="datechip" id="dateChip">📅 -</span>
+        <span class="hdr-pill" id="dateChip">📅 -</span>
         <div class="dropdown" id="dateMenu">
           <input type="date" id="datePick" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:7px 8px;font:inherit"/>
           <div class="muted small" style="margin-top:6px">Range view arrives with daily rollups</div>
         </div>
       </div>
-      <button class="btn" id="addDrv">＋ Add Driver</button>
+      <button class="btn" id="addDrv"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>＋ Add Driver</button>
     </div>
 
     <div class="kpis">
@@ -338,7 +346,13 @@ refreshBellData();setInterval(refreshBellData,5000);
 
 /* ================= date dropdown ================= */
 (function(){
-  const chip=$('dateChip'),menu=$('dateMenu');
+  function setDateChipText(){
+      const d=new Date();
+      const t=d.toLocaleDateString([],{day:'numeric',month:'short',year:'numeric'});
+      chip.textContent='\ud83d\udcc5 '+t+' \u2013 '+t;
+    }
+    setDateChipText();
+    const chip=$('dateChip'),menu=$('dateMenu');
   if(!chip||!menu)return;
   chip.addEventListener('click',e=>{e.stopPropagation();menu.classList.toggle('open');});
   document.addEventListener('click',e=>{if(!menu.parentElement.contains(e.target))menu.classList.remove('open');});
