@@ -261,6 +261,29 @@ tr.sel td{background:#eff6ff}
   </div>
 </main>
 </div>
+<div class="modal" id="drvModal" style="position:fixed;inset:0;background:rgba(2,6,23,.55);display:none;place-items:center;z-index:2600">
+  <div style="background:#fff;border-radius:16px;max-width:480px;width:92%;padding:22px 24px;position:relative">
+    <button onclick="closeDrv()" style="position:absolute;top:14px;right:16px;border:0;background:none;font-size:18px;cursor:pointer;color:var(--muted)">✕</button>
+    <h2 style="font-size:18px;margin-bottom:4px">Add Driver</h2>
+    <div class="muted small" style="margin-bottom:12px">Registers the driver in the fleet roster.</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div style="grid-column:1/-1"><label class="muted small">Full name *</label>
+        <input id="nvName" placeholder="Grace Wanjiku" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit"/></div>
+      <div><label class="muted small">Driver ID * (D + digits)</label>
+        <input id="nvId" placeholder="D026" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit"/></div>
+      <div><label class="muted small">Phone</label>
+        <input id="nvPhone" placeholder="+254 7XX XXX XXX" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit"/></div>
+      <div><label class="muted small">Branch</label>
+        <input id="nvBranch" placeholder="Nairobi" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit"/></div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:14px">
+      <button class="btn" style="flex:1" id="nvSave">Register Driver</button>
+      <button class="btn ghost" style="flex:1" onclick="closeDrv()">Cancel</button>
+    </div>
+    <div class="muted small" id="nvMsg" style="margin-top:8px;min-height:16px"></div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <script>
@@ -296,7 +319,8 @@ function persona(d){
 /* ================= avatars ================= */
 function drvAvatar(d){
   const ini=initials(d.name);
-  const img='<img src="img/drv/'+encodeURIComponent(d.driverId)+'.jpg" data-svg="img/drv/'+encodeURIComponent(d.driverId)+'.svg" onerror="if(!this.dataset.f){this.dataset.f=1;this.src=this.dataset.svg;}else{this.remove();}" alt="">';
+  /* generated SVG avatar first; drop img/drv/<ID>.jpg to upgrade a driver to a real photo */
+  const img='<img src="img/drv/'+encodeURIComponent(d.driverId)+'.svg" data-jpg="img/drv/'+encodeURIComponent(d.driverId)+'.jpg" onerror="this.remove()" alt="">';
   return '<span class="dinit">'+ini+'</span>'+img;
 }
 
@@ -581,6 +605,30 @@ async function loadDist(){
     load();setInterval(load,5000);
 const _hv=loadHeavy;loadHeavy=async function(){try{await _hv()}catch(e){}};loadHeavy();setInterval(loadHeavy,30000);
 const autoSel=setInterval(()=>{if(drivers.length&&!selId){selectDriver(drivers[0].driverId);clearInterval(autoSel);}},800);
+
+/* add-driver canonical wiring */
+function openDrv(){ document.getElementById("drvModal").style.display="grid"; document.getElementById("nvName").focus(); }
+function closeDrv(){ document.getElementById("drvModal").style.display="none"; }
+document.getElementById("addDrv").onclick=function(){ openDrv(); };
+document.getElementById("drvModal").addEventListener("click",function(e){ if(e.target.id==="drvModal") closeDrv(); });
+document.getElementById("nvSave").onclick=async function(){
+  const body={ name:document.getElementById("nvName").value.trim(),
+    driverId:document.getElementById("nvId").value.trim().toUpperCase(),
+    phone:document.getElementById("nvPhone").value.trim(),
+    branch:document.getElementById("nvBranch").value.trim() };
+  const msg=document.getElementById("nvMsg");
+  try{
+    const r=await fetch('/api/v1/drivers',{method:'POST',
+      headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    if(r.status===201){
+      msg.style.color='#065f46';msg.textContent='✅ Driver registered';
+      setTimeout(function(){closeDrv();msg.textContent='';if(typeof load==='function')load();},800);
+    } else if(r.status===403){msg.style.color='#991b1b';msg.textContent='⛔ ADMIN or FLEET_MANAGER required';}
+    else if(r.status===409){msg.style.color='#991b1b';msg.textContent='❌ Driver ID already exists';}
+    else if(r.status===400){const t=await r.text();msg.style.color='#991b1b';msg.textContent='❌ '+t.slice(0,120);}
+    else{msg.style.color='#991b1b';msg.textContent='❌ Failed ('+r.status+')';}
+  }catch(e){msg.style.color='#991b1b';msg.textContent='❌ Network error';}
+};
 </script>
 </body>
 </html>
