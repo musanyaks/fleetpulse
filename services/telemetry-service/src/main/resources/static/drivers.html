@@ -372,14 +372,8 @@ async function load(){
     alerts=al;
     docsByVehicle=new Map(vp.filter(v=>v.nextService||v.insuranceExpiry||v.inspectionExpiry)
       .map(v=>[v.vehicleId,[v.nextService,v.insuranceExpiry,v.inspectionExpiry].filter(Boolean)]));
-    try{
-      const t2=new Date(),f2=new Date();f2.setDate(f2.getDate()-6);
-      const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-      const rep=await api('/api/v1/reports/fuel?from='+iso(f2)+'&to='+iso(t2)).catch(()=>({rows:[]}));
-      __distByVeh={};__effByVeh={};
-      rep.rows.forEach(r=>{__distByVeh[r.vehicle_id]=r.distance_km||0;
-        __effByVeh[r.vehicle_id]=(r.km_per_fuel_pct||0)/100*200;});
-    }catch(e){}
+    /* 7d distance/efficiency now fetched separately on a 60s timer (see loadDist) */
+    renderTable();renderFeed();renderDocs();
 
     const driving=drivers.filter(d=>driverStatus(d)==='Active').length;
     const idle=drivers.filter(d=>driverStatus(d)==='Idle').length;
@@ -572,7 +566,19 @@ function renderBehav(){
  $('addDrv').onclick=()=>toast('Driver registration arrives with the driver-service module',false);
  $('perfAll').onclick=()=>toast('All drivers shown - full history scoring arrives with driver-service',true);
 
-load();setInterval(load,5000);
+async function loadDist(){
+      try{
+        const t2=new Date(),f2=new Date();f2.setDate(f2.getDate()-6);
+        const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+        const rep=await api('/api/v1/reports/fuel?from='+iso(f2)+'&to='+iso(t2));
+        __distByVeh={};__effByVeh={};
+        rep.rows.forEach(r=>{__distByVeh[r.vehicle_id]=r.distance_km||0;
+          __effByVeh[r.vehicle_id]=(r.km_per_fuel_pct||0)*100/200;});
+        if(selId)renderDetail();
+      }catch(e){}
+    }
+    loadDist();setInterval(loadDist,60000);
+    load();setInterval(load,5000);
 const _hv=loadHeavy;loadHeavy=async function(){try{await _hv()}catch(e){}};loadHeavy();setInterval(loadHeavy,30000);
 const autoSel=setInterval(()=>{if(drivers.length&&!selId){selectDriver(drivers[0].driverId);clearInterval(autoSel);}},800);
 </script>
