@@ -471,6 +471,7 @@ async function loadGroups(){
 }
 
 /* ================= branches & depots (self-contained) ================= */
+const _fbEsc = s => (s ?? '').replace(/[<>&"]/g, function(c){return {'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c];});
 async function loadBranches(){
   try{
     const zr = await fetch('/api/v1/geofences');
@@ -481,9 +482,9 @@ async function loadBranches(){
     el.innerHTML = active.map(function(z){
       const col = (z.type==='RESTRICTED'||z.type==='DANGER') ? 'var(--red)' : z.type==='DEPOT' ? 'var(--blue2)' : 'var(--green)';
       const t = z.type==='DEPOT' ? 'Depot' : z.type==='RESTRICTED' ? 'Restricted Zone' : z.type==='DANGER' ? 'Danger Zone' : 'Customer Site';
-      return '<tr><td><span class="pint"><span class="pdot" style="background:'+col+'"></span><b>'+_fpEsc(z.name)+'</b></span></td>'+
+      return '<tr><td><span class="pint"><span class="pdot" style="background:'+col+'"></span><b>'+_fbEsc(z.name)+'</b></span></td>'+
         '<td style="color:#64748b">Kenya</td>'+
-        '<td>'+_fpEsc(t)+'</td>'+
+        '<td>'+_fbEsc(t)+'</td>'+
         '<td><span class="chip Active">Active</span></td>'+
         '<td style="color:#64748b;font-size:11px">geofence</td></tr>';
     }).join('') || '<tr><td colspan="5" style="color:#64748b">No zones - create them on the Geofences tab.</td></tr>';
