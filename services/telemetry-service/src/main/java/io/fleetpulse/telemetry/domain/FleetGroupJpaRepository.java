@@ -6,4 +6,5 @@ import java.util.Optional;
 
 public interface FleetGroupJpaRepository extends JpaRepository<FleetGroupEntity, Long> {
     Optional<FleetGroupEntity> findByNameIgnoreCase(String name);
+    boolean existsByNameIgnoreCase(String name);
 }
