@@ -74,6 +74,7 @@ main{flex:1;min-width:0;display:flex;flex-direction:column}
 .muted{color:var(--muted)}.small{font-size:12px}
 #toast{position:fixed;bottom:20px;right:20px;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;display:none;box-shadow:0 8px 24px rgba(2,6,23,.2);background:#d1fae5;color:#065f46;z-index:3000}
 @media (max-width:1200px){.g-main{grid-template-columns:1fr}.frm{grid-template-columns:1fr 1fr}}
+  .traffic-tint .leaflet-tile-pane{filter:saturate(1.4) sepia(0.35) hue-rotate(-15deg) brightness(0.95)}
 </style>
 </head>
 <body>
@@ -325,6 +326,13 @@ document.querySelectorAll('.tgl').forEach(function(t){
     t.classList.toggle('on', on);
     togglePrefs[t.dataset.pref] = on;
     localStorage.setItem('fleetpulse-toggles', JSON.stringify(togglePrefs));
+    if(label === 'Show Traffic Layer'){
+      window.__trafficOn = on;
+      localStorage.setItem('fleetpulse-traffic', on ? 'on' : 'off');
+      applyTrafficTint();
+      toast('Traffic overlay: ' + (on ? 'congestion-style tinting ON (placeholder - live data needs a provider)' : 'OFF'), false);
+      return;
+    }
     const gated = ['Email Notifications','SMS Notifications','Two-Factor Authentication','IP Whitelist','Show Traffic Layer'];
     if(on && gated.includes(label)){
       toast(label + ': preference saved - delivery arrives with its roadmap module', false);
@@ -334,6 +342,20 @@ document.querySelectorAll('.tgl').forEach(function(t){
   });
 });
 applyTogglePrefs();
+
+/* ================= traffic toggle engine (persists, tints maps) ================= */
+window.__trafficOn = localStorage.getItem('fleetpulse-traffic') === 'on';
+function applyTrafficTint(){
+  document.querySelectorAll('#map, #fmap, #dmap, #dmap2').forEach(function(el){
+    el.classList.toggle('traffic-tint', window.__trafficOn);
+  });
+}
+applyTrafficTint();
+window.__trafficSync = function(){
+  const t = document.querySelector('#tgTraffic, .tgl[data-pref="Show Traffic Layer"]');
+  if(t) t.classList.toggle('on', window.__trafficOn);
+  applyTrafficTint();
+};
 </script>
 </body>
 </html>
