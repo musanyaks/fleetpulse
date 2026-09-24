@@ -3,17 +3,6 @@
 <head>
 <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Settings · FleetPulse</title>
-
-<script>
-const FP_ICONS = {
-  truck: '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="6" width="13" height="9" rx="1.5"/><path d="M14 9h3.6c.5 0 .97.24 1.26.64L21 12.5V15h-7V9Z"/><circle cx="5.5" cy="17.5" r="1.9"/><circle cx="16.5" cy="17.5" r="1.9"/></svg>',
-  kafka: '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#1e293b" stroke-width="1.8"><circle cx="16" cy="4" r="2.2"/><circle cx="16" cy="12" r="2.2"/><circle cx="16" cy="20" r="2.2"/><circle cx="7" cy="8" r="2.2"/><circle cx="7" cy="16" r="2.2"/><path d="M9 9l5 2M9 15l5-2M15 6v3.5M15 14.5V18"/></svg>',
-  pgsql: '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#2563eb" stroke-width="1.8"><ellipse cx="12" cy="5.5" rx="8" ry="3"/><path d="M4 5.5v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/><path d="M4 11.5v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></svg>',
-  redis: '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#dc2626" stroke-width="1.8"><path d="M3 8.5l9-4.5 9 4.5-9 4.5-9-4.5z" fill="#fee2e2"/><path d="M3 12.5l9 4.5 9-4.5"/><path d="M3 16.5l9 4.5 9-4.5"/></svg>',
-  cloud: '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>'
-};
-window.FP_ICONS = FP_ICONS;
-</script>
 <style>
 :root{--bg:#f4f6fb;--panel:#fff;--line:#e6eaf2;--text:#1e293b;--muted:#64748b;--blue:#2563eb;--blue2:#3b82f6;--green:#10b981;--amber:#f59e0b;--red:#ef4444;--navy:#0d2b57}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -44,47 +33,44 @@ main{flex:1;min-width:0;display:flex;flex-direction:column}
 .pagehead h1{font-size:22px;font-weight:800}
 .pagehead .sub{color:var(--muted);font-size:12.5px}
 .stabs{display:flex;gap:4px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:6px;overflow-x:auto}
-.stabs button{border:0;background:transparent;padding:9px 13px;font:inherit;font-size:12.5px;font-weight:600;color:var(--muted);cursor:pointer;border-radius:9px;white-space:nowrap;display:flex;align-items:center;gap:7px}
+.stabs button{border:0;background:transparent;padding:9px 13px;font:inherit;font-size:12.5px;font-weight:600;color:var(--muted);cursor:pointer;border-radius:9px;white-space:nowrap}
 .stabs button.on{background:var(--blue);color:#fff}
 .grid{display:grid;gap:16px;align-items:start}
 .g-main{grid-template-columns:1fr 340px}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
 .card>h3{font-size:13px;font-weight:700;padding:12px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}
-.card>h3 .ic{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;font-size:13px}
-.card>h3 .edit{margin-left:auto;font-size:12px;color:var(--blue);font-weight:600;cursor:pointer;text-decoration:none}
 .card .sub{font-weight:400;color:var(--muted);font-size:11.5px}
 .pad{padding:14px 16px}
 .frm{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.frm2{grid-template-columns:1fr 1fr}
 .frm label,.fl{font-size:11.5px;color:var(--muted);display:block;margin-bottom:4px;font-weight:600}
 .frm input,.frm select{width:100%;border:1px solid var(--line);border-radius:9px;padding:8px 10px;font:inherit;background:#fff;color:var(--text)}
-.tgl{display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;margin:4px 0}
+.tgl{display:inline-flex;align-items:center;gap:10px;cursor:pointer;user-select:none;margin:4px 0}
 .tgl .sw{width:36px;height:20px;border-radius:99px;background:#cbd5e1;position:relative;transition:.2s;flex:none}
 .tgl .sw::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:.2s}
 .tgl.on .sw{background:var(--blue2)}.tgl.on .sw::after{left:18px}
-.tgl.dis{opacity:.5;cursor:not-allowed}
+.tgl.dis{opacity:.55;cursor:not-allowed}
 .tgl .tx{font-size:12.5px;font-weight:600}
 .tgl .tx .d{display:block;font-weight:400;color:var(--muted);font-size:11px}
 .btn{border:0;border-radius:9px;padding:9px 14px;font:inherit;font-weight:600;background:var(--blue);color:#fff;cursor:pointer}
-.btn.ghost{background:#fff;color:var(--text);border:1px solid var(--line)}
 .irow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:12.8px}
 .irow:last-child{border-bottom:0}
-.irow .k{display:flex;align-items:center;gap:8px;color:var(--text)}
-.irow .ic{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;font-size:12px}
-.irow .sub{display:block;font-size:10.5px;color:var(--muted)}
+.irow .k{display:flex;align-items:center;gap:8px}
+.irow .ic{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;font-size:12px;flex:none}
+.irow .sub2{display:block;font-size:10.5px;color:var(--muted)}
 .conn{font-size:10px;font-weight:700;padding:2px 9px;border-radius:99px}
-.conn.up{background:#d1fae5;color:#065f46}.conn.down{background:#fee2e2;color:#991b1b}.conn.warn{background:#fef3c7;color:#92400e}
+.conn.up{background:#d1fae5;color:#065f46}.conn.warn{background:#fef3c7;color:#92400e}
 .orgcard{padding:14px 16px}
 .orglogo{display:flex;align-items:center;gap:12px;margin-bottom:12px}
-.orglogo .bub{width:48px;height:48px;border-radius:12px;background:var(--blue2);display:grid;place-items:center;font-size:22px}
+.orglogo .bub{width:48px;height:48px;border-radius:12px;background:var(--blue2);display:grid;place-items:center}
 .orglogo .nm{font-size:17px;font-weight:800}
 .orglogo .tg{font-size:11px;color:var(--muted)}
 .krow{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid var(--line);font-size:12.5px}
 .krow:last-child{border-bottom:0}
 .krow .k{color:var(--muted)}
-.colorrow{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:12.5px}
-.colorrow i{width:16px;height:16px;border-radius:6px;display:inline-block}
-.footer-note{background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;border-radius:12px;padding:9px 14px;font-size:12px;display:flex;align-items:center;gap:8px}
+.colorrow{display:flex;align-items:center;gap:10px;padding:5px 0;font-size:12.5px}
+.colorrow .sw2{width:22px;height:22px;border-radius:8px;border:1px solid var(--line)}
+.colorrow b{margin-left:8px}
+.footer-note{background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;border-radius:12px;padding:9px 14px;font-size:12px}
 .muted{color:var(--muted)}.small{font-size:12px}
 #toast{position:fixed;bottom:20px;right:20px;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;display:none;box-shadow:0 8px 24px rgba(2,6,23,.2);background:#d1fae5;color:#065f46;z-index:3000}
 @media (max-width:1200px){.g-main{grid-template-columns:1fr}.frm{grid-template-columns:1fr 1fr}}
@@ -140,28 +126,20 @@ main{flex:1;min-width:0;display:flex;flex-direction:column}
       <button data-s="system">🖥 System</button>
     </div>
 
-    <div class="grid g-main">
+    <div class="grid g-main" id="generalWrap">
       <div>
-        <!-- ============ GENERAL ============ -->
-        <div class="card" style="margin-bottom:16px" id="sec-general">
+        <div class="card" style="margin-bottom:16px">
           <h3>General Settings</h3>
           <div class="pad">
             <div class="frm">
               <div><label>System Name</label><input id="sName" value="FleetPulse"/></div>
-              <div><label>Timezone</label>
-                <select id="sTz"><option>Africa/Nairobi (EAT)</option><option>UTC</option></select></div>
-              <div><label>Date Format</label>
-                <select id="sDate"><option>DD/MM/YYYY</option><option>MM/DD/YYYY</option><option>YYYY-MM-DD</option></select></div>
-              <div><label>Time Format</label>
-                <select id="sTime"><option>24 Hour</option><option>12 Hour</option></select></div>
-              <div><label>Language</label>
-                <select id="sLang"><option>English</option><option>Swahili</option></select></div>
-              <div><label>Default Map View</label>
-                <select id="sMap"><option>Roadmap</option><option>Satellite</option></select></div>
-              <div><label>Auto Refresh Interval</label>
-                <select id="sRef"><option>5 seconds</option><option selected>30 seconds</option><option>60 seconds</option></select></div>
-              <div><label>System Version</label>
-                <input value="v1.0.0" disabled style="background:#f1f5fb"/></div>
+              <div><label>Timezone</label><select id="sTz"><option>Africa/Nairobi (EAT)</option><option>UTC</option></select></div>
+              <div><label>Date Format</label><select id="sDate"><option>DD/MM/YYYY</option><option>YYYY-MM-DD</option></select></div>
+              <div><label>Time Format</label><select id="sTime"><option>24 Hour</option><option>12 Hour</option></select></div>
+              <div><label>Language</label><select id="sLang"><option>English</option><option>Swahili</option></select></div>
+              <div><label>Default Map View</label><select id="sMap"><option>Roadmap</option><option>Satellite</option></select></div>
+              <div><label>Auto Refresh Interval</label><select id="sRef"><option>5 seconds</option><option selected>30 seconds</option><option>60 seconds</option></select></div>
+              <div><label>System Version</label><input value="v1.0.0" disabled style="background:#f1f5fb"/></div>
             </div>
             <div class="tgl on" id="tglRt" style="margin-top:12px"><span class="sw"></span>
               <span class="tx">Enable Real-time Tracking<span class="d">Automatically update vehicle locations in real-time.</span></span></div>
@@ -173,24 +151,21 @@ main{flex:1;min-width:0;display:flex;flex-direction:column}
 
         <div class="grid" style="grid-template-columns:1fr 1fr 1fr">
           <div class="card">
-            <h3><span class="ic" style="background:#e8f0fe">🗺</span> Map &amp; Location <span class="sub" style="margin-left:auto">providers &amp; location services</span></h3>
+            <h3><span class="ic" style="background:#e8f0fe">🗺</span> Map &amp; Location</h3>
             <div class="pad">
               <label class="fl">Map Provider</label>
-              <select style="width:100%;border:1px solid var(--line);border-radius:9px;padding:8px 10px;font:inherit;margin-bottom:10px">
-                <option>OpenStreetMap</option><option disabled>Google Maps (key required)</option><option disabled>MapTiler (key required)</option></select>
-              <label class="fl">API Key</label>
-              <input type="password" value="notrequired" disabled style="width:100%;border:1px solid var(--line);border-radius:9px;padding:8px 10px;font:inherit;margin-bottom:10px;background:#f1f5fb"/>
-              <label class="fl">Default Zoom Level</label>
+              <select style="width:100%;border:1px solid var(--line);border-radius:9px;padding:8px 10px;font:inherit;margin-bottom:10px"><option>OpenStreetMap</option><option disabled>Google Maps (key required)</option></select>
+              <label class="fl">Default Zoom</label>
               <select style="width:100%;border:1px solid var(--line);border-radius:9px;padding:8px 10px;font:inherit;margin-bottom:10px"><option>7</option><option selected>10</option><option>13</option></select>
-              <div class="tgl on" id="tgGeoS"><span class="sw"></span><span class="tx">Show Geofences<span class="d">Display geofence zones on the map.</span></span></div>
-              <div class="tgl dis" id="tgTraffic"><span class="sw"></span><span class="tx">Show Traffic Layer<span class="d">Requires a traffic data provider — roadmap.</span></span></div>
+              <div class="tgl on"><span class="sw"></span><span class="tx">Show Geofences<span class="d">Display geofence zones on maps.</span></span></div>
+              <div class="tgl dis" data-mod="traffic"><span class="sw"></span><span class="tx">Show Traffic Layer<span class="d">Requires a traffic provider — roadmap.</span></span></div>
             </div>
           </div>
           <div class="card">
-            <h3><span class="ic" style="background:#dbeafe">🔔</span> Alert &amp; Notification <span class="sub" style="margin-left:auto">how you receive alerts</span></h3>
+            <h3><span class="ic" style="background:#dbeafe">🔔</span> Alert &amp; Notification</h3>
             <div class="pad">
-              <div class="tgl dis"><span class="sw"></span><span class="tx">Email Notifications<span class="d">Requires notification module — roadmap.</span></span></div>
-              <div class="tgl dis"><span class="sw"></span><span class="tx">SMS Notifications<span class="d">Requires SMS gateway — roadmap.</span></span></div>
+              <div class="tgl dis" data-mod="notification"><span class="sw"></span><span class="tx">Email Notifications<span class="d">Requires notification module.</span></span></div>
+              <div class="tgl dis" data-mod="notification"><span class="sw"></span><span class="tx">SMS Notifications<span class="d">Requires SMS gateway.</span></span></div>
               <div class="tgl on"><span class="sw"></span><span class="tx">In-app Notifications<span class="d">Live bell + alert pages.</span></span></div>
               <div style="margin-top:10px"><label class="fl">Notification Frequency</label>
                 <select style="width:100%;border:1px solid var(--line);border-radius:9px;padding:8px 10px;font:inherit"><option>Instant</option><option>Hourly digest</option></select></div>
@@ -199,13 +174,12 @@ main{flex:1;min-width:0;display:flex;flex-direction:column}
             </div>
           </div>
           <div class="card">
-            <h3><span class="ic" style="background:#d1fae5">🔌</span> Integration Status <span class="sub" style="margin-left:auto">live probes</span></h3>
+            <h3><span class="ic" style="background:#d1fae5">🔌</span> Integrations</h3>
             <div class="pad">
-              <div class="irow"><span class="k"><span class="ic" style="background:#f1f5f9"><img src="https://cdn.simpleicons.org/apachekafka/231F20" width="14" height="14" alt="Kafka" style="display:block"/></span><span>Apache Kafka<span class="sub">kafka:9092</span></span></span><span class="conn up">Connected</span></div>
-              <div class="irow"><span class="k"><span class="ic" style="background:#eef2ff"><img src="https://cdn.simpleicons.org/postgresql/336791" width="14" height="14" alt="PostgreSQL" style="display:block"/></span><span>PostgreSQL / Timescale<span class="sub">timescaledb:5432</span></span></span><span class="conn up">Connected</span></div>
-              <div class="irow"><span class="k"><span class="ic" style="background:#fee2e2"><img src="https://cdn.simpleicons.org/redis/DC382D" width="14" height="14" alt="Redis" style="display:block"/></span><span>Redis<span class="sub">redis:6379 (sessions)</span></span></span><span class="conn up">Connected</span></div>
-              <div class="irow"><span class="k"><span class="ic" style="background:#f1f5f9">📡</span><span>MQTT Mosquitto<span class="sub">mosquitto:1883</span></span></span><span class="conn up">Connected</span></div>
-              <div class="irow"><span class="k"><span class="ic" style="background:#f1f5f9"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg></span><span>External API<span class="sub">not configured</span></span></span><span class="conn warn">Not Configured</span></div>
+              <div class="irow"><span class="k">⚡ Apache Kafka<span class="sub2">kafka:9092</span></span><span class="conn up">Connected</span></div>
+              <div class="irow"><span class="k">🗄 PostgreSQL<span class="sub2">timescaledb:5432</span></span><span class="conn up">Connected</span></div>
+              <div class="irow"><span class="k">🧠 Redis<span class="sub2">redis:6379</span></span><span class="conn up">Connected</span></div>
+              <div class="irow"><span class="k">☁ External API<span class="sub2">not configured</span></span><span class="conn warn">Not Configured</span></div>
             </div>
           </div>
         </div>
@@ -215,19 +189,19 @@ main{flex:1;min-width:0;display:flex;flex-direction:column}
 
       <div>
         <div class="card" style="margin-bottom:16px">
-          <h3>Organization Details <span class="edit" id="orgEdit">✏ Edit</span></h3>
+          <h3>Organization Details <span class="edit" style="margin-left:auto;font-size:12px;color:var(--blue);font-weight:600;cursor:pointer" onclick="toast('Organization editing arrives with the org module',false)">✏ Edit</span></h3>
           <div class="orgcard">
-            <div class="orglogo"><div class="bub" id="org-truck-logo"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="6" width="13" height="9" rx="1.5"/><path d="M14 9h3.6c.5 0 .97.24 1.26.64L21 12.5V15h-7V9Z"/><circle cx="5.5" cy="17.5" r="1.9"/><circle cx="16.5" cy="17.5" r="1.9"/></svg></div>
+            <div class="orglogo"><div class="bub">🚛</div>
               <div><div class="nm">FleetPulse</div><div class="tg">Smarter Fleets. Safer Roads.</div></div></div>
-            <div class="krow"><span class="k">Company Name</span><b id="oName">FleetPulse Logistics Ltd</b></div>
-            <div class="krow"><span class="k">Registration No.</span><b id="oReg">CPI23456789</b></div>
-            <div class="krow"><span class="k">Email</span><b id="oMail">info@fleetpulse.co.ke</b></div>
-            <div class="krow"><span class="k">Phone</span><b id="oPhone">+254 700 123 456</b></div>
-            <div class="krow"><span class="k">Address</span><b id="oAddr">Nairobi, Kenya</b></div>
+            <div class="krow"><span class="k">Company Name</span><b>FleetPulse Logistics Ltd</b></div>
+            <div class="krow"><span class="k">Registration No.</span><b>CPI23456789</b></div>
+            <div class="krow"><span class="k">Email</span><b>info@fleetpulse.co.ke</b></div>
+            <div class="krow"><span class="k">Phone</span><b>+254 700 123 456</b></div>
+            <div class="krow"><span class="k">Address</span><b>Nairobi, Kenya</b></div>
             <b class="small" style="display:block;margin:12px 0 6px">Branding</b>
-            <div class="colorrow"><span class="muted" style="width:110px">Primary Color</span><i style="background:#2563EB;width:22px;height:22px;border-radius:8px;border:1px solid var(--line)"></i><b style="margin-left:8px">#2563EB</b></div>
-            <div class="colorrow"><span class="muted" style="width:110px">Secondary Color</span><i style="background:#0D2B57;width:22px;height:22px;border-radius:8px;border:1px solid var(--line)"></i><b style="margin-left:8px">#0D2B57</b></div>
-            <div class="note">Organization details and branding are demo values — organization management arrives with the driver-service / org module.</div>
+            <div class="colorrow"><span class="muted" style="width:110px">Primary Color</span><i class="sw2" style="background:#2563EB"></i><b>#2563EB</b></div>
+            <div class="colorrow"><span class="muted" style="width:110px">Secondary Color</span><i class="sw2" style="background:#0D2B57"></i><b>#0D2B57</b></div>
+            <div class="note">Organization details and branding are demo values — org management arrives with the driver-service / org module.</div>
           </div>
         </div>
         <div class="card">
@@ -236,9 +210,9 @@ main{flex:1;min-width:0;display:flex;flex-direction:column}
             <div class="irow"><span class="k">Password Policy</span><span class="conn up">Strong</span></div>
             <div class="irow"><span class="k">Session Timeout</span><b>8 hours</b></div>
             <div class="irow"><span class="k">Two-Factor Authentication</span>
-              <span class="tgl dis on" id="tgl2fa"><span class="sw"></span></span></div>
+              <span class="tgl dis" data-mod="security"><span class="sw"></span></span></div>
             <div class="irow"><span class="k">IP Whitelist</span>
-              <span class="tgl dis"><span class="sw"></span></span></div>
+              <span class="tgl dis" data-mod="security"><span class="sw"></span></span></div>
             <div class="irow"><span class="k">Login Attempts Limit</span><b>5</b></div>
             <div class="note">2FA and IP whitelisting arrive with the JWT + users-in-PostgreSQL security milestone.</div>
           </div>
@@ -246,7 +220,6 @@ main{flex:1;min-width:0;display:flex;flex-direction:column}
       </div>
     </div>
 
-    <!-- other tabs -->
     <div class="card" id="tabFallback" style="display:none">
       <h3 id="fbTitle">—</h3>
       <div class="pad muted small" id="fbBody"></div>
@@ -260,7 +233,6 @@ main{flex:1;min-width:0;display:flex;flex-direction:column}
 /* ================= helpers ================= */
 const $=id=>document.getElementById(id);
 const esc=s=>(s??'').replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
-const api=async p=>{const r=await fetch(p);if(!r.ok)throw new Error('HTTP '+r.status);return r.json();};
 const toast=(m,ok)=>{const t=$('toast');t.textContent=m;
   t.style.background=ok===false?'#fee2e2':'#d1fae5';t.style.color=ok===false?'#991b1b':'#065f46';
   t.style.display='block';setTimeout(()=>t.style.display='none',2600);};
@@ -274,9 +246,6 @@ const initials=n=>(n||'?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCa
   const me=await r.json();
   $('uInit').textContent=initials(me.username);
   $('uName').textContent=me.username;$('uRole').textContent=me.roles.join(', ');
-  if(!(me.roles.includes('ADMIN')||me.roles.includes('FLEET_MANAGER'))){
-    $('orgEdit').style.opacity=.4;$('orgEdit').title='Edit arrives with org module';
-  }
 }catch(e){$('uName').textContent='Sign in';$('uRole').textContent='session expired';
   $('userChip').onclick=()=>location.href='/login.html';}})();
  $('fsBtn').onclick=()=>document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();
@@ -285,38 +254,24 @@ function refreshBell(){fetch('/api/v1/alerts/recent?limit=100').then(r=>r.ok?r.j
     const b=$('topBell');b.textContent=n;b.style.display=n?'block':'none';}).catch(()=>{});}
 refreshBell();setInterval(refreshBell,5000);
 
-/* ================= tabs ================= */
-const TAB_META={
-  org:['Organization Management','Org profile editing, branches and company hierarchy arrive with the org module. The Organization Details card on the right shows the current demo-org profile.'],
-  users:['User Management','User accounts are currently in-memory demo users (admin/manager/dispatcher/analyst/maintenance/driver). Database-backed users with the full CRUD UI arrive with the JWT security milestone. Roles are enforced on every API call today.'],
-  roles:['Roles & Permissions','Six roles are enforced server-side: ADMIN and FLEET_MANAGER (write), DISPATCHER/ANALYST/MAINTENANCE_MANAGER (read), DRIVER (no API access). See the Roles & Access card in General. A permission matrix UI arrives with users-in-PostgreSQL.'],
-  notif:['Notification Settings','In-app notifications are live (bell dropdowns on every page). Email and SMS channels require the notification module with an SMTP/SMS gateway.'],
-  alert:['Alert Rules','Rule thresholds (speed limits per vehicle, engine temp, low fuel, cooldowns) are configured in code and editable per-vehicle on the Vehicles tab. A rules UI arrives with the rules-engine milestone.'],
-  geo:['Geofence Settings','Zones are fully managed on the Geofences tab (create, map picker, RBAC). This section will hold zone defaults (dwell limits, hysteresis).'],
-  integr:['Integrations','Kafka, PostgreSQL/Timescale, Redis and MQTT are live — see the Integration Status card in General. External API webhooks arrive with the integration milestone.'],
-  security:['Security','Form login + session auth (Redis-backed), RBAC on every endpoint, BCrypt password storage. JWT with database users is the next security milestone. 2FA/IP whitelist after that.'],
-  api:['API','REST v1 under /api/v1 — vehicles, drivers, trips, geofences, reports, settings. Auth: session (browser) or HTTP Basic (API clients). OpenAPI spec arrives with the API milestone.'],
-  system:['System','Java 21 · Spring Boot 3.3 · Kafka 3.7 · TimescaleDB 2.15 · Redis 7 · Mosquitto 2. Metrics at /actuator/prometheus, health at /actuator/health.']
-};
-document.querySelectorAll('#stabs button').forEach(b=>b.onclick=()=>{
-  document.querySelectorAll('#stabs button').forEach(x=>x.classList.remove('on'));
-  b.classList.add('on');
-  const key=b.dataset.s;
-  if(key==='general'){
-    ['sec-general'].forEach(id=>document.getElementById(id).style.display='');
-    document.querySelector('.g-main').style.display='';
-    document.getElementById('tabFallback').style.display='none';
-    return;
-  }
-  document.getElementById('sec-general').style.display='none';
-  document.querySelector('.g-main').style.display='none';
-  const fb=$('tabFallback');fb.style.display='';
-  $('fbTitle').textContent=TAB_META[key][0];
-  $('fbBody').innerHTML=esc(TAB_META[key][1])+
-    '<div style="margin-top:8px">This section becomes fully manageable with its roadmap module.</div>';
-});
+/* ================= toggles: all wired ================= */
+function wireToggles(){
+  document.querySelectorAll('.tgl').forEach(function(t){
+    if(t.dataset.wired)return;
+    t.dataset.wired='1';
+    t.addEventListener('click',function(){
+      if(t.classList.contains('dis')){
+        const mod=t.dataset.mod||'a roadmap module';
+        toast('Requires '+mod+' — arrives with the roadmap milestone',false);
+        return;
+      }
+      t.classList.toggle('on');
+    });
+  });
+}
+wireToggles();
 
-/* ================= general save (localStorage - client prefs) ================= */
+/* ================= general save ================= */
  $('genSave').onclick=()=>{
   const prefs={name:$('sName').value,tz:$('sTz').value,df:$('sDate').value,
     tf:$('sTime').value,lang:$('sLang').value,map:$('sMap').value,ref:$('sRef').value};
@@ -327,9 +282,32 @@ try{const p=JSON.parse(localStorage.getItem('fleetpulse-prefs')||'null');
   if(p){$('sName').value=p.name;$('sTz').value=p.tz;$('sDate').value=p.df;
     $('sTime').value=p.tf;$('sLang').value=p.lang;$('sMap').value=p.map;$('sRef').value=p.ref;}}catch(e){}
 
-/* toggles */
-document.querySelectorAll('.tgl:not(.dis)').forEach(t=>t.addEventListener('click',()=>t.classList.toggle('on')));
- $('orgEdit').onclick=()=>toast('Organization editing arrives with the org module — values shown are the demo profile',false);
+/* ================= tabs ================= */
+const TAB_META={
+  org:['Organization Management','Org profile editing, branches and hierarchy arrive with the org module. The Organization Details card shows the current demo profile.'],
+  users:['User Management','Users are currently in-memory demo accounts (admin, manager, dispatcher, analyst, maintenance, driver). Database-backed users with CRUD UI arrive with the JWT security milestone. Roles are enforced on every API call today.'],
+  roles:['Roles & Permissions','Six roles enforced server-side: ADMIN/FLEET_MANAGER (write), DISPATCHER/ANALYST/MAINTENANCE_MANAGER (read), DRIVER (no API). Permission matrix UI arrives with users-in-PostgreSQL.'],
+  notif:['Notification Settings','In-app notifications are live on every page (bells + alert feeds). Email and SMS channels require the notification module with an SMTP/SMS gateway.'],
+  alert:['Alert Rules','Rule thresholds (per-vehicle speed limits, engine temp, low fuel, cooldowns) are set in code and editable per-vehicle on the Vehicles tab. A rules UI arrives with the rules-engine milestone.'],
+  geo:['Geofence Settings','Zones are fully managed on the Geofences tab (create, map picker, RBAC). Zone defaults (dwell limits, hysteresis) will live here.'],
+  integr:['Integrations','Kafka, PostgreSQL/Timescale, Redis and MQTT are live — see the Integration card in General. External API webhooks arrive with the integration milestone.'],
+  security:['Security','Form login + Redis-backed session auth, RBAC on every endpoint, BCrypt storage. JWT with database users is the next security milestone; 2FA and IP whitelisting follow.'],
+  api:['API','REST v1 under /api/v1: vehicles, drivers, trips, geofences, reports, settings. Auth: session (browser) or HTTP Basic (API clients). OpenAPI spec arrives with the API milestone.'],
+  system:['System','Java 21 · Spring Boot 3.3 · Kafka 3.7 · TimescaleDB 2.15 · Redis 7 · Mosquitto 2. Metrics: /actuator/prometheus · Health: /actuator/health.']
+};
+document.querySelectorAll('#stabs button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#stabs button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');
+  const key=b.dataset.s;
+  const gw=$('generalWrap'), fb=$('tabFallback');
+  if(key==='general'){gw.style.display='';fb.style.display='none';}
+  else{
+    gw.style.display='none';fb.style.display='';
+    $('fbTitle').textContent=TAB_META[key][0];
+    $('fbBody').innerHTML=esc(TAB_META[key][1])+
+      '<div style="margin-top:8px">This section becomes fully manageable with its roadmap module.</div>';
+  }
+});
 </script>
 </body>
 </html>
