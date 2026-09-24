@@ -303,7 +303,8 @@ const initials=n=>(n||'?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCa
 function refreshBell(){fetch('/api/v1/alerts/recent?limit=100').then(r=>r.ok?r.json():[])
   .then(al=>{const n=al.filter(a=>new Date(a.ts).getTime()>Date.now()-36e5).length;
     const b=$('topBell');b.textContent=n;b.style.display=n?'block':'none';}).catch(()=>{});}
-refreshBell();setInterval(refreshBell,5000);
+refreshBell();setInterval(refreshBell,5000)
+loadGroups();setInterval(loadGroups,60000);;
 
 /* ================= org sub-nav ================= */
 const SECTIONS=['profile','branches','groups','units','contact','hours','logo'];
@@ -453,6 +454,21 @@ function closeUnit(){ $("unitModal").style.display="none"; }
     else{toast('❌ Failed ('+r.status+')',false);}
   }catch(e){toast('❌ Network error',false);}
 };
+
+async function loadGroups(){
+  try{
+    const groups = await api('/api/v1/org/groups');
+    if($('groupRows')){
+      $('groupRows').innerHTML = groups.map(function(g){
+        return '<tr><td><span class="pint"><span class="pdot" style="background:var(--blue2)"></span><b>'+esc(g.name)+'</b></span></td>'+
+          '<td>'+fmt(g.vehicles)+'</td>'+
+          '<td class="muted">'+esc(g.description||'')+'</td></tr>';
+      }).join('') || '<tr><td colspan="3" class="muted">No groups.</td></tr>';
+    }
+  }catch(e){
+    if($('groupRows'))$('groupRows').innerHTML='<tr><td colspan="3" class="muted">Load failed: '+esc(e.message)+'</td></tr>';
+  }
+}
 </script>
 </body>
 </html>
