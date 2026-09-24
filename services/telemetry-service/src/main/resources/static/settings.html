@@ -158,14 +158,14 @@ main{flex:1;min-width:0;display:flex;flex-direction:column}
               <label class="fl">Default Zoom</label>
               <select style="width:100%;border:1px solid var(--line);border-radius:9px;padding:8px 10px;font:inherit;margin-bottom:10px"><option>7</option><option selected>10</option><option>13</option></select>
               <div class="tgl on"><span class="sw"></span><span class="tx">Show Geofences<span class="d">Display geofence zones on maps.</span></span></div>
-              <div class="tgl dis" data-mod="traffic"><span class="sw"></span><span class="tx">Show Traffic Layer<span class="d">Requires a traffic provider — roadmap.</span></span></div>
+              <div class="tgl" data-mod="traffic"><span class="sw"></span><span class="tx">Show Traffic Layer<span class="d">Requires a traffic provider — roadmap.</span></span></div>
             </div>
           </div>
           <div class="card">
             <h3><span class="ic" style="background:#dbeafe">🔔</span> Alert &amp; Notification</h3>
             <div class="pad">
-              <div class="tgl dis" data-mod="notification"><span class="sw"></span><span class="tx">Email Notifications<span class="d">Requires notification module.</span></span></div>
-              <div class="tgl dis" data-mod="notification"><span class="sw"></span><span class="tx">SMS Notifications<span class="d">Requires SMS gateway.</span></span></div>
+              <div class="tgl" data-mod="notification"><span class="sw"></span><span class="tx">Email Notifications<span class="d">Requires notification module.</span></span></div>
+              <div class="tgl" data-mod="notification"><span class="sw"></span><span class="tx">SMS Notifications<span class="d">Requires SMS gateway.</span></span></div>
               <div class="tgl on"><span class="sw"></span><span class="tx">In-app Notifications<span class="d">Live bell + alert pages.</span></span></div>
               <div style="margin-top:10px"><label class="fl">Notification Frequency</label>
                 <select style="width:100%;border:1px solid var(--line);border-radius:9px;padding:8px 10px;font:inherit"><option>Instant</option><option>Hourly digest</option></select></div>
@@ -210,9 +210,9 @@ main{flex:1;min-width:0;display:flex;flex-direction:column}
             <div class="irow"><span class="k">Password Policy</span><span class="conn up">Strong</span></div>
             <div class="irow"><span class="k">Session Timeout</span><b>8 hours</b></div>
             <div class="irow"><span class="k">Two-Factor Authentication</span>
-              <span class="tgl dis" data-mod="security"><span class="sw"></span></span></div>
+              <span class="tgl" data-mod="security"><span class="sw"></span></span></div>
             <div class="irow"><span class="k">IP Whitelist</span>
-              <span class="tgl dis" data-mod="security"><span class="sw"></span></span></div>
+              <span class="tgl" data-mod="security"><span class="sw"></span></span></div>
             <div class="irow"><span class="k">Login Attempts Limit</span><b>5</b></div>
             <div class="note">2FA and IP whitelisting arrive with the JWT + users-in-PostgreSQL security milestone.</div>
           </div>
@@ -308,6 +308,32 @@ document.querySelectorAll('#stabs button').forEach(b=>b.onclick=()=>{
       '<div style="margin-top:8px">This section becomes fully manageable with its roadmap module.</div>';
   }
 });
+
+/* ================= persistent independent toggles ================= */
+const togglePrefs = JSON.parse(localStorage.getItem('fleetpulse-toggles') || '{}');
+function applyTogglePrefs(){
+  document.querySelectorAll('.tgl[data-pref]').forEach(function(t){
+    const saved = togglePrefs[t.dataset.pref];
+    if(saved !== undefined) t.classList.toggle('on', saved);
+  });
+}
+document.querySelectorAll('.tgl').forEach(function(t){
+  const label = (t.textContent || '').trim().split('\n')[0] || 'Toggle';
+  t.dataset.pref = t.dataset.pref || label;
+  t.addEventListener('click', function(){
+    const on = !t.classList.contains('on');
+    t.classList.toggle('on', on);
+    togglePrefs[t.dataset.pref] = on;
+    localStorage.setItem('fleetpulse-toggles', JSON.stringify(togglePrefs));
+    const gated = ['Email Notifications','SMS Notifications','Two-Factor Authentication','IP Whitelist','Show Traffic Layer'];
+    if(on && gated.includes(label)){
+      toast(label + ': preference saved - delivery arrives with its roadmap module', false);
+    } else {
+      toast(label + ': ' + (on ? 'ON' : 'OFF'), true);
+    }
+  });
+});
+applyTogglePrefs();
 </script>
 </body>
 </html>
