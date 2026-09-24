@@ -473,7 +473,8 @@ async function loadGroups(){
 /* ================= branches & depots (self-contained) ================= */
 async function loadBranches(){
   try{
-    const zones = await _fpApi('/api/v1/geofences');
+    const zr = await fetch('/api/v1/geofences');
+    const zones = zr.ok ? await zr.json() : [];
     const el = document.getElementById('branchRows');
     if(!el) return;
     const active = zones.filter(function(z){return z.active;});
