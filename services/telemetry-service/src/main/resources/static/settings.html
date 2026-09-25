@@ -298,6 +298,19 @@ document.querySelectorAll('.tgl').forEach(function(t){
   });
 });
 applyTogglePrefs();
+
+const TAB_META={
+  general:{title:'General Settings',body:'System name, timezone, formats, map defaults and integrations status — switch to the General tab.'},
+  org:{title:'Organization',body:'Branches (from live geofence zones) and fleet groups with live vehicle counts — shown below.'},
+  roles:{title:'Roles & Permissions',body:'Six roles enforced server-side: ADMIN/FLEET_MANAGER (write), DISPATCHER/ANALYST/MAINTENANCE_MANAGER (read), DRIVER (none). Permission matrix UI arrives with users-in-PostgreSQL.'},
+  notif:{title:'Notifications',body:'In-app notifications are live (bells + alert feeds). Email/SMS channels arrive with the notification module.'},
+  alert:{title:'Alert Rules',body:'Thresholds are per-vehicle editable on the Vehicles tab. A rules UI arrives with the rules-engine milestone.'},
+  geo:{title:'Geofence Settings',body:'Zones are managed on the Geofences tab. Zone defaults arrive with the org module.'},
+  integr:{title:'Integrations',body:'Kafka, PostgreSQL/Timescale, Redis and MQTT are live. External API webhooks arrive with the integration milestone.'},
+  security:{title:'Security',body:'Form login + Redis-backed sessions, RBAC, BCrypt. JWT + database users is the next security milestone.'},
+  api:{title:'API',body:'REST v1 under /api/v1. Session auth for browsers, HTTP Basic for API clients. OpenAPI spec arrives with the API milestone.'},
+  system:{title:'System',body:'Java 21 · Spring Boot 3.3 · Kafka 3.7 · TimescaleDB 2.15 · Redis 7 · Mosquitto 2. Metrics: /actuator/prometheus.'}
+};
 </script>
 
 <div class="modal" id="addUserModal" style="position:fixed;inset:0;background:rgba(2,6,23,.55);display:none;place-items:center;z-index:2600">
