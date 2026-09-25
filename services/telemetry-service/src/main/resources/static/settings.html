@@ -264,6 +264,7 @@ main{flex:1;min-width:0;display:flex;flex-direction:column}
 /* ================= helpers ================= */
 const $=id=>document.getElementById(id);
 const esc=s=>(s??'').replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+const api=async p=>{const r=await fetch(p);if(!r.ok)throw new Error('HTTP '+r.status);return r.json();};
 const toast=(m,ok)=>{const t=$('toast');t.textContent=m;
   t.style.background=ok===false?'#fee2e2':'#d1fae5';t.style.color=ok===false?'#991b1b':'#065f46';
   t.style.display='block';setTimeout(()=>t.style.display='none',2600);};
