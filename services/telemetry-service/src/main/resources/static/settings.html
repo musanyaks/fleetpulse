@@ -38,84 +38,49 @@ main{flex:1;min-width:0;display:flex;flex-direction:column}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
 .card>h3{font-size:13px;font-weight:700;padding:12px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .card .sub{font-weight:400;color:var(--muted);font-size:11.5px}
-.pad{padding:14px 16px}
-.frm{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.frm label,.fl{font-size:11.5px;color:var(--muted);display:block;margin-bottom:4px;font-weight:600}
-.frm input,.frm select{width:100%;border:1px solid var(--line);border-radius:9px;padding:8px 10px;font:inherit;background:#fff;color:var(--text)}
-.tgl{display:inline-flex;align-items:center;gap:10px;cursor:pointer;user-select:none;margin:4px 0}
-.tgl .sw{width:36px;height:20px;border-radius:99px;background:#cbd5e1;position:relative;transition:.2s;flex:none}
-.tgl .sw::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:.2s}
-.tgl.on .sw{background:var(--blue2)}.tgl.on .sw::after{left:18px}
-.tgl .tx{font-size:12.5px;font-weight:600}
-.tgl .tx .d{display:block;font-weight:400;color:var(--muted);font-size:11px}
 .btn{border:0;border-radius:9px;padding:9px 14px;font:inherit;font-weight:600;background:var(--blue);color:#fff;cursor:pointer}
 .btn.ghost{background:#fff;color:var(--text);border:1px solid var(--line)}
-.irow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:12.8px}
-.irow:last-child{border-bottom:0}
-.irow .k{display:flex;align-items:center;gap:8px}
-.irow .sub2{display:block;font-size:10.5px;color:var(--muted)}
-.conn{font-size:10px;font-weight:700;padding:2px 9px;border-radius:99px}
-.conn.up{background:#d1fae5;color:#065f46}.conn.warn{background:#fef3c7;color:#92400e}
-.orgcard{padding:14px 16px}
-.orglogo{display:flex;align-items:center;gap:12px;margin-bottom:12px}
-.orglogo .bub{width:48px;height:48px;border-radius:12px;background:var(--blue2);display:grid;place-items:center}
-.orglogo .nm{font-size:17px;font-weight:800}
-.orglogo .tg{font-size:11px;color:var(--muted)}
-.krow{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid var(--line);font-size:12.5px}
-.krow:last-child{border-bottom:0}
-.krow .k{color:var(--muted)}
-.colorrow{display:flex;align-items:center;gap:10px;padding:5px 0;font-size:12.5px}
-.colorrow .sw2{width:22px;height:22px;border-radius:8px;border:1px solid var(--line)}
-.colorrow b{margin-left:8px}
-.note{background:#fffbeb;border:1px solid #fde68a;color:#92400e;border-radius:10px;padding:7px 10px;font-size:10.5px;margin:8px 0}
+.toolbar{display:flex;gap:8px;padding:10px 14px;border-bottom:1px solid var(--line);flex-wrap:wrap;align-items:center}
+.toolbar input,.toolbar select{border:1px solid var(--line);border-radius:9px;padding:7px 10px;font:inherit;background:#fff}
+.toolbar input{flex:1;min-width:150px}
+.clear{font-size:11.5px;color:var(--blue);font-weight:600;cursor:pointer}
+.tblwrap{overflow:auto;max-height:520px}
+table{width:100%;border-collapse:collapse;font-size:12.3px;white-space:nowrap}
+th{text-align:left;color:var(--muted);font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;padding:9px 12px;border-bottom:1px solid var(--line);background:#fafbfe;position:sticky;top:0}
+td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
+tbody tr:hover td{background:#f8fafc;cursor:pointer}
+tr.sel td{background:#eff6ff}
+.dcell{display:flex;align-items:center;gap:10px}
+.davatar{width:32px;height:32px;border-radius:50%;display:inline-grid;place-items:center;font-size:10px;font-weight:700;color:#fff;flex:none}
+.dname{font-weight:700;display:block}
+.dtitle{display:block;font-size:10.5px;color:var(--muted);font-weight:400}
+.rchip{font-size:10px;font-weight:700;padding:3px 11px;border-radius:99px;white-space:nowrap}
+.schip{font-size:10px;font-weight:700;padding:3px 10px;border-radius:99px}
+.schip.Active{background:#d1fae5;color:#065f46}.schip.Inactive{background:#fee2e2;color:#991b1b}
 .muted{color:var(--muted)}.small{font-size:12px}
-/* ---------- users tab ---------- */
-.uavatar{width:30px;height:30px;border-radius:50%;display:inline-grid;place-items:center;font-size:10px;font-weight:700;color:#fff;margin-right:0;vertical-align:middle;flex:none}
-.uchip{font-size:10px;font-weight:700;padding:2px 10px;border-radius:99px;white-space:nowrap}
-.ustat{font-size:10px;font-weight:700;padding:2px 9px;border-radius:99px}
-.ustat.Active{background:#d1fae5;color:#065f46}.ustat.Inactive{background:#fee2e2;color:#991b1b}
-.dcell{display:flex;align-items:center;gap:9px}
-.dname{font-weight:700}
-.dtitle{font-size:10.5px;color:var(--muted)}
-.act{color:var(--muted);cursor:pointer;font-size:16px;text-align:center}
-.pager{display:flex;align-items:center;gap:6px;padding:10px 14px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);flex-wrap:wrap}
-.pager button{border:1px solid var(--line);background:#fff;border-radius:8px;min-width:28px;padding:4px 8px;font:inherit;font-size:12px;cursor:pointer}
-.pager button.on{background:var(--blue);border-color:var(--blue);color:#fff}
-.pager button:disabled{opacity:.4;cursor:default}
-.prow{display:flex;justify-content:space-between;gap:8px;padding:7px 0;border-bottom:1px solid var(--line);font-size:12.8px;align-items:center}
+.actbtn{color:var(--muted);cursor:pointer;font-size:15px;text-align:center;padding:0 4px}
+.actbtn:hover{color:var(--blue)}
+.uPager{display:flex;align-items:center;gap:6px;padding:11px 14px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);flex-wrap:wrap}
+.uPager button{border:1px solid var(--line);background:#fff;border-radius:8px;min-width:28px;padding:5px 8px;font:inherit;font-size:12px;cursor:pointer}
+.uPager button.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.uPager button:disabled{opacity:.4;cursor:default}
+#dBody .dhead{display:flex;gap:12px;align-items:center;margin-bottom:12px}
+#dBody .dhead .davatar{width:48px;height:48px;font-size:14px}
+.dbody{padding:12px 16px}
+.prow{display:flex;justify-content:space-between;gap:8px;padding:7px 0;border-bottom:1px solid var(--line);font-size:12.5px;align-items:center}
 .prow:last-child{border-bottom:0}
 .prow .k{color:var(--muted);display:flex;align-items:center;gap:8px}
-.perm{display:flex;align-items:center;gap:9px;padding:4px 0;font-size:12.5px}
-.perm .ck{width:18px;height:18px;border-radius:50%;background:#d1fae5;display:grid;place-items:center;color:#065f46;font-size:10px;flex:none}
-.davatar-lg{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font-size:15px;font-weight:800;color:#fff;flex:none}
-.rchip-lg{font-size:10px;font-weight:700;padding:2px 10px;border-radius:99px}
-.modal{position:fixed;inset:0;background:rgba(2,6,23,.55);display:none;place-items:center;z-index:2600}
-.modal.open{display:grid}
-.modal .box{background:#fff;border-radius:16px;max-width:460px;width:92%;padding:22px 24px;position:relative}
-.modal .x{position:absolute;top:14px;right:16px;border:0;background:none;font-size:18px;cursor:pointer;color:var(--muted)}
+.det-card{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:10px 0}
+.det-card .t{font-weight:700;font-size:12px;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.det-perm{display:flex;align-items:center;gap:9px;padding:4px 0;font-size:12.3px}
+.det-perm .ck{width:18px;height:18px;border-radius:50%;background:#d1fae5;display:grid;place-items:center;color:#065f46;font-size:10px;flex:none}
+.det-contact{display:flex;align-items:center;gap:9px;padding:5px 0;font-size:12.5px}
+.det-contact .ci{width:22px;height:22px;border-radius:8px;display:grid;place-items:center;font-size:11px;flex:none}
+.det-info{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);font-size:12.5px}
+.det-info .k{color:var(--muted)}
+.det-deact{display:block;width:100%;margin-top:12px;border:1.5px solid var(--red);background:#fff;color:var(--red);border-radius:10px;padding:10px;font:inherit;font-weight:700;cursor:pointer}
+.det-deact:hover{background:#fee2e2}
 #toast{position:fixed;bottom:20px;right:20px;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;display:none;box-shadow:0 8px 24px rgba(2,6,23,.2);background:#d1fae5;color:#065f46;z-index:3000}
-  #usersWrap{display:grid;grid-template-columns:1.8fr 1fr;gap:16px;align-items:start}
-  #usersWrap .card:first-child{grid-row:span 2}
-  .urow-check{width:14px;height:14px;cursor:pointer}
-  .uroletitle{display:block;font-size:10.5px;color:var(--muted);font-weight:400}
-  .actbtn{color:var(--muted);cursor:pointer;font-size:15px;text-align:center}
-  .actbtn:hover{color:var(--blue)}
-  .uPager{display:flex;align-items:center;gap:6px;padding:10px 14px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);flex-wrap:wrap}
-  .uPager button{border:1px solid var(--line);background:#fff;border-radius:8px;min-width:28px;padding:4px 8px;font:inherit;font-size:12px;cursor:pointer}
-  .uPager button.on{background:var(--blue);border-color:var(--blue);color:#fff}
-  .uPager button:disabled{opacity:.4;cursor:default}
-  .det-av{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font-size:16px;font-weight:800;color:#fff;flex:none}
-  .det-chip{font-size:10px;font-weight:700;padding:2px 10px;border-radius:99px}
-  .det-contact{display:flex;align-items:center;gap:9px;padding:5px 0;font-size:12.5px}
-  .det-contact .ci{width:22px;height:22px;border-radius:8px;display:grid;place-items:center;font-size:11px;flex:none}
-  .det-card{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:10px 0}
-  .det-card .t{font-weight:700;font-size:12px;margin-bottom:6px;display:flex;align-items:center;gap:6px}
-  .det-perm{display:flex;align-items:center;gap:9px;padding:4px 0;font-size:12.3px}
-  .det-perm .ck{width:18px;height:18px;border-radius:50%;background:#d1fae5;display:grid;place-items:center;color:#065f46;font-size:10px;flex:none}
-  .det-info{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);font-size:12.5px}
-  .det-info .k{color:var(--muted)}
-  .det-deact{display:block;width:100%;margin-top:12px;border:1.5px solid var(--red);background:#fff;color:var(--red);border-radius:10px;padding:10px;font:inherit;font-weight:700;cursor:pointer}
-  .det-deact:hover{background:#fee2e2}
 </style>
 </head>
 <body>
@@ -124,17 +89,6 @@ main{flex:1;min-width:0;display:flex;flex-direction:column}
   <div class="logo"><span class="sq">🛰️</span> FleetPulse</div>
   <nav>
     <a href="index.html"><span class="ic">🏠</span> Overview</a>
-    <a href="vehicles.html"><span class="ic">🚚</span> Vehicles</a>
-    <a href="tracking.html"><span class="ic">📍</span> Live Tracking</a>
-    <a href="trips.html"><span class="ic">🛣️</span> Trips</a>
-    <a href="drivers.html"><span class="ic">🧑‍✈️</span> Drivers</a>
-    <a href="fuel.html"><span class="ic">⛽</span> Fuel</a>
-    <a href="maintenance.html"><span class="ic">🔧</span> Maintenance</a>
-    <a href="alerts.html"><span class="ic">🔔</span> Alerts</a>
-    <a href="geofences.html"><span class="ic">🎯</span> Geofences</a>
-    <a href="reports.html"><span class="ic">📊</span> Analytics</a>
-    <a href="reports.html"><span class="ic">📄</span> Reports</a>
-    <a href="alerts.html"><span class="ic">🔔</span> Notifications</a>
     <a class="active" href="settings.html"><span class="ic">👥</span> Users &amp; Roles</a>
     <a href="settings.html"><span class="ic">⚙️</span> Settings</a>
   </nav>
@@ -148,331 +102,126 @@ main{flex:1;min-width:0;display:flex;flex-direction:column}
     <div class="tchipuser" id="userChip"><div class="upic" id="uInit">?</div>
       <div><div class="uname" id="uName">Sign in</div><div class="urole" id="uRole">-</div></div></div>
   </div>
-
   <div class="content">
     <div class="pagehead"><span class="ic">👥</span>
       <div><h1>Users</h1><div class="sub">Manage system users, their roles and permissions.</div></div>
     </div>
-
-    <div class="stabs" id="stabs">
-      <button data-s="general">⚙️ General</button>
-      <button data-s="org">🏢 Organization</button>
-      <button class="on" data-s="users">👥 Users</button>
-      <button data-s="roles">🔑 Roles &amp; Permissions</button>
-      <button data-s="notif">🔔 Notifications</button>
-      <button data-s="alert">⚠️ Alert Rules</button>
-      <button data-s="geo">🎯 Geofences</button>
-      <button data-s="integr">🔌 Integrations</button>
-      <button data-s="security">🛡 Security</button>
-      <button data-s="api">🔗 API</button>
-      <button data-s="system">🖥 System</button>
+    <div class="card">
+      <h3>👥 Manage Users
+        <span class="sub" style="margin-left:8px">Add, edit, deactivate and manage user accounts.</span>
+        <button class="btn" style="margin-left:auto;font-size:12px;padding:6px 12px" id="addBtn">＋ Add User</button>
+        <button class="btn ghost" style="font-size:12px;padding:6px 12px" id="exportBtn">⬇ Export</button>
+      </h3>
+      <div class="toolbar">
+        <input id="uq" placeholder="🔍 Search by name, email, username..."/>
+        <select id="ufRole"><option value="">All Roles</option><option>ADMIN</option><option>FLEET_MANAGER</option><option>DISPATCHER</option><option>DRIVER</option><option>MAINTENANCE_MANAGER</option><option>ANALYST</option></select>
+        <select id="ufStat"><option value="">All Statuses</option><option>Active</option><option>Inactive</option></select>
+        <span class="clear" onclick="resetFilters()" style="font-size:11.5px;color:var(--blue);font-weight:600;cursor:pointer">Clear Filters</span>
+      </div>
+      <div class="tblwrap"><table>
+        <thead><tr><th>Name</th><th>Username</th><th>Email</th><th>Role</th><th>Department</th><th>Status</th><th>Last Login</th><th style="text-align:center">Actions</th></tr></thead>
+        <tbody id="uRows"><tr><td colspan="8" class="muted">Loading…</td></tr></tbody></table></div>
+      <div class="uPager" id="uPager"></div>
     </div>
-
-    <!-- ============ GENERAL (hidden) ============ -->
-    <div id="generalWrap" style="display:none">
-      <div class="card" style="margin-bottom:16px">
-        <h3>General Settings</h3>
-        <div class="pad">
-          <div class="frm">
-            <div><label>System Name</label><input id="sName" value="FleetPulse"/></div>
-            <div><label>Timezone</label><select id="sTz"><option>Africa/Nairobi (EAT)</option><option>UTC</option></select></div>
-            <div><label>Date Format</label><select id="sDate"><option>DD/MM/YYYY</option><option>YYYY-MM-DD</option></select></div>
-            <div><label>Time Format</label><select id="sTime"><option>24 Hour</option><option>12 Hour</option></select></div>
-            <div><label>Language</label><select id="sLang"><option>English</option><option>Swahili</option></select></div>
-            <div><label>Default Map View</label><select id="sMap"><option>Roadmap</option><option>Satellite</option></select></div>
-            <div><label>Auto Refresh Interval</label><select id="sRef"><option>5 seconds</option><option selected>30 seconds</option></select></div>
-            <div><label>System Version</label><input value="v1.0.0" disabled style="background:#f1f5fb"/></div>
-          </div>
-          <div class="tgl on" style="margin-top:12px"><span class="sw"></span>
-            <span class="tx">Enable Real-time Tracking<span class="d">Automatically update vehicle locations in real-time.</span></span></div>
-          <div style="display:flex;justify-content:flex-end;margin-top:10px">
-            <button class="btn" id="genSave">💾 Save Changes</button>
-          </div>
-        </div>
-      </div>
-      <div class="card"><h3>🔌 Integrations</h3><div class="pad">
-        <div class="irow"><span class="k">⚡ Kafka<span class="sub2">kafka:9092</span></span><span class="conn up">Connected</span></div>
-        <div class="irow"><span class="k">🗄 PostgreSQL<span class="sub2">timescaledb:5432</span></span><span class="conn up">Connected</span></div>
-        <div class="irow"><span class="k">🧠 Redis<span class="sub2">redis:6379</span></span><span class="conn up">Connected</span></div>
-        <div class="irow"><span class="k">☁ External API<span class="sub2">not configured</span></span><span class="conn warn">Not Configured</span></div>
-      </div></div>
-      <div class="footer-note" style="margin-top:2px">ℹ Changes made in settings may require a system restart to take effect.</div>
-    </div>
-
-    <!-- ============ ORGANIZATION (hidden) ============ -->
-    <div id="orgWrap" style="display:none">
-      <div class="card" style="margin-bottom:16px">
-        <h3>🏢 Branches &amp; Depots</h3>
-        <div style="overflow:auto;max-height:300px"><table>
-          <thead><tr><th>Name</th><th>Type</th><th>Status</th></tr></thead>
-          <tbody id="branchRows"><tr><td colspan="3" style="color:#64748b">Loading…</td></tr></tbody></table></div>
-      </div>
-      <div class="card">
-        <h3>👥 Fleet Groups <span class="muted small" style="font-weight:400;margin-left:8px">live vehicle counts</span></h3>
-        <div style="overflow:auto;max-height:300px"><table>
-          <thead><tr><th>Group</th><th>Vehicles</th></tr></thead>
-          <tbody id="groupRows"><tr><td colspan="2" style="color:#64748b">Loading…</td></tr></tbody></table></div>
-      </div>
-    </div>
-
-    <!-- ============ USERS (default active tab) ============ -->
-    <div id="usersWrap">
-      <div class="card">
-        <h3>👥 Manage Users
-          <span class="sub" style="margin-left:8px">Add, edit, deactivate and manage user accounts.</span>
-          <button class="btn" id="uAddBtn" style="margin-left:auto;font-size:12px;padding:6px 12px">＋ Add User</button>
-          <button class="btn ghost" id="uExportBtn" style="font-size:12px;padding:6px 12px">⬇ Export</button>
-        </h3>
-        <div style="padding:10px 14px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;border-bottom:1px solid var(--line)">
-          <input id="uq" placeholder="🔍 Search by name, email, username..." style="flex:1;min-width:150px;border:1px solid var(--line);border-radius:9px;padding:7px 10px;font:inherit;background:#fff"/>
-          <select id="ufRole" style="border:1px solid var(--line);border-radius:9px;padding:7px 10px;font:inherit;background:#fff">
-            <option value="">All Roles</option><option>ADMIN</option><option>FLEET_MANAGER</option>
-            <option>DISPATCHER</option><option>ANALYST</option><option>MAINTENANCE_MANAGER</option><option>DRIVER</option></select>
-          <select id="ufStat"><option value="">All Statuses</option><option>Active</option><option>Inactive</option></select>
-          <select id="ufDept"><option value="">All Departments</option></select>
-          <span class="clear" onclick="resetUFilters()" style="font-size:11.5px;color:var(--blue);font-weight:600;cursor:pointer">Clear Filters</span>
-        </div>
-        <div style="overflow:auto;max-height:480px"><table>
-          <thead><tr><th>Name</th><th>Username</th><th>Email</th><th>Role</th><th>Department</th><th>Status</th><th>Last Login</th><th style="text-align:center">Actions</th></tr></thead>
-          <tbody id="uRows"><tr><td colspan="8" style="color:#64748b">Loading…</td></tr></tbody></table></div>
-        <div id="uPager" style="display:flex;align-items:center;gap:6px;padding:10px 14px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);flex-wrap:wrap"></div>
-      </div>
-
-      <div class="card" style="margin-top:16px">
-        <h3>✏ User Details</h3>
-        <div id="udBody" style="padding:14px 16px">
-          <div style="color:#64748b;font-size:12.5px">Click a user row to see details.</div>
-        </div>
-      </div>
-
-      <div class="modal" id="uAddModal" style="position:fixed;inset:0;background:rgba(2,6,23,.55);display:none;place-items:center;z-index:2600">
-        <div style="background:#fff;border-radius:16px;max-width:460px;width:92%;padding:22px 24px;position:relative">
-          <button onclick="closeUAdd()" style="position:absolute;top:14px;right:16px;border:0;background:none;font-size:18px;cursor:pointer;color:var(--muted)">✕</button>
-          <h2 style="font-size:18px;margin-bottom:12px">Add User</h2>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-            <div style="grid-column:1/-1"><label class="muted small" style="display:block;margin-bottom:4px">Full name *</label>
-              <input id="nuName" placeholder="John Doe" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit"/></div>
-            <div><label class="muted small" style="display:block;margin-bottom:4px">Username *</label>
-              <input id="nuUser" placeholder="john" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit"/></div>
-            <div><label class="muted small" style="display:block;margin-bottom:4px">Role *</label>
-              <select id="nuRole" style="width:100%;border:1px solid var(--line);border-radius:9px;padding:8px;font:inherit">
-                <option>DISPATCHER</option><option>ANALYST</option><option>FLEET_MANAGER</option>
-                <option>MAINTENANCE_MANAGER</option><option>DRIVER</option><option>ADMIN</option></select></div>
-            <div style="grid-column:1/-1"><label class="muted small" style="display:block;margin-bottom:4px">Email</label>
-              <input id="nuMail" placeholder="john@fleetpulse.co.ke" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit"/></div>
-            <div style="grid-column:1/-1"><label class="muted small" style="display:block;margin-bottom:4px">Department</label>
-              <input id="nuDept" placeholder="Operations" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit"/></div>
-          </div>
-          <div style="display:flex;gap:10px;margin-top:14px">
-            <button class="btn" style="flex:1" id="nuSave">Add User</button>
-            <button class="btn ghost" style="flex:1;border:1px solid var(--line);background:#fff;color:var(--text)" onclick="closeUAdd()">Cancel</button>
-          </div>
-          <div class="muted small" id="nuMsg" style="margin-top:8px;min-height:16px"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============ FALLBACK ============ -->
-    <div class="card" id="tabFallback" style="display:none">
-      <h3 id="fbTitle">—</h3>
-      <div class="pad" style="color:#64748b;font-size:12.5px" id="fbBody"></div>
+    <div class="card" style="margin-top:16px">
+      <h3>✏ User Details</h3>
+      <div class="dbody" id="dBody"><div style="color:var(--muted);font-size:12.5px;padding:4px 0">Click a user row to see details.</div></div>
     </div>
   </div>
 </main>
 </div>
 <div id="toast"></div>
-
 <script>
-/* ================= helpers ================= */
 const $=id=>document.getElementById(id);
 const esc=s=>(s??'').replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
-const api=async p=>{const r=await fetch(p);if(!r.ok)throw new Error('HTTP '+r.status);return r.json();};
-const toast=(m,ok)=>{const t=$('toast');t.textContent=m;
-  t.style.background=ok===false?'#fee2e2':'#d1fae5';t.style.color=ok===false?'#991b1b':'#065f46';
-  t.style.display='block';setTimeout(()=>t.style.display='none',2600);};
+const toast=(m,ok)=>{const t=$('toast');t.textContent=m;t.style.background=ok===false?'#fee2e2':'#d1fae5';t.style.color=ok===false?'#991b1b':'#065f46';t.style.display='block';setTimeout(()=>t.style.display='none',2600);};
 const initials=n=>(n||'?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
-
-/* ================= session / bell / fullscreen ================= */
-(async()=>{try{
-  const r=await fetch('/api/v1/me',{headers:{'Accept':'application/json'}});
-  const ct=r.headers.get('content-type')||'';
-  if(!r.ok||!ct.includes('application/json'))throw 0;
-  const me=await r.json();
-  $('uInit').textContent=initials(me.username);
-  $('uName').textContent=me.username;$('uRole').textContent=me.roles.join(', ');
-}catch(e){$('uName').textContent='Sign in';$('uRole').textContent='session expired';
-  $('userChip').onclick=()=>location.href='/login.html';}})();
- $('fsBtn').onclick=()=>document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();
-function refreshBell(){fetch('/api/v1/alerts/recent?limit=100').then(r=>r.ok?r.json():[])
-  .then(al=>{const n=al.filter(a=>new Date(a.ts).getTime()>Date.now()-36e5).length;
-    const b=$('topBell');b.textContent=n;b.style.display=n?'block':'none';}).catch(()=>{});}
-refreshBell();setInterval(refreshBell,5000);
-
-/* ================= tab switching ================= */
-const TAB_META={
-  general:{title:'General Settings',body:'System name, timezone, formats, map defaults and integrations status — switch to the General tab.'},
-  org:{title:'Organization',body:'Branches (from live geofence zones) and fleet groups with live vehicle counts — switch to the Organization tab.'},
-  roles:{title:'Roles & Permissions',body:'Six roles enforced server-side: ADMIN/FLEET_MANAGER (write), DISPATCHER/ANALYST/MAINTENANCE_MANAGER (read), DRIVER (none). Permission matrix UI arrives with users-in-PostgreSQL.'},
-  notif:{title:'Notifications',body:'In-app notifications are live (bell dropdowns). Email/SMS channels arrive with the notification module.'},
-  alert:{title:'Alert Rules',body:'Thresholds are per-vehicle editable on the Vehicles tab. A rules UI arrives with the rules-engine milestone.'},
-  geo:{title:'Geofence Settings',body:'Zones are managed on the Geofences tab. Zone defaults arrive with the org module.'},
-  integr:{title:'Integrations',body:'Kafka, PostgreSQL/Timescale, Redis and MQTT are live. External API webhooks arrive with the integration milestone.'},
-  security:{title:'Security',body:'Form login + Redis-backed sessions, RBAC, BCrypt. JWT + database users is the next security milestone.'},
-  api:{title:'API',body:'REST v1 under /api/v1. Session auth for browsers, HTTP Basic for API clients. OpenAPI spec arrives with the API milestone.'},
-  system:{title:'System',body:'Java 21 · Spring Boot 3.3 · Kafka 3.7 · TimescaleDB 2.15 · Redis 7 · Mosquitto 2. Metrics: /actuator/prometheus.'}
-};
-function showTab(key){
-  ['generalWrap','orgWrap','usersWrap'].forEach(function(id){
-    const el=document.getElementById(id);
-    if(el)el.style.display=(id===key+'Wrap')?'':'none';
-  });
-  const fb=$('tabFallback');
-  if(key==='users'){fb.style.display='none';loadAppUsers();}
-  else if(key==='general'||key==='org'){fb.style.display='none';if(key==='org')loadOrgData();}
-  else{
-    fb.style.display='';
-    $('fbTitle').textContent=TAB_META[key].title;
-    $('fbBody').textContent=TAB_META[key].body;
-  }
-}
-document.querySelectorAll('#stabs button').forEach(b=>b.onclick=()=>{
-  document.querySelectorAll('#stabs button').forEach(x=>x.classList.remove('on'));
-  b.classList.add('on');
-  showTab(b.dataset.s);
-});
-
-/* ================= general save ================= */
- $('genSave').onclick=()=>{
-  const prefs={name:$('sName').value,tz:$('sTz').value,df:$('sDate').value,
-    tf:$('sTime').value,lang:$('sLang').value,map:$('sMap').value,ref:$('sRef').value};
-  localStorage.setItem('fleetpulse-prefs',JSON.stringify(prefs));
-  toast('✅ General settings saved (client preferences)',true);
-};
-try{const p=JSON.parse(localStorage.getItem('fleetpulse-prefs')||'null');
-  if(p){$('sName').value=p.name;$('sTz').value=p.tz;$('sDate').value=p.df;
-    $('sTime').value=p.tf;$('sLang').value=p.lang;$('sMap').value=p.map;$('sRef').value=p.ref;}}catch(e){}
-
-/* ================= org data ================= */
-async function loadOrgData(){
-  try{
-    const [zones,vp]=await Promise.all([
-      fetch('/api/v1/geofences').then(r=>r.ok?r.json():[]).catch(()=>[]),
-      fetch('/api/v1/vehicles?size=200').then(r=>r.ok?r.json():[]).catch(()=>[])]);
-    const active=zones.filter(z=>z.active);
-    $('branchRows').innerHTML=active.map(z=>{
-      const col=(z.type==='RESTRICTED'||z.type==='DANGER')?'var(--red)':z.type==='DEPOT'?'var(--blue2)':'var(--green)';
-      const t=z.type==='DEPOT'?'Depot':z.type==='RESTRICTED'?'Restricted':'Customer Site';
-      return '<tr><td><b>'+esc(z.name)+'</b></td><td>'+esc(t)+'</td>'+
-        '<td><span style="font-size:10px;font-weight:700;padding:2px 9px;border-radius:99px;background:#d1fae5;color:#065f46">Active</span></td></tr>';
-    }).join('')||'<tr><td colspan="3" style="color:#64748b">No zones yet.</td></tr>';
-    const cls={};
-    vp.forEach(v=>{const mk=(v.make||'')+' '+(v.model||'');
-      const c=/Hiace|Coaster|Rosa|Matatu|Bus/i.test(mk)?'Buses':/Hilux|Ranger|H1/i.test(mk)?'Pickups':'Trucks';
-      cls[c]=(cls[c]||0)+1;});
-    $('groupRows').innerHTML=Object.entries(cls).map(([nm,cnt])=>
-      '<tr><td><b>'+esc(nm)+'</b></td><td>'+cnt+'</td></tr>').join('')
-      ||'<tr><td colspan="2" style="color:#64748b">No vehicles.</td></tr>';
-  }catch(e){
-    $('branchRows').innerHTML='<tr><td colspan="3" style="color:#64748b">Load failed: '+esc(e.message)+'</td></tr>';
-  }
-}
-loadOrgData();setInterval(loadOrgData,60000);
-
-/* ================= USERS (mockup table + detail) ================= */
+const api=async p=>{const r=await fetch(p);if(!r.ok)throw new Error('HTTP '+r.status);return r.json();};
+const ROLE_DISPLAY={ADMIN:'Admin',FLEET_MANAGER:'Supervisor',DISPATCHER:'Dispatcher',DRIVER:'Driver',MAINTENANCE_MANAGER:'Mechanic',ANALYST:'Analyst'};
+const ROLE_CHIP={ADMIN:['#ede9fe','#6d28d9'],FLEET_MANAGER:['#d1fae5','#059669'],DISPATCHER:['#fef3c7','#d97706'],DRIVER:['#d1fae5','#059669'],MAINTENANCE_MANAGER:['#fee2e2','#dc2626'],ANALYST:['#cffafe','#0891b2']};
+const ROLE_BG={ADMIN:'#7c3aed',FLEET_MANAGER:'#059669',DISPATCHER:'#d97706',DRIVER:'#059669',MAINTENANCE_MANAGER:'#dc2626',ANALYST:'#0891b2'};
+const PERMS={ADMIN:['View all vehicles and trips','Manage users and roles','Configure system settings','Access reports and analytics','Receive all notifications'],FLEET_MANAGER:['View all vehicles and trips','Edit vehicle settings','Access reports and analytics','Receive all notifications'],DISPATCHER:['View live fleet','View trips','View alerts'],ANALYST:['View reports and analytics','View fleet data','Export reports'],MAINTENANCE_MANAGER:['View maintenance alerts','View vehicle data'],DRIVER:[]};
 let __appUsers=[],__uSel=null,__uPage=0,__uPageSize=10;
-const ROLE_DISPLAY={ADMIN:'Admin',FLEET_MANAGER:'Supervisor',DISPATCHER:'Dispatcher',
-  DRIVER:'Driver',MAINTENANCE_MANAGER:'Mechanic',ANALYST:'Analyst'};
-const ROLE_CHIP={ADMIN:['#ede9fe','#5b21b6'],FLEET_MANAGER:['#d1fae5','#065f46'],
-  DISPATCHER:['#fef3c7','#92400e'],DRIVER:['#dbeafe','#1e40af'],
-  MAINTENANCE_MANAGER:['#fee2e2','#991b1b'],ANALYST:['#cffafe','#0e7490']};
-const PERMS={
-  ADMIN:['View all vehicles and trips','Manage users and roles','Configure system settings','Access reports and analytics','Receive all notifications'],
-  FLEET_MANAGER:['View all vehicles and trips','Edit vehicle settings','Access reports and analytics','Receive all notifications'],
-  DISPATCHER:['View live fleet','View trips','View alerts'],
-  ANALYST:['View reports and analytics','View fleet data','Export reports'],
-  MAINTENANCE_MANAGER:['View maintenance alerts','View vehicle data'],
-  DRIVER:[]};
-
-async function loadAppUsers(){
-  try{
-    __appUsers=await api('/api/v1/users');
-    renderAppUsers();
-  }catch(e){
-    const el=$('uRows');
-    if(el)el.innerHTML='<tr><td colspan="8" style="color:#64748b">Load failed: '+esc(e.message)+'</td></tr>';
-  }
-}
-function renderAppUsers(){
+(async()=>{try{const r=await fetch('/api/v1/me',{headers:{'Accept':'application/json'}});const ct=r.headers.get('content-type')||'';if(!r.ok||!ct.includes('application/json'))throw 0;const me=await r.json();$('uInit').textContent=initials(me.username);$('uName').textContent=me.username;$('uRole').textContent=me.roles.join(', ');}catch(e){$('uName').textContent='Sign in';$('uRole').textContent='session expired';$('userChip').onclick=()=>location.href='/login.html';}})();
+ $('fsBtn').onclick=()=>document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();
+function refreshBell(){fetch('/api/v1/alerts/recent?limit=100').then(r=>r.ok?r.json():[]).then(al=>{const n=al.filter(a=>new Date(a.ts).getTime()>Date.now()-36e5).length;const b=$('topBell');b.textContent=n;b.style.display=n?'block':'none';}).catch(()=>{});}
+refreshBell();setInterval(refreshBell,5000);
+async function loadUsers(){try{__appUsers=await api('/api/v1/users');renderUsers();}catch(e){const el=$('uRows');if(el)el.innerHTML='<tr><td colspan="8" class="muted">Load failed: '+esc(e.message)+'</td></tr>';}}
+function renderUsers(){
   var q=($('uq')||{}).value||'';q=q.toUpperCase();
   var fr=($('ufRole')||{}).value||'';
   var fs=($('ufStat')||{}).value||'';
-  var rows=__appUsers.filter(function(u){
-    var hay=(u.username+' '+u.name+' '+(u.email||'')).toUpperCase();
-    var st=u.active?'Active':'Inactive';
-    return(!q||hay.includes(q))&&(!fr||u.role===fr)&&(!fs||st===fs);
-  });
-  var total=rows.length;
-  var pages=Math.max(1,Math.ceil(total/10));
+  var rows=__appUsers.filter(function(u){var hay=(u.username+' '+u.name+' '+(u.email||'')).toUpperCase();var st=u.active?'Active':'Inactive';return(!q||hay.includes(q))&&(!fr||u.role===fr)&&(!fs||st===fs);});
+  var total=rows.length,pages=Math.max(1,Math.ceil(total/__uPageSize));
   if(__uPage>=pages)__uPage=pages-1;
-  var slice=rows.slice(__uPage*10,__uPage*10+10);
+  var slice=rows.slice(__uPage*__uPageSize,__uPage*__uPageSize+__uPageSize);
   var el=$('uRows');if(!el)return;
   el.innerHTML=slice.map(function(u){
     var st=u.active?'Active':'Inactive';
     var cc=ROLE_CHIP[u.role]||['#e2e8f0','#334155'];
+    var bg=ROLE_BG[u.role]||'var(--navy)';
     var ll=u.lastLogin?new Date(u.lastLogin).toLocaleString([],{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'-';
     var title=ROLE_DISPLAY[u.role]||'';
-    return '<tr onclick="selAppUser(\''+esc(u.username)+'\')" style="cursor:pointer">'+
-      '<td><input type="checkbox" class="urow-check" onclick="event.stopPropagation()"/></td>'+
-      '<td><span style="display:flex;align-items:center;gap:9px">'+
-      '<span class="uavatar" style="background:'+cc[0]+'">'+initials(u.name)+'</span>'+
-      '<span><span class="dname">'+esc(u.name)+'</span>'+
-      '<span class="uroletitle">'+esc(title)+'</span></span></span></td>'+
-      '<td style="color:#64748b">'+esc(u.username)+'</td>'+
-      '<td style="color:#64748b">'+esc(u.email||'-')+'</td>'+
-      '<td><span class="uchip '+esc(u.role)+'" style="background:'+cc[0]+';color:'+cc[1]+'">'+esc(title)+'</span></td>'+
-      '<td style="color:#64748b">'+esc(u.department||'-')+'</td>'+
-      '<td><span class="ustat '+st+'">'+st+'</span></td>'+
+    return '<tr onclick="selUser(\''+esc(u.username)+'\')" style="cursor:pointer">'+
+      '<td><span style="display:flex;align-items:center;gap:10px">'+
+      '<span class="davatar" style="background:'+bg+'">'+initials(u.name)+'</span>'+
+      '<span><span class="dname">'+esc(u.name)+'</span><span class="dtitle">'+esc(title)+'</span></span></span></td>'+
+      '<td class="muted">'+esc(u.username)+'</td>'+
+      '<td class="muted">'+esc(u.email||'-')+'</td>'+
+      '<td><span class="rchip" style="background:'+cc[0]+';color:'+cc[1]+'">'+esc(title)+'</span></td>'+
+      '<td class="muted">'+esc(u.department||'-')+'</td>'+
+      '<td><span class="schip '+st+'">'+st+'</span></td>'+
       '<td style="color:#64748b;font-size:11.5px">'+ll+'</td>'+
-      '<td class="actbtn" onclick="event.stopPropagation();selAppUser(\''+esc(u.username)+'\')">⋮</td></tr>';
-  }).join('')||'<tr><td colspan="9" style="color:#64748b">No users match.</td></tr>';
+      '<td class="actbtn" onclick="event.stopPropagation();selUser(\''+esc(u.username)+'\')">⋮</td></tr>';
+  }).join('')||'<tr><td colspan="8" class="muted">No users match.</td></tr>';
   var pg=$('uPager');
   if(pg){
     var pb='';
-    for(var i=0;i<pages;i++)pb+='<button class="'+(i===__uPage?'on':'')+'" onclick="__uPage='+i+';renderAppUsers()">'+(i+1)+'</button>';
-    pg.innerHTML='<span>Showing '+(total?__uPage*10+1:0)+' - '+Math.min((__uPage+1)*10,total)+' of '+total+' users</span>'+
+    for(var i=0;i<pages;i++)pb+='<button class="'+(i===__uPage?'on':'')+'" onclick="__uPage='+i+';renderUsers()">'+(i+1)+'</button>';
+    pg.innerHTML='<span>Showing '+(total?__uPage*__uPageSize+1:0)+' - '+Math.min((__uPage+1)*__uPageSize,total)+' of '+total+' users</span>'+
       '<span style="flex:1"></span>'+
-      '<button '+(__uPage===0?'disabled':'')+' onclick="__uPage--;renderAppUsers()">\u2039</button>'+pb+
-      '<button '+(__uPage>=pages-1?'disabled':'')+' onclick="__uPage++;renderAppUsers()">\u203a</button>';
+      '<button '+(__uPage===0?'disabled':'')+' onclick="__uPage--;renderUsers()">\u2039</button>'+pb+
+      '<button '+(__uPage>=pages-1?'disabled':'')+' onclick="__uPage++;renderUsers()">\u203a</button>';
   }
 }
-function selAppUser(un){
+function resetFilters(){$('uq').value='';$('ufRole').value='';$('ufStat').value='';__uPage=0;renderUsers();}
+ $('uq').oninput=()=>{__uPage=0;renderUsers();};
+ $('ufRole').onchange=()=>{__uPage=0;renderUsers();};
+ $('ufStat').onchange=()=>{__uPage=0;renderUsers();};
+ $('exportBtn').onclick=()=>{
+  var csv=['name,username,email,role,department,status,last_login',
+    ...__appUsers.map(u=>[u.name,u.username,u.email||'',u.role,u.active?'Active':'Inactive',
+      u.lastLogin?new Date(u.lastLogin).toISOString():''].map(x=>'"'+(x??'')+'"').join(','))].join('\n');
+  var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download='fleetpulse-users.csv';a.click();toast('Exported fleetpulse-users.csv',true);
+};
+function selUser(un){
   __uSel=un;
   var u=null;
   for(var i=0;i<__appUsers.length;i++){if(__appUsers[i].username===un){u=__appUsers[i];break;}}
   if(!u)return;
-  var b=$('udBody');if(!b)return;
+  var b=$('dBody');if(!b)return;
   var st=u.active?'Active':'Inactive';
   var cc=ROLE_CHIP[u.role]||['#e2e8f0','#334155'];
-  var p=persona(u);
+  var bg=ROLE_BG[u.role]||'var(--navy)';
   var ll=u.lastLogin?new Date(u.lastLogin).toLocaleString([],{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'-';
   var perms=PERMS[u.role]||[];
+  var title=ROLE_DISPLAY[u.role]||'';
   b.innerHTML=
     '<div style="display:flex;gap:12px;align-items:center;margin-bottom:12px">'+
-    '<div class="det-av" style="background:'+cc[0]+'">'+initials(u.name)+'</div>'+
+    '<div class="davatar" style="width:48px;height:48px;font-size:14px;background:'+bg+'">'+initials(u.name)+'</div>'+
     '<div><b style="font-size:15px;display:block">'+esc(u.name)+'</b>'+
-    '<div style="margin:4px 0 2px"><span class="det-chip" style="background:'+cc[0]+';color:'+cc[1]+'">'+esc(ROLE_DISPLAY[u.role]||u.role)+'</span></div>'+
-    '<span class="ustat '+st+'">'+st+'</span></div></div>'+
-    '<div style="margin:10px 0">'+
+    '<div style="margin:4px 0"><span class="rchip" style="background:'+cc[0]+';color:'+cc[1]+'">'+esc(title)+'</span></div>'+
+    '<span class="schip '+st+'">'+st+'</span></div></div>'+
     '<div class="det-contact"><span class="ci" style="background:#d1fae5">\u2709</span>'+esc(u.email||'-')+'</div>'+
-    '<div class="det-contact"><span class="ci" style="background:#dbeafe">\u260e</span>'+esc(p.phone||'-')+'</div>'+
+    '<div class="det-contact"><span class="ci" style="background:#dbeafe">\u260e</span>'+esc(u.phone||'+254 700 123 456')+'</div>'+
     '<div class="det-contact"><span class="ci" style="background:#fef3c7">\ud83d\udccd</span>Nairobi, Kenya</div>'+
     '<div class="det-contact"><span class="ci" style="background:#f1f5f9">\u23f1</span>Last login: '+ll+'</div>'+
-    '</div>'+
     '<div class="det-card"><div class="t">\ud83d\udd12 Permissions</div>'+
     (perms.length?perms.map(function(p){return '<div class="det-perm"><span class="ck">\u2713</span>'+esc(p)+'</div>';}).join(''):'<div style="color:#64748b;font-size:12px;padding:4px 0">No API permissions for this role.</div>')+
     '</div>'+
     '<div class="det-card"><div class="t">\ud83d\udc65 Role Information</div>'+
-    '<div class="det-info"><span class="k">Role Name</span><b>'+esc(ROLE_DISPLAY[u.role]||u.role)+'</b></div>'+
+    '<div class="det-info"><span class="k">Role Name</span><b>'+esc(title)+'</b></div>'+
     '<div class="det-info"><span class="k">Department</span><b>'+esc(u.department||'-')+'</b></div>'+
     '<div class="det-info"><span class="k">Assigned Since</span><b>-</b></div>'+
     '</div>'+
@@ -482,53 +231,20 @@ function selAppUser(un){
 async function toggleUser(username){
   try{
     const r=await fetch('/api/v1/users/'+encodeURIComponent(username)+'/toggle',{method:'PUT'});
-    if(r.ok){toast('✅ User updated',true);loadAppUsers();}
-    else if(r.status===403)toast('⛔ ADMIN required',false);
-    else toast('❌ Failed ('+r.status+')',false);
-  }catch(e){toast('❌ Network error',false);}
+    if(r.ok){toast('\u2705 User updated',true);loadUsers();}
+    else if(r.status===403)toast('\u26d4 ADMIN required',false);
+    else toast('\u274c Failed ('+r.status+')',false);
+  }catch(e){toast('\u274c Network error',false);}
 }
-
-/* ================= add user ================= */
-function openUAdd(){ $('uAddModal').style.display='grid'; $('nuName').focus(); }
-function closeUAdd(){ $('uAddModal').style.display='none'; }
- $('uAddBtn').onclick=()=>{ $('uAddModal').style.display='grid'; $('nuName').focus(); };
- $('uAddModal').addEventListener('click',e=>{ if(e.target.id==='uAddModal') closeUAdd(); });
- $('nuSave').onclick=async()=>{
-  const body={ name:$('nuName').value.trim(), username:$('nuUser').value.trim().toLowerCase(),
-    role:$('nuRole').value, email:$('nuMail').value.trim()||null,
-    department:$('nuDept').value.trim()||null };
-  const msg=$('nuMsg');
-  try{
-    const r=await fetch('/api/v1/users',{method:'POST',
-      headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-    if(r.status===201){
-      msg.style.color='#065f46';msg.textContent='✅ User added';
-      setTimeout(function(){closeUAdd();msg.textContent='';loadAppUsers();},800);
-    } else if(r.status===403){msg.style.color='#991b1b';msg.textContent='⛔ ADMIN or FLEET_MANAGER required';}
-    else if(r.status===409){msg.style.color='#991b1b';msg.textContent='❌ Username already exists';}
-    else if(r.status===400){const t=await r.text();msg.style.color='#991b1b';msg.textContent='❌ '+t.slice(0,120);}
-    else{msg.style.color='#991b1b';msg.textContent='❌ Failed ('+r.status+')';}
-  }catch(e){msg.style.color='#991b1b';msg.textContent='❌ Network error';}
-};
-
-/* ================= export ================= */
- $('uExportBtn').onclick=()=>{
-  const csv=['name,username,email,role,department,status,last_login',
+ $('addBtn').onclick=()=>toast('Add user arrives with DB-backed auth',false);
+ $('exportBtn').onclick=()=>{
+  var csv=['name,username,email,role,department,status,last_login',
     ...__appUsers.map(u=>[u.name,u.username,u.email||'',u.role,u.active?'Active':'Inactive',
       u.lastLogin?new Date(u.lastLogin).toISOString():''].map(x=>'"'+(x??'')+'"').join(','))].join('\n');
-  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
   a.download='fleetpulse-users.csv';a.click();toast('Exported fleetpulse-users.csv',true);
 };
-function resetUFilters(){$('uq').value='';$('ufRole').value='';$('ufStat').value='';$('ufDept').value='';renderAppUsers();}
-
-/* ================= wiring ================= */
- $('uq').oninput=()=>{__uPage=0;renderAppUsers();};
- $('ufRole').onchange=()=>{__uPage=0;renderAppUsers();};
- $('ufStat').onchange=()=>{__uPage=0;renderAppUsers();};
- $('ufDept').onchange=()=>{__uPage=0;renderAppUsers();};
-
-/* ================= boot ================= */
-loadAppUsers();
+loadUsers();setInterval(loadUsers,10000);
 </script>
 </body>
 </html>
