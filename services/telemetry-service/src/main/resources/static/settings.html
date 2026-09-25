@@ -33,75 +33,51 @@ main{flex:1;min-width:0;display:flex;flex-direction:column}
 .pagehead h1{font-size:22px;font-weight:800}
 .pagehead .sub{color:var(--muted);font-size:12.5px}
 .stabs{display:flex;gap:4px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:6px;overflow-x:auto}
-.stabs button{border:0;background:transparent;padding:9px 13px;font:inherit;font-size:12.5px;font-weight:600;color:var(--muted);cursor:pointer;border-radius:9px;white-space:nowrap;display:flex;align-items:center;gap:7px}
+.stabs button{border:0;background:transparent;padding:9px 13px;font:inherit;font-size:12.5px;font-weight:600;color:var(--muted);cursor:pointer;border-radius:9px;white-space:nowrap}
 .stabs button.on{background:var(--blue);color:#fff}
-.grid{display:grid;gap:16px;align-items:start}
-.g-org{grid-template-columns:230px 1.4fr 1.3fr}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
-.card>h3{font-size:13px;font-weight:700;padding:12px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}
-.card>h3 .sub{font-weight:400;color:var(--muted);font-size:11.5px}
-.subnav{display:flex;flex-direction:column;padding:8px}
-.subnav button{border:0;background:transparent;text-align:left;padding:10px 12px;margin:2px 0;border-radius:9px;font:inherit;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;display:flex;align-items:center;gap:9px}
-.subnav button:hover{background:#f1f5f9}
-.subnav button.on{background:#e8f0fe;color:var(--blue)}
+.card>h3{font-size:13px;font-weight:700;padding:12px 16px;border-bottom:1px solid var(--line)}
 .pad{padding:14px 16px}
-label.fl{font-size:11.5px;color:var(--muted);display:block;margin-bottom:4px;font-weight:600}
-input.f,textarea.f,select.f{width:100%;border:1px solid var(--line);border-radius:9px;padding:8px 10px;font:inherit;background:#fff;color:var(--text)}
+.grid{display:grid;gap:16px;align-items:start}
+.g-main{grid-template-columns:1fr 340px}
+.frm{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.frm label,.fl{font-size:11.5px;color:var(--muted);display:block;margin-bottom:4px;font-weight:600}
+.frm input,.frm select{width:100%;border:1px solid var(--line);border-radius:9px;padding:8px 10px;font:inherit;background:#fff;color:var(--text)}
+.tgl{display:inline-flex;align-items:center;gap:10px;cursor:pointer;user-select:none;margin:4px 0}
+.tgl .sw{width:36px;height:20px;border-radius:99px;background:#cbd5e1;position:relative;transition:.2s;flex:none}
+.tgl .sw::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:.2s}
+.tgl.on .sw{background:var(--blue2)}.tgl.on .sw::after{left:18px}
+.tgl .tx{font-size:12.5px;font-weight:600}
+.tgl .tx .d{display:block;font-weight:400;color:var(--muted);font-size:11px}
 .btn{border:0;border-radius:9px;padding:9px 14px;font:inherit;font-weight:600;background:var(--blue);color:#fff;cursor:pointer}
-.btn.ghost{background:#fff;color:var(--text);border:1px solid var(--line)}
-.tblwrap{overflow:auto;max-height:300px}
-table{width:100%;border-collapse:collapse;font-size:12.3px;white-space:nowrap}
-th{text-align:left;color:var(--muted);font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;padding:8px 10px;border-bottom:1px solid var(--line);background:#fafbfe;position:sticky;top:0}
-td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
-tbody tr:hover td{background:#f8fafc}
-.pint{display:flex;align-items:center;gap:8px}
-.pdot{width:10px;height:10px;border-radius:50%;flex:none}
-.chip{font-size:10px;font-weight:700;padding:2px 9px;border-radius:99px}
-.chip.Active{background:#d1fae5;color:#065f46}
+.irow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:12.8px}
+.irow:last-child{border-bottom:0}
+.irow .k{display:flex;align-items:center;gap:8px}
+.irow .sub2{display:block;font-size:10.5px;color:var(--muted)}
+.conn{font-size:10px;font-weight:700;padding:2px 9px;border-radius:99px}
+.conn.up{background:#d1fae5;color:#065f46}.conn.warn{background:#fef3c7;color:#92400e}
 .orgcard{padding:14px 16px}
-.orglogo{display:flex;flex-direction:column;align-items:center;gap:8px;margin-bottom:14px}
-.orglogo .bub{width:64px;height:64px;border-radius:14px;background:var(--blue2);display:grid;place-items:center}
-.orglogo .nm{font-size:15px;font-weight:800;text-align:center}
+.orglogo{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.orglogo .bub{width:48px;height:48px;border-radius:12px;background:var(--blue2);display:grid;place-items:center}
+.orglogo .nm{font-size:17px;font-weight:800}
+.orglogo .tg{font-size:11px;color:var(--muted)}
 .krow{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid var(--line);font-size:12.5px}
 .krow:last-child{border-bottom:0}
 .krow .k{color:var(--muted)}
-.statcard{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 16px}
-.stat{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:10px;padding:10px 12px}
-.stat .bub{width:38px;height:38px;border-radius:10px;background:#e8f0fe;display:grid;place-items:center;font-size:17px}
-.stat .k{font-size:11px;color:var(--muted)}.stat .v{font-size:18px;font-weight:800}
-.daychips{display:flex;gap:6px;flex-wrap:wrap}
-.daychips button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:7px 12px;font:inherit;font-size:12px;font-weight:700;cursor:pointer;color:var(--muted)}
-.daychips button.on{background:var(--blue);border-color:var(--blue);color:#fff}
-.hours{display:flex;gap:10px;align-items:center;margin-top:10px}
-.hours input{flex:1;border:1px solid var(--line);border-radius:9px;padding:8px 10px;font:inherit}
-.btile{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:10px}
-.btile .nm{font-weight:700;display:flex;align-items:center;gap:8px}
-.btile .ic{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;font-size:12px}
-.btile .d{font-size:11.5px;color:var(--muted)}
-.modal{position:fixed;inset:0;background:rgba(2,6,23,.55);display:none;place-items:center;z-index:2600}
-.modal.open{display:grid}
+.colorrow{display:flex;align-items:center;gap:10px;padding:5px 0;font-size:12.5px}
+.colorrow .sw2{width:22px;height:22px;border-radius:8px;border:1px solid var(--line)}
+.colorrow b{margin-left:8px}
 .note{background:#fffbeb;border:1px solid #fde68a;color:#92400e;border-radius:10px;padding:7px 10px;font-size:10.5px;margin:8px 0}
-.footer-note{background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;border-radius:12px;padding:9px 14px;font-size:12px}
 .muted{color:var(--muted)}.small{font-size:12px}
-.g-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;margin-top:16px}
-.g-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;align-items:start;margin-top:16px}
+.uavatar{width:30px;height:30px;border-radius:50%;display:inline-grid;place-items:center;font-size:10px;font-weight:700;color:#fff;margin-right:8px;vertical-align:middle}
+.uchip{font-size:10px;font-weight:700;padding:2px 9px;border-radius:99px}
+.uchip.ADMIN{background:#ede9fe;color:#5b21b6}.uchip.FLEET_MANAGER{background:#d1fae5;color:#065f46}
+.uchip.DISPATCHER{background:#fef3c7;color:#92400e}.uchip.DRIVER{background:#dbeafe;color:#1e40af}
+.uchip.MAINTENANCE_MANAGER{background:#fee2e2;color:#991b1b}.uchip.ANALYST{background:#cffafe;color:#0e7490}
+.ustat{font-size:10px;font-weight:700;padding:2px 9px;border-radius:99px}
+.ustat.Active{background:#d1fae5;color:#065f46}.ustat.Inactive{background:#fee2e2;color:#991b1b}
 #toast{position:fixed;bottom:20px;right:20px;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;display:none;box-shadow:0 8px 24px rgba(2,6,23,.2);background:#d1fae5;color:#065f46;z-index:3000}
-@media (max-width:1300px){.g-org{grid-template-columns:1fr}.g-3{grid-template-columns:1fr}}
-  .uavatar{width:30px;height:30px;border-radius:50%;display:inline-grid;place-items:center;font-size:10px;font-weight:700;color:#fff;margin-right:8px;vertical-align:middle}
-  .uchip{font-size:10px;font-weight:700;padding:2px 9px;border-radius:99px}
-  .uchip.ADMIN{background:#ede9fe;color:#5b21b6}.uchip.FLEET_MANAGER{background:#d1fae5;color:#065f46}
-  .uchip.DISPATCHER{background:#fef3c7;color:#92400e}.uchip.DRIVER{background:#dbeafe;color:#1e40af}
-  .uchip.MAINTENANCE_MANAGER{background:#fee2e2;color:#991b1b}.uchip.ANALYST{background:#cffafe;color:#0e7490}
-  .ustat{font-size:10px;font-weight:700;padding:2px 9px;border-radius:99px}
-  .ustat.Active{background:#d1fae5;color:#065f46}.ustat.Inactive{background:#fee2e2;color:#991b1b}
-  .ustat\ {\}
-  .udel{color:var(--red);cursor:pointer;font-weight:700}
-  .udel:hover{text-decoration:underline}
-  #usersWrap .card>h3{display:flex;align-items:center;gap:8px}
-  #usersWrap input,#usersWrap select{font:inherit}
-  .ubtn-sm{border:0;border-radius:8px;padding:5px 10px;font:inherit;font-size:11px;font-weight:700;cursor:pointer}
-  .ubtn-sm.deact{border:1.5px solid var(--red);background:#fff;color:var(--red)}
-  .ubtn-sm.deact:hover{background:#fee2e2}
+@media (max-width:1200px){.g-main{grid-template-columns:1fr}.frm{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
@@ -137,13 +113,13 @@ tbody tr:hover td{background:#f8fafc}
 
   <div class="content">
     <div class="pagehead"><span class="ic">⚙️</span>
-      <div><h1>Organization Settings</h1><div class="sub">Manage your company information, branches, fleet and general configuration.</div></div>
+      <div><h1>Settings</h1><div class="sub">Configure your fleet management system, organization settings and integrations.</div></div>
     </div>
 
     <div class="stabs" id="stabs">
       <button data-s="general">⚙️ General</button>
-      <button class="on" data-s="org">🏢 Organization</button>
-      <button data-s="users">👥 Users</button>
+      <button data-s="org">🏢 Organization</button>
+      <button class="on" data-s="users">👥 Users</button>
       <button data-s="roles">🔑 Roles &amp; Permissions</button>
       <button data-s="notif">🔔 Notifications</button>
       <button data-s="alert">⚠️ Alert Rules</button>
@@ -154,179 +130,132 @@ tbody tr:hover td{background:#f8fafc}
       <button data-s="system">🖥 System</button>
     </div>
 
-    <!-- ============ ORGANIZATION TAB ============ -->
-    <div id="orgWrap">
-      <div class="grid g-org">
-        <div class="card">
-          <div class="subnav" id="orgSub">
-            <button class="on" data-p="profile">🏢 Company Profile</button>
-            <button data-p="branches">📍 Branches &amp; Depots</button>
-            <button data-p="groups">👥 Fleet Groups</button>
-            <button data-p="units">🧩 Business Units</button>
-            <button data-p="contact">📞 Contact Information</button>
-            <button data-p="hours">🕐 Working Hours</button>
-            <button data-p="logo">🖼 Company Logo</button>
+    <!-- ============ GENERAL (hidden by default) ============ -->
+    <div id="generalWrap" style="display:none">
+      <div class="grid g-main">
+        <div>
+          <div class="card" style="margin-bottom:16px">
+            <h3>General Settings</h3>
+            <div class="pad">
+              <div class="frm">
+                <div><label>System Name</label><input id="sName" value="FleetPulse"/></div>
+                <div><label>Timezone</label><select id="sTz"><option>Africa/Nairobi (EAT)</option><option>UTC</option></select></div>
+                <div><label>Date Format</label><select id="sDate"><option>DD/MM/YYYY</option><option>YYYY-MM-DD</option></select></div>
+                <div><label>Time Format</label><select id="sTime"><option>24 Hour</option><option>12 Hour</option></select></div>
+                <div><label>Language</label><select id="sLang"><option>English</option><option>Swahili</option></select></div>
+                <div><label>Default Map View</label><select id="sMap"><option>Roadmap</option><option>Satellite</option></select></div>
+                <div><label>Auto Refresh Interval</label><select id="sRef"><option>5 seconds</option><option selected>30 seconds</option></select></div>
+                <div><label>System Version</label><input value="v1.0.0" disabled style="background:#f1f5fb"/></div>
+              </div>
+              <div class="tgl on" id="tglRt" style="margin-top:12px"><span class="sw"></span>
+                <span class="tx">Enable Real-time Tracking<span class="d">Automatically update vehicle locations in real-time.</span></span></div>
+              <div style="display:flex;justify-content:flex-end;margin-top:10px">
+                <button class="btn" id="genSave">💾 Save Changes</button>
+              </div>
+            </div>
           </div>
+          <div class="grid" style="grid-template-columns:1fr 1fr 1fr">
+            <div class="card"><h3>🗺 Map &amp; Location</h3><div class="pad">
+              <label class="fl">Map Provider</label>
+              <select style="width:100%;border:1px solid var(--line);border-radius:9px;padding:8px 10px;font:inherit;margin-bottom:10px"><option>OpenStreetMap</option></select>
+              <div class="tgl on"><span class="sw"></span><span class="tx">Show Geofences</span></div>
+              <div class="tgl dis"><span class="sw"></span><span class="tx">Show Traffic Layer<span class="d">Requires provider — roadmap.</span></span></div>
+            </div></div>
+            <div class="card"><h3>🔔 Alert &amp; Notification</h3><div class="pad">
+              <div class="tgl on"><span class="sw"></span><span class="tx">In-app Notifications<span class="d">Live bell + alert pages.</span></span></div>
+              <div class="tgl dis"><span class="sw"></span><span class="tx">Email Notifications<span class="d">Requires notification module.</span></span></div>
+              <div class="tgl dis"><span class="sw"></span><span class="tx">SMS Notifications<span class="d">Requires SMS gateway.</span></span></div>
+            </div></div>
+            <div class="card"><h3>🔌 Integrations</h3><div class="pad">
+              <div class="irow"><span class="k">⚡ Kafka<span class="sub2">kafka:9092</span></span><span class="conn up">Connected</span></div>
+              <div class="irow"><span class="k">🗄 PostgreSQL<span class="sub2">timescaledb:5432</span></span><span class="conn up">Connected</span></div>
+              <div class="irow"><span class="k">🧠 Redis<span class="sub2">redis:6379</span></span><span class="conn up">Connected</span></div>
+              <div class="irow"><span class="k">☁ External API<span class="sub2">not configured</span></span><span class="conn warn">Not Configured</span></div>
+            </div></div>
+          </div>
+          <div class="footer-note" style="margin-top:2px">ℹ Changes made in settings may require a system restart to take effect.</div>
         </div>
-
-        <div class="card">
-          <h3 id="pTitle">🏢 Company Profile</h3>
-          <div class="pad" id="pBody">
-            <div class="grid" style="grid-template-columns:130px 1fr 1fr;gap:12px;align-items:start">
-              <div style="text-align:center">
-                <div style="width:64px;height:64px;border-radius:14px;background:var(--blue2);display:grid;place-items:center;margin:0 auto 8px">
-                  <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="6" width="13" height="9" rx="1.5"/><path d="M14 9h3.6c.5 0 .97.24 1.26.64L21 12.5V15h-7V9Z"/><circle cx="5.5" cy="17.5" r="1.9"/><circle cx="16.5" cy="17.5" r="1.9"/></svg>
-                </div>
-                <b style="font-size:14px">FleetPulse</b>
-                <div class="muted small" style="margin-top:4px"><button class="btn ghost" style="font-size:11px;padding:5px 10px;border-radius:8px;border:1px solid var(--line);background:#fff;color:var(--text)" onclick="toast('Logo upload arrives with the org module',false)">⇪ Change Logo</button></div>
-              </div>
-              <div>
-                <label class="fl">Organization Name *</label>
-                <input class="f" id="orgName" value="FleetPulse Logistics Ltd" style="margin-bottom:10px"/>
-                <label class="fl">Email *</label>
-                <input class="f" id="orgMail" value="info@fleetpulse.co.ke"/>
-              </div>
-              <div>
-                <label class="fl">Registration No. *</label>
-                <input class="f" id="orgReg" value="CPI23456789" style="margin-bottom:10px"/>
-                <label class="fl">Phone *</label>
-                <input class="f" id="orgPhone" value="+254 700 123 456"/>
-              </div>
-            </div>
-            <div style="margin-top:12px">
-              <label class="fl">Address *</label>
-              <input class="f" value="Nairobi, Kenya"/>
-            </div>
-            <div style="margin-top:12px">
-              <label class="fl">Description</label>
-              <textarea class="f" rows="3">Leading fleet management solutions for a smarter, safer and more efficient tomorrow.</textarea>
-              <div class="muted small" style="text-align:right;margin-top:3px">72/500</div>
-            </div>
-            <div style="display:flex;justify-content:flex-end;margin-top:10px">
-              <button class="btn" id="profSave">💾 Save Changes</button>
+        <div>
+          <div class="card" style="margin-bottom:16px">
+            <h3>Organization Details</h3>
+            <div class="orgcard">
+              <div class="orglogo"><div class="bub">🚛</div>
+                <div><div class="nm">FleetPulse</div><div class="tg">Smarter Fleets. Safer Roads.</div></div></div>
+              <div class="krow"><span class="k">Company Name</span><b>FleetPulse Logistics Ltd</b></div>
+              <div class="krow"><span class="k">Registration No.</span><b>CPI23456789</b></div>
+              <div class="krow"><span class="k">Email</span><b>info@fleetpulse.co.ke</b></div>
+              <div class="krow"><span class="k">Phone</span><b>+254 700 123 456</b></div>
+              <div class="krow"><span class="k">Address</span><b>Nairobi, Kenya</b></div>
             </div>
           </div>
-        </div>
-
-        <div class="card">
-          <h3>📍 Branches &amp; Depots <span class="sub">manage branches, depots and operational locations</span></h3>
-          <div class="tblwrap"><table>
-            <thead><tr><th>Name</th><th>Location</th><th>Type</th><th>Status</th><th>Source</th></tr></thead>
-            <tbody id="branchRows"><tr><td colspan="5" class="muted">Loading…</td></tr></tbody></table></div>
-          <div class="statcard">
-            <div class="stat"><div class="bub">📍</div><div><div class="k">Total Branches</div><div class="v" id="stTotal">–</div></div></div>
-            <div class="stat"><div class="bub" style="background:#d1fae5">🟢</div><div><div class="k">Active Locations</div><div class="v" id="stActive">–</div></div></div>
+          <div class="card">
+            <h3>🛡 Security Settings</h3>
+            <div class="pad">
+              <div class="irow"><span class="k">Password Policy</span><span class="conn up">Strong</span></div>
+              <div class="irow"><span class="k">Session Timeout</span><b>8 hours</b></div>
+              <div class="irow"><span class="k">Two-Factor Authentication</span><span class="conn warn">Roadmap</span></div>
+            </div>
           </div>
-          <div class="note" style="margin:0 16px 12px">Branches are seeded from your live geofence zones (DEPOT-type zones become depots). Adding branches here arrives with the org module.</div>
         </div>
       </div>
     </div>
 
-    <div class="g-2" id="orgBottom">
-      <div class="card">
-        <h3>👥 Fleet Groups <button class="btn" style="margin-left:auto;font-size:11px;padding:5px 10px" onclick="toast('Group management arrives with the org module',false)">＋ Add Group</button></h3>
-        <div class="tblwrap"><table>
-          <thead><tr><th>Group Name</th><th>Vehicles</th><th>Description</th></tr></thead>
-          <tbody id="groupRows"><tr><td colspan="3" class="muted">Loading…</td></tr></tbody></table></div>
+    <!-- ============ ORGANIZATION (hidden by default) ============ -->
+    <div id="orgWrap" style="display:none">
+      <div class="card" style="margin-bottom:16px">
+        <h3>🏢 Branches &amp; Depots <span class="muted small" style="font-weight:400;margin-left:8px">from live geofence zones</span></h3>
+        <div style="overflow:auto;max-height:300px"><table>
+          <thead><tr><th>Name</th><th>Location</th><th>Type</th><th>Status</th><th>Source</th></tr></thead>
+          <tbody id="branchRows"><tr><td colspan="5" style="color:#64748b">Loading…</td></tr></tbody></table></div>
       </div>
       <div class="card">
-        <h3>🧩 Business Units <button class="btn" style="margin-left:auto;font-size:11px;padding:5px 10px" onclick="toast('Business units arrive with the org module',false)">＋ Add Unit</button></h3>
-        <div class="tblwrap"><table>
-          <thead><tr><th>Unit Name</th><th>Description</th><th>Status</th></tr></thead>
-          <tbody id="unitRows"></tbody></table></div>
-      </div>
-      <div class="card">
-        <h3>🕐 Working Hours <span class="sub">organization timezone and hours</span></h3>
-        <div class="pad">
-          <label class="fl">Timezone</label>
-          <select class="f"><option>Africa/Nairobi (EAT)</option><option>UTC</option></select>
-          <label class="fl" style="margin-top:10px">Working Days</label>
-          <div class="daychips" id="days"></div>
-          <div class="hours">
-            <input value="08:00 AM" id="hStart"/><span class="muted">–</span><input value="05:00 PM" id="hEnd"/>
-          </div>
-          <div class="note">Working hours are stored client-side for demo; org-wide scheduling arrives with the org module.</div>
-        </div>
+        <h3>👥 Fleet Groups <span class="muted small" style="font-weight:400;margin-left:8px">with live vehicle counts</span></h3>
+        <div style="overflow:auto;max-height:300px"><table>
+          <thead><tr><th>Group</th><th>Vehicles</th><th>Description</th></tr></thead>
+          <tbody id="groupRows"><tr><td colspan="3" style="color:#64748b">Loading…</td></tr></tbody></table></div>
       </div>
     </div>
-    <!-- ============ /ORGANIZATION TAB ============ -->
 
-    <!-- ============ OTHER TABS ============ -->
-    <div id="usersWrap" style="display:none">
-      <div class="cols" style="display:grid;grid-template-columns:1fr 320px;gap:16px;align-items:start">
-        <div class="card">
-          <h3>Manage Users
-            <button class="btn" style="margin-left:auto;font-size:12px;padding:6px 12px" id="uAddBtn">＋ Add User</button>
-          </h3>
-          <div style="padding:10px 12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;border-bottom:1px solid var(--line)">
-            <input id="uq" placeholder="🔍 Search by name, username..." style="flex:1;min-width:150px;border:1px solid var(--line);border-radius:9px;padding:7px 10px;font:inherit;background:#fff"/>
-            <select id="ufRole" style="border:1px solid var(--line);border-radius:9px;padding:7px 10px;font:inherit;background:#fff">
-              <option value="">All Roles</option><option>ADMIN</option><option>FLEET_MANAGER</option>
-              <option>DISPATCHER</option><option>ANALYST</option><option>MAINTENANCE_MANAGER</option><option>DRIVER</option></select>
-            <select id="ufStat"><option value="">All Statuses</option><option>Active</option><option>Inactive</option></select>
-          </div>
-          <div style="overflow:auto;max-height:440px"><table>
-            <thead><tr><th>Name</th><th>Username</th><th>Email</th><th>Role</th><th>Department</th><th>Status</th><th>Last Login</th><th></th></tr></thead>
-            <tbody id="uRows"><tr><td colspan="8" class="muted">Loading…</td></tr></tbody></table></div>
+    <!-- ============ USERS TAB (fully built) ============ -->
+    <div id="usersWrap">
+      <div class="card">
+        <h3>👥 Manage Users
+          <span class="muted small" style="margin-left:auto;font-weight:400" id="uCount"></span>
+        </h3>
+        <div style="padding:10px 14px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;border-bottom:1px solid var(--line)">
+          <input id="uq" placeholder="🔍 Search by name, username..." style="flex:1;min-width:160px;border:1px solid var(--line);border-radius:9px;padding:7px 10px;font:inherit;background:#fff"/>
+          <select id="ufRole" style="border:1px solid var(--line);border-radius:9px;padding:7px 10px;font:inherit;background:#fff">
+            <option value="">All Roles</option><option>ADMIN</option><option>FLEET_MANAGER</option>
+            <option>DISPATCHER</option><option>ANALYST</option><option>MAINTENANCE_MANAGER</option><option>DRIVER</option></select>
+          <select id="ufStat"><option value="">All Statuses</option><option>Active</option><option>Inactive</option></select>
         </div>
-        <div class="card" id="uPanel">
-          <div style="display:flex;gap:12px;align-items:center;padding:14px 16px;border-bottom:1px solid var(--line)">
-            <div style="width:48px;height:48px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-size:14px;font-weight:800" id="udInit">–</div>
-            <div><b id="udName" style="font-size:15px">–</b><div class="muted small" id="udId">select a user</div></div>
-            <span id="udChip" style="margin-left:auto"></span>
-          </div>
-          <div style="padding:12px 16px;max-height:380px;overflow-y:auto" id="udBody">
-            <span class="muted small">Click a user row.</span></div>
+        <div style="overflow:auto;max-height:480px"><table>
+          <thead><tr><th>Name</th><th>Username</th><th>Email</th><th>Role</th><th>Department</th><th>Status</th><th>Last Login</th></tr></thead>
+          <tbody id="uRows"><tr><td colspan="7" style="color:#64748b">Loading…</td></tr></tbody></table></div>
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <h3>User Details</h3>
+        <div id="udBody" style="padding:14px 16px">
+          <div style="color:#64748b;font-size:12.5px">Click a user row above to see details.</div>
         </div>
       </div>
     </div>
+
+    <!-- ============ FALLBACK (other tabs) ============ -->
     <div class="card" id="tabFallback" style="display:none">
       <h3 id="fbTitle">—</h3>
-      <div class="pad muted small" id="fbBody"></div>
+      <div class="pad" style="color:#64748b;font-size:12.5px" id="fbBody"></div>
     </div>
   </div>
 </main>
 </div>
-<div class="modal" id="grpModal" style="position:fixed;inset:0;background:rgba(2,6,23,.55);display:none;place-items:center;z-index:2600">
-  <div style="background:#fff;border-radius:16px;max-width:420px;width:92%;padding:22px 24px;position:relative">
-    <button onclick="closeGrp()" style="position:absolute;top:14px;right:16px;border:0;background:none;font-size:18px;cursor:pointer;color:var(--muted)">✕</button>
-    <h2 style="font-size:18px;margin-bottom:12px">Add Fleet Group</h2>
-    <label class="muted small">Group name *</label>
-    <input id="gName" placeholder="Refrigerated" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit;margin:4px 0 10px"/>
-    <label class="muted small">Description</label>
-    <input id="gDesc" placeholder="Refrigerated & other" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit"/>
-    <div style="display:flex;gap:10px;margin-top:14px">
-      <button class="btn" style="flex:1" id="gSave">Add Group</button>
-      <button class="btn ghost" style="flex:1;border:1px solid var(--line);background:#fff;color:var(--text)" onclick="closeGrp()">Cancel</button>
-    </div>
-    <div class="muted small" id="gMsg" style="margin-top:8px;min-height:16px"></div>
-  </div>
-</div>
-<div class="modal" id="unitModal" style="position:fixed;inset:0;background:rgba(2,6,23,.55);display:none;place-items:center;z-index:2600">
-  <div style="background:#fff;border-radius:16px;max-width:420px;width:92%;padding:22px 24px;position:relative">
-    <button onclick="closeUnit()" style="position:absolute;top:14px;right:16px;border:0;background:none;font-size:18px;cursor:pointer;color:var(--muted)">✕</button>
-    <h2 style="font-size:18px;margin-bottom:12px">Add Business Unit</h2>
-    <label class="muted small">Unit name *</label>
-    <input id="uName2" placeholder="Cold Chain" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit;margin:4px 0 10px"/>
-    <label class="muted small">Description</label>
-    <input id="uDesc" placeholder="Cold chain logistics" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit"/>
-    <div style="display:flex;gap:10px;margin-top:14px">
-      <button class="btn" style="flex:1" id="uSave">Add Unit</button>
-      <button class="btn ghost" style="flex:1;border:1px solid var(--line);background:#fff;color:var(--text)" onclick="closeUnit()">Cancel</button>
-    </div>
-    <div class="muted small" id="uMsg" style="margin-top:8px;min-height:16px"></div>
-  </div>
-</div>
-
 <div id="toast"></div>
 
 <script>
 /* ================= helpers ================= */
 const $=id=>document.getElementById(id);
 const esc=s=>(s??'').replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
-const fmt=n=>n==null?'–':Number(n).toFixed(0);
-const fmtPlate=id=>{const m=/^(K[A-Z]{2})(\d{3}[A-Z])$/.exec(id||'');return m?m[1]+' '+m[2]:id||'';};
-const api=async p=>{const r=await fetch(p);if(!r.ok)throw new Error('HTTP '+r.status);return r.json();};
 const toast=(m,ok)=>{const t=$('toast');t.textContent=m;
   t.style.background=ok===false?'#fee2e2':'#d1fae5';t.style.color=ok===false?'#991b1b':'#065f46';
   t.style.display='block';setTimeout(()=>t.style.display='none',2600);};
@@ -346,241 +275,116 @@ const initials=n=>(n||'?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCa
 function refreshBell(){fetch('/api/v1/alerts/recent?limit=100').then(r=>r.ok?r.json():[])
   .then(al=>{const n=al.filter(a=>new Date(a.ts).getTime()>Date.now()-36e5).length;
     const b=$('topBell');b.textContent=n;b.style.display=n?'block':'none';}).catch(()=>{});}
-refreshBell();setInterval(refreshBell,5000)
-loadGroups();setInterval(loadGroups,60000);;
+refreshBell();setInterval(refreshBell,5000);
 
-/* ================= org sub-nav ================= */
-const SECTIONS=['profile','branches','groups','units','contact','hours','logo'];
-const SEC_META={
-  contact:['Contact Information','Contact details are managed in the Company Profile form (email, phone, address). A dedicated contact-book arrives with the org module.'],
-  hours:['Working Hours','Set your organization timezone, working days and hours below. Org-wide scheduling shifts arrive with the org module.'],
-  logo:['Company Logo','The logo tile renders the FleetPulse truck mark. Upload of custom logo files arrives with the org module.'],
-};
-let curSection='profile';
-document.querySelectorAll('#orgSub button').forEach(b=>b.onclick=()=>{
-  document.querySelectorAll('#orgSub button').forEach(x=>x.classList.remove('on'));
-  b.classList.add('on');
-  curSection=b.dataset.p;
-  // scroll to the relevant card
-  const map={profile:'pTitle',branches:'branchRows',groups:'groupRows',units:'unitRows',hours:null,contact:null,logo:null};
-  if(map[curSection]){
-    const el=document.getElementById(map[curSection]);
-    if(el)el.scrollIntoView({behavior:'smooth',block:'center'});
-  }
-  toast(SEC_META[curSection]?SEC_META[curSection][0]:'Section: '+curSection,true);
-});
-
-/* ================= load org data ================= */
-async function load(){
-  try{
-    const [lv,zones,vp]=await Promise.all([
-      api('/api/v1/vehicles/live'),
-      api('/api/v1/geofences').catch(()=>[]),
-      api('/api/v1/vehicles?size=200')]);
-
-    /* branches from geofence zones (depots/hq) */
-    const branches=zones.filter(z=>z.active).map(z=>({
-      name:z.name, loc:nearestCity(z.lat,z.lon),
-      type:z.type==='DEPOT'?'Depot':z.type==='RESTRICTED'?'Restricted Zone':'Customer Site', z}));
-    $('branchRows').innerHTML=branches.map(b=>'<tr>'+
-      '<td><span class="pint"><span class="pdot" style="background:'+(b.z.type==='DEPOT'?'var(--blue2)':b.z.type==='RESTRICTED'?'var(--red)':'var(--green)')+'"></span><b>'+esc(b.name)+'</b></span></td>'+
-      '<td class="muted">'+esc(b.loc)+', Kenya</td>'+
-      '<td>'+esc(b.type)+'</td>'+
-      '<td><span class="chip Active">Active</span></td>'+
-      '<td class="muted small">geofence</td></tr>').join('')
-      ||'<tr><td colspan="5" class="muted">No zones — create them on the Geofences tab.</td></tr>';
-    $('stTotal').textContent=branches.length;
-    $('stActive').textContent=branches.length;
-
-    /* fleet groups by class */
-    const groups=[['Trucks','var(--blue2)','Heavy duty trucks'],['Vans','var(--amber)','Delivery vans'],
-                  ['Pickups','var(--green)','Light vehicles'],['Buses','var(--red)','Matatus & buses']];
-    const cls={};vp.forEach(v=>{const c=vehClass(v.make,v.model);cls[c]=(cls[c]||0)+1;});
-    $('groupRows').innerHTML=groups.map(([nm,col,d])=>
-      '<tr><td><span class="pint"><span class="pdot" style="background:'+col+'"></span><b>'+nm+'</b></span></td>'+
-      '<td>'+(cls[nm]||0)+'</td><td class="muted">'+d+'</td></tr>').join('');
-
-    /* business units (persona-derived, deterministic) */
-    const units=[['Logistics','Main logistics operations'],['Distribution','Regional distribution'],
-                 ['Transport','Fleet transport services'],['Sales & Operations','Sales and customer service']];
-    $('unitRows').innerHTML=units.map(([nm,d])=>
-      '<tr><td><b>'+esc(nm)+'</b></td><td class="muted">'+esc(d)+'</td>'+
-      '<td><span class="chip Active">Active</span></td></tr>').join('');
-  }catch(e){
-    $('branchRows').innerHTML='<tr><td colspan="5" class="muted">Load failed: '+esc(e.message)+' — if HTTP 401/302, sign in again.</td></tr>';
-  }
-}
-
-function vehClass(mk,mo){const m=`${mk??''} ${mo??''}`;
-  if(/Hiace|Coaster|Rosa|Matatu|Bus/i.test(m))return 'Buses';
-  if(/Hilux|Ranger|H1/i.test(m))return 'Pickups';return 'Trucks';}
-
-/* ================= working hours ================= */
-const DAYS=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-(function(){
-  const saved=JSON.parse(localStorage.getItem('fleetpulse-days')||'null')||['Mon','Tue','Wed','Thu','Fri'];
-  $('days').innerHTML=DAYS.map(d=>'<button class="'+(saved.includes(d)?'on':'')+'" data-d="'+d+'">'+d+'</button>').join('');
-  $('days').querySelectorAll('button').forEach(b=>b.onclick=()=>{
-    b.classList.toggle('on');
-    const on=[...$('days').querySelectorAll('button.on')].map(x=>x.dataset.d);
-    localStorage.setItem('fleetpulse-days',JSON.stringify(on));
-  });
-  const hs=JSON.parse(localStorage.getItem('fleetpulse-hours')||'null');
-  if(hs){$('hStart').value=hs[0];$('hEnd').value=hs[1];}
-  $('hStart').onchange=$('hEnd').onchange=()=>{
-    localStorage.setItem('fleetpulse-hours',JSON.stringify([$('hStart').value,$('hEnd').value]));
-    toast('Working hours saved (client demo store)',true);};
-})();
-
-/* ================= profile save (localStorage) ================= */
- $('profSave').onclick=()=>{
-  localStorage.setItem('fleetpulse-org',JSON.stringify({
-    name:$('orgName').value,mail:$('orgMail').value,reg:$('orgReg').value,phone:$('orgPhone').value}));
-  toast('✅ Company profile saved (client demo store)',true);
-};
-try{const o=JSON.parse(localStorage.getItem('fleetpulse-org')||'null');
-  if(o){$('orgName').value=o.name;$('orgMail').value=o.mail;$('orgReg').value=o.reg;$('orgPhone').value=o.phone;}}catch(e){}
-
-/* ================= top tabs (org built; others = module panels) ================= */
-const TAB_META={
-  general:['General Settings','System name, timezone, formats, map defaults and integrations status — switch back to this tab. It was the previous General view.'],
-  users:['User Management','Users are in-memory demo accounts (admin, manager, dispatcher, analyst, maintenance, driver). Database-backed users with CRUD UI arrive with the JWT security milestone.'],
-  roles:['Roles & Permissions','Six roles enforced server-side: ADMIN/FLEET_MANAGER (write), DISPATCHER/ANALYST/MAINTENANCE_MANAGER (read), DRIVER (none). Permission matrix UI arrives with users-in-PostgreSQL.'],
-  notif:['Notification Settings','In-app notifications are live everywhere. Email/SMS channels arrive with the notification module.'],
-  alert:['Alert Rules','Thresholds are per-vehicle editable on the Vehicles tab. A rules UI arrives with the rules-engine milestone.'],
-  geo:['Geofence Settings','Zones are fully managed on the Geofences tab. Zone defaults (dwell limits, hysteresis) will live here.'],
-  integr:['Integrations','Kafka, PostgreSQL/Timescale, Redis and MQTT are live. External API webhooks arrive with the integration milestone.'],
-  security:['Security','Form login + Redis sessions, RBAC everywhere, BCrypt. JWT + users-in-PostgreSQL is the next security milestone.'],
-  api:['API','REST v1 under /api/v1. Session auth for browsers, HTTP Basic for API clients. OpenAPI spec arrives with the API milestone.'],
-  system:['System','Java 21 · Spring Boot 3.3 · Kafka 3.7 · TimescaleDB 2.15 · Redis 7 · Mosquitto 2. Metrics: /actuator/prometheus.'],
-};
+/* ================= tab switching ================= */
 document.querySelectorAll('#stabs button').forEach(b=>b.onclick=()=>{
   document.querySelectorAll('#stabs button').forEach(x=>x.classList.remove('on'));
   b.classList.add('on');
   const key=b.dataset.s;
-  const ow=$('orgWrap'), ob=$('orgBottom'), fb=$('tabFallback');
-  if(key==='org'){ow.style.display='';ob.style.display='';fb.style.display='none';}
-  else{
-    ow.style.display='none';ob.style.display='none';fb.style.display='';
-    $('fbTitle').textContent=TAB_META[key][0];
-    $('fbBody').innerHTML=esc(TAB_META[key][1])+
-      '<div style="margin-top:8px">This section becomes fully manageable with its roadmap module.</div>';
+  ['generalWrap','orgWrap','usersWrap'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)el.style.display=(id===key+'Wrap')?'':'none';
+  });
+  const fb=$('tabFallback');
+  if(key==='general'||key==='org'||key==='users'){
+    fb.style.display='none';
+    if(key==='users')loadAppUsers();
+  } else {
+    fb.style.display='';
+    const meta=TAB_META[key];
+    $('fbTitle').textContent=meta.title;
+    $('fbBody').textContent=meta.body;
   }
 });
-
-/* ================= groups + units CRUD (end-of-script) ================= */
-function openGrp(){ $("grpModal").style.display="grid"; $("gName").focus(); }
-function closeGrp(){ $("grpModal").style.display="none"; }
-function openUnit(){ $("unitModal").style.display="grid"; $("uName2").focus(); }
-function closeUnit(){ $("unitModal").style.display="none"; }
- $("grpModal").addEventListener("click",e=>{if(e.target.id==="grpModal")closeGrp();});
- $("unitModal").addEventListener("click",e=>{if(e.target.id==="unitModal")closeUnit();});
- $("gSave").onclick=async()=>{
-  try{
-    const r=await fetch('/api/v1/org/groups',{method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({name:$("gName").value.trim(),description:$("gDesc").value.trim()})});
-    if(r.status===201){toast('✅ Group added',true);closeGrp();load();}
-    else if(r.status===409){toast('❌ Group already exists',false);}
-    else if(r.status===403){toast('⛔ ADMIN or FLEET_MANAGER required',false);}
-    else{toast('❌ Failed ('+r.status+')',false);}
-  }catch(e){toast('❌ Network error',false);}
-};
- $("uSave").onclick=async()=>{
-  try{
-    const r=await fetch('/api/v1/org/units',{method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({name:$("uName2").value.trim(),description:$("uDesc").value.trim()})});
-    if(r.status===201){toast('✅ Unit added',true);closeUnit();load();}
-    else if(r.status===409){toast('❌ Unit already exists',false);}
-    else if(r.status===403){toast('⛔ ADMIN or FLEET_MANAGER required',false);}
-    else{toast('❌ Failed ('+r.status+')',false);}
-  }catch(e){toast('❌ Network error',false);}
+const TAB_META={
+  general:{title:'General Settings',body:'Switch to the General tab to see system preferences. This panel shows module info for the selected tab.'},
+  org:{title:'Organization',body:'Switch to the Organization tab to see branches, fleet groups and business units.'},
+  roles:{title:'Roles & Permissions',body:'Six roles are enforced server-side: ADMIN/FLEET_MANAGER (write), DISPATCHER/ANALYST/MAINTENANCE_MANAGER (read), DRIVER (none). A permission matrix UI arrives with users-in-PostgreSQL.'},
+  notif:{title:'Notifications',body:'In-app notifications are live (bells + alert feeds). Email/SMS channels arrive with the notification module.'},
+  alert:{title:'Alert Rules',body:'Thresholds are per-vehicle editable on the Vehicles tab. A rules UI arrives with the rules-engine milestone.'},
+  geo:{title:'Geofence Settings',body:'Zones are managed on the Geofences tab. Zone defaults arrive with the org module.'},
+  integr:{title:'Integrations',body:'Kafka, PostgreSQL/Timescale, Redis and MQTT are live. External API webhooks arrive with the integration milestone.'},
+  security:{title:'Security',body:'Form login + Redis-backed sessions, RBAC, BCrypt. JWT + database users is the next security milestone.'},
+  api:{title:'API',body:'REST v1 under /api/v1. Session auth for browsers, HTTP Basic for API clients. OpenAPI spec arrives with the API milestone.'},
+  system:{title:'System',body:'Java 21 · Spring Boot 3.3 · Kafka 3.7 · TimescaleDB 2.15 · Redis 7 · Mosquitto 2. Metrics: /actuator/prometheus.'}
 };
 
-async function loadGroups(){
-  try{
-    const groups = await api('/api/v1/org/groups');
-    if($('groupRows')){
-      $('groupRows').innerHTML = groups.map(function(g){
-        return '<tr><td><span class="pint"><span class="pdot" style="background:var(--blue2)"></span><b>'+esc(g.name)+'</b></span></td>'+
-          '<td>'+fmt(g.vehicles)+'</td>'+
-          '<td class="muted">'+esc(g.description||'')+'</td></tr>';
-      }).join('') || '<tr><td colspan="3" class="muted">No groups.</td></tr>';
-    }
-  }catch(e){
-    if($('groupRows'))$('groupRows').innerHTML='<tr><td colspan="3" class="muted">Load failed: '+esc(e.message)+'</td></tr>';
-  }
-}
+/* ================= general save ================= */
+ $('genSave').onclick=()=>{
+  const prefs={name:$('sName').value,tz:$('sTz').value,df:$('sDate').value,
+    tf:$('sTime').value,lang:$('sLang').value,map:$('sMap').value,ref:$('sRef').value};
+  localStorage.setItem('fleetpulse-prefs',JSON.stringify(prefs));
+  toast('✅ General settings saved (client preferences)',true);
+};
+try{const p=JSON.parse(localStorage.getItem('fleetpulse-prefs')||'null');
+  if(p){$('sName').value=p.name;$('sTz').value=p.tz;$('sDate').value=p.df;
+    $('sTime').value=p.tf;$('sLang').value=p.lang;$('sMap').value=p.map;$('sRef').value=p.ref;}}catch(e){}
 
-/* ================= branches & depots (self-contained) ================= */
-const _fbEsc = s => (s ?? '').replace(/[<>&"]/g, function(c){return {'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c];});
-async function loadBranches(){
+/* ================= org data: branches + fleet groups ================= */
+async function loadOrgData(){
   try{
-    const zr = await fetch('/api/v1/geofences');
-    const zones = zr.ok ? await zr.json() : [];
-    const el = document.getElementById('branchRows');
-    if(!el) return;
-    const active = zones.filter(function(z){return z.active;});
-    el.innerHTML = active.map(function(z){
-      const col = (z.type==='RESTRICTED'||z.type==='DANGER') ? 'var(--red)' : z.type==='DEPOT' ? 'var(--blue2)' : 'var(--green)';
-      const t = z.type==='DEPOT' ? 'Depot' : z.type==='RESTRICTED' ? 'Restricted Zone' : z.type==='DANGER' ? 'Danger Zone' : 'Customer Site';
-      return '<tr><td><span class="pint"><span class="pdot" style="background:'+col+'"></span><b>'+_fbEsc(z.name)+'</b></span></td>'+
-        '<td style="color:#64748b">Kenya</td>'+
-        '<td>'+_fbEsc(t)+'</td>'+
-        '<td><span class="chip Active">Active</span></td>'+
+    const [zones,vp]=await Promise.all([
+      fetch('/api/v1/geofences').then(r=>r.ok?r.json():[]).catch(()=>[]),
+      fetch('/api/v1/vehicles?size=200').then(r=>r.ok?r.json():[]).catch(()=>[])]);
+    const active=zones.filter(z=>z.active);
+    $('branchRows').innerHTML=active.map(z=>{
+      const col=(z.type==='RESTRICTED'||z.type==='DANGER')?'var(--red)':z.type==='DEPOT'?'var(--blue2)':'var(--green)';
+      const t=z.type==='DEPOT'?'Depot':z.type==='RESTRICTED'?'Restricted':'Customer Site';
+      return '<tr><td><b>'+esc(z.name)+'</b></td><td style="color:#64748b">Kenya</td><td>'+esc(t)+'</td>'+
+        '<td><span style="font-size:10px;font-weight:700;padding:2px 9px;border-radius:99px;background:#d1fae5;color:#065f46">Active</span></td>'+
         '<td style="color:#64748b;font-size:11px">geofence</td></tr>';
-    }).join('') || '<tr><td colspan="5" style="color:#64748b">No zones - create them on the Geofences tab.</td></tr>';
-    const st = document.getElementById('stTotal');
-    const sa = document.getElementById('stActive');
-    if(st) st.textContent = active.length;
-    if(sa) sa.textContent = active.length;
+    }).join('')||'<tr><td colspan="5" style="color:#64748b">No zones yet.</td></tr>';
+    const cls={};
+    vp.forEach(v=>{const mk=(v.make||'')+' '+(v.model||'');
+      const c=/Hiace|Coaster|Rosa|Matatu|Bus/i.test(mk)?'Buses':/Hilux|Ranger|H1/i.test(mk)?'Pickups':'Trucks';
+      cls[c]=(cls[c]||0)+1;});
+    $('groupRows').innerHTML=Object.entries(cls).map(([nm,cnt])=>
+      '<tr><td><b>'+esc(nm)+'</b></td><td>'+cnt+'</td><td style="color:#64748b">Auto-grouped by vehicle class</td></tr>').join('')
+      ||'<tr><td colspan="3" style="color:#64748b">No vehicles.</td></tr>';
   }catch(e){
-    const el = document.getElementById('branchRows');
-    if(el) el.innerHTML = '<tr><td colspan="5" style="color:#64748b">Load failed: '+e.message+'</td></tr>';
+    $('branchRows').innerHTML='<tr><td colspan="5" style="color:#64748b">Load failed: '+esc(e.message)+'</td></tr>';
   }
 }
-loadBranches();
-setInterval(loadBranches, 30000);
+loadOrgData();setInterval(loadOrgData,60000);
 
-/* ================= users tab (end-of-script) ================= */
-let __appUsers=[],__uSel=null,__uRoleFilter='',__uStatFilter='',__uSearch='';
+/* ================= users ================= */
+let __appUsers=[],__uSel=null;
 async function loadAppUsers(){
   try{
     __appUsers=await api('/api/v1/users');
     renderAppUsers();
   }catch(e){
-    const el=$("uRows");if(el)el.innerHTML='<tr><td colspan="8" class="muted">Load failed: '+esc(e.message)+'</td></tr>';
+    const el=$('uRows');
+    if(el)el.innerHTML='<tr><td colspan="7" style="color:#64748b">Load failed: '+esc(e.message)+'</td></tr>';
   }
 }
 function renderAppUsers(){
-  const q=__uSearch.toUpperCase();
+  const q=$('uq').value.toUpperCase(),fr=$('ufRole').value,fs=$('ufStat').value;
   const rows=__appUsers.filter(u=>{
     const hay=(u.username+' '+u.name+' '+(u.email||'')).toUpperCase();
-    return(!q||hay.includes(q))&&(!__uRoleFilter||u.role===__uRoleFilter)&&
-      (!__uStatFilter||(u.active?'Active':'Inactive')===__uStatFilter);});
-  const el=$("uRows");if(!el)return;
-  el.innerHTML=rows.map(u=>{
+    return(!q||hay.includes(q))&&(!fr||u.role===fr)&&(!fs||(u.active?'Active':'Inactive')===fs);});
+  $('uRows').innerHTML=rows.map(u=>{
     const st=u.active?'Active':'Inactive';
-    return '<tr onclick="selAppUser(\''+esc(u.username)+'\')">'+
+    const rchipBg=u.role==='ADMIN'?'#ede9fe;color:#5b21b6':u.role==='FLEET_MANAGER'?'#d1fae5;color:#065f46':u.role==='DISPATCHER'?'#fef3c7;color:#92400e':u.role==='DRIVER'?'#dbeafe;color:#1e40af':u.role==='MAINTENANCE_MANAGER'?'#fee2e2;color:#991b1b':'#cffafe;color:#0e7490';
+    const avatarBg=u.role==='ADMIN'?'var(--navy)':'var(--blue2)';
+    return '<tr onclick="selAppUser(\''+esc(u.username)+'\')" style="cursor:pointer">'+
       '<td><span style="display:flex;align-items:center;gap:8px">'+
-      '<span class="uavatar" style="background:'+(u.role==='ADMIN'?'var(--navy)':'var(--blue2)')+'">'+initials(u.name)+'</span><b>'+esc(u.name)+'</b></span></td>'+
-      '<td class="muted">'+esc(u.username)+'</td>'+
-      '<td class="muted small">'+esc(u.email||'-')+'</td>'+
-      '<td><span class="uchip '+esc(u.role)+'">'+esc(u.role.replace('_',' '))+'</span></td>'+
-      '<td class="muted">'+esc(u.department||'-')+'</td>'+
+      '<span class="uavatar" style="background:'+avatarBg+'">'+initials(u.name)+'</span><b>'+esc(u.name)+'</b></span></td>'+
+      '<td style="color:#64748b">'+esc(u.username)+'</td>'+
+      '<td style="color:#64748b">'+esc(u.email||'-')+'</td>'+
+      '<td><span class="uchip '+esc(u.role)+'">'+esc(u.role.replace(/_/g,' '))+'</span></td>'+
+      '<td style="color:#64748b">'+esc(u.department||'-')+'</td>'+
       '<td><span class="ustat '+st+'">'+st+'</span></td>'+
-      '<td class="muted small">'+(u.lastLogin?new Date(u.lastLogin).toLocaleString([],{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'-')+'</td></tr>';
-  }).join('')||'<tr><td colspan="8" class="muted">No users match.</td></tr>';
+      '<td style="color:#64748b;font-size:11.5px">'+(u.lastLogin?new Date(u.lastLogin).toLocaleString([],{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'-')+'</td></tr>';}).join('')
+    ||'<tr><td colspan="7" style="color:#64748b">No users match.</td></tr>';
 }
 function selAppUser(un){
   __uSel=un;
   const u=__appUsers.find(x=>x.username===un);if(!u)return;
-  const b=$("udBody");
-  $("udInit").textContent=initials(u.name);
-  $("udName").textContent=u.name;
-  $("udId").textContent='Username: '+u.username;
-  $("udChip").innerHTML='<span class="uchip '+esc(u.role)+'">'+esc(u.role.replace('_',' '))+'</span>';
+  const b=$('udBody');
+  const rchipBg=u.role==='ADMIN'?'#ede9fe':u.role==='FLEET_MANAGER'?'#d1fae5':u.role==='DISPATCHER'?'#fef3c7':u.role==='DRIVER'?'#dbeafe':u.role==='MAINTENANCE_MANAGER'?'#fee2e2':'#cffafe';
+  const rchipFg=u.role==='ADMIN'?'#5b21b6':u.role==='FLEET_MANAGER'?'#065f46':u.role==='DISPATCHER'?'#92400e':u.role==='DRIVER'?'#1e40af':u.role==='MAINTENANCE_MANAGER'?'#991b1b':'#0e7490';
   const perms={
     ADMIN:['View all vehicles and trips','Manage users and roles','Configure system settings','Access reports and analytics','Receive all notifications'],
     FLEET_MANAGER:['View all vehicles and trips','Edit vehicle settings','Access reports and analytics'],
@@ -589,19 +393,30 @@ function selAppUser(un){
     MAINTENANCE_MANAGER:['View maintenance alerts','View vehicle data'],
     DRIVER:[]};
   const list=perms[u.role]||[];
-  b.innerHTML='<div class="prow" style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);font-size:12.5px"><span class="muted">✉ Email</span><b>'+esc(u.email||'-')+'</b></div>'+
-    '<div class="prow" style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);font-size:12.5px"><span class="muted">🏢 Department</span><b>'+esc(u.department||'-')+'</b></div>'+
-    '<div class="prow" style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);font-size:12.5px"><span class="muted">🕒 Last Login</span><b>'+(u.lastLogin?new Date(u.lastLogin).toLocaleString([],{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'-')+'</b></div>'+
-    '<b class="small" style="display:block;margin:12px 0 4px">Permissions</b>'+
-    (list.length?list.map(p=>'<div style="display:flex;align-items:center;gap:8px;padding:4px 0;font-size:12.5px"><span style="width:18px;height:18px;border-radius:50%;background:#d1fae5;display:grid;place-items:center;color:#065f46;font-size:10px">✓</span>'+esc(p)+'</div>').join(''):'<div class="muted small">No API permissions for this role.</div>');
+  b.innerHTML=
+    '<div style="display:flex;gap:12px;align-items:center;margin-bottom:10px">'+
+    '<div style="width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-size:14px;font-weight:800;color:#fff;background:'+(u.role==='ADMIN'?'var(--navy)':'var(--blue2)')+'">'+initials(u.name)+'</div>'+
+    '<div><b style="font-size:15px">'+esc(u.name)+'</b><div style="font-size:11px;color:#64748b">Username: '+esc(u.username)+'</div></div>'+
+    '<span style="margin-left:auto;font-size:10px;font-weight:700;padding:2px 10px;border-radius:99px;background:'+rchipBg+';color:'+rchipFg+'">'+esc(u.role.replace(/_/g,' '))+'</span></div>'+
+    '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);font-size:12.5px"><span style="color:#64748b">✉ Email</span><b>'+esc(u.email||'-')+'</b></div>'+
+    '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);font-size:12.5px"><span style="color:#64748b">🏢 Department</span><b>'+esc(u.department||'-')+'</b></div>'+
+    '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);font-size:12.5px"><span style="color:#64748b">🕒 Last Login</span><b>'+(u.lastLogin?new Date(u.lastLogin).toLocaleString([],{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'-')+'</b></div>'+
+    '<b style="display:block;margin:12px 0 4px;font-size:12.5px">Permissions</b>'+
+    (list.length?list.map(p=>'<div style="display:flex;align-items:center;gap:8px;padding:4px 0;font-size:12.5px"><span style="width:18px;height:18px;border-radius:50%;background:#d1fae5;display:grid;place-items:center;color:#065f46;font-size:10px">✓</span>'+esc(p)+'</div>').join(''):'<div style="padding:4px 0;color:#64748b;font-size:12.5px">No API permissions for this role.</div>')+
+    '<button onclick="toggleUser(\''+esc(u.username)+'\')" style="display:block;width:100%;margin-top:12px;border:1.5px solid '+(u.active?'var(--red)':'var(--green)')+';background:#fff;color:'+(u.active?'var(--red)':'var(--green)')+';border-radius:10px;padding:10px;font:inherit;font-weight:700;cursor:pointer">'+
+    (u.active?'⛔ Deactivate User':'✓ Reactivate User')+'</button>';
 }
-/* wire the users tab to trigger load */
-document.querySelectorAll('#stabs button').forEach(function(b){
-  const orig=b.onclick;
-  b.addEventListener('click',function(){
-    if(b.dataset.s==='users'&&!__appUsers.length){loadAppUsers();}
-  });
-});
+async function toggleUser(username){
+  try{
+    const r=await fetch('/api/v1/users/'+encodeURIComponent(username)+'/toggle',{method:'PUT'});
+    if(r.ok){toast('✅ User updated',true);loadAppUsers();}
+    else if(r.status===403)toast('⛔ ADMIN required',false);
+    else toast('❌ Failed ('+r.status+')',false);
+  }catch(e){toast('❌ Network error',false);}
+}
+
+/* ================= boot ================= */
+loadAppUsers();
 </script>
 </body>
 </html>
