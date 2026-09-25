@@ -36,10 +36,9 @@ main{flex:1;min-width:0;display:flex;flex-direction:column}
 .stabs button{border:0;background:transparent;padding:9px 13px;font:inherit;font-size:12.5px;font-weight:600;color:var(--muted);cursor:pointer;border-radius:9px;white-space:nowrap}
 .stabs button.on{background:var(--blue);color:#fff}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
-.card>h3{font-size:13px;font-weight:700;padding:12px 16px;border-bottom:1px solid var(--line)}
+.card>h3{font-size:13px;font-weight:700;padding:12px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.card .sub{font-weight:400;color:var(--muted);font-size:11.5px}
 .pad{padding:14px 16px}
-.grid{display:grid;gap:16px;align-items:start}
-.g-main{grid-template-columns:1fr 340px}
 .frm{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .frm label,.fl{font-size:11.5px;color:var(--muted);display:block;margin-bottom:4px;font-weight:600}
 .frm input,.frm select{width:100%;border:1px solid var(--line);border-radius:9px;padding:8px 10px;font:inherit;background:#fff;color:var(--text)}
@@ -50,6 +49,7 @@ main{flex:1;min-width:0;display:flex;flex-direction:column}
 .tgl .tx{font-size:12.5px;font-weight:600}
 .tgl .tx .d{display:block;font-weight:400;color:var(--muted);font-size:11px}
 .btn{border:0;border-radius:9px;padding:9px 14px;font:inherit;font-weight:600;background:var(--blue);color:#fff;cursor:pointer}
+.btn.ghost{background:#fff;color:var(--text);border:1px solid var(--line)}
 .irow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:12.8px}
 .irow:last-child{border-bottom:0}
 .irow .k{display:flex;align-items:center;gap:8px}
@@ -69,15 +69,31 @@ main{flex:1;min-width:0;display:flex;flex-direction:column}
 .colorrow b{margin-left:8px}
 .note{background:#fffbeb;border:1px solid #fde68a;color:#92400e;border-radius:10px;padding:7px 10px;font-size:10.5px;margin:8px 0}
 .muted{color:var(--muted)}.small{font-size:12px}
-.uavatar{width:30px;height:30px;border-radius:50%;display:inline-grid;place-items:center;font-size:10px;font-weight:700;color:#fff;margin-right:8px;vertical-align:middle}
-.uchip{font-size:10px;font-weight:700;padding:2px 9px;border-radius:99px}
-.uchip.ADMIN{background:#ede9fe;color:#5b21b6}.uchip.FLEET_MANAGER{background:#d1fae5;color:#065f46}
-.uchip.DISPATCHER{background:#fef3c7;color:#92400e}.uchip.DRIVER{background:#dbeafe;color:#1e40af}
-.uchip.MAINTENANCE_MANAGER{background:#fee2e2;color:#991b1b}.uchip.ANALYST{background:#cffafe;color:#0e7490}
+/* ---------- users tab ---------- */
+.uavatar{width:30px;height:30px;border-radius:50%;display:inline-grid;place-items:center;font-size:10px;font-weight:700;color:#fff;margin-right:0;vertical-align:middle;flex:none}
+.uchip{font-size:10px;font-weight:700;padding:2px 10px;border-radius:99px;white-space:nowrap}
 .ustat{font-size:10px;font-weight:700;padding:2px 9px;border-radius:99px}
 .ustat.Active{background:#d1fae5;color:#065f46}.ustat.Inactive{background:#fee2e2;color:#991b1b}
+.dcell{display:flex;align-items:center;gap:9px}
+.dname{font-weight:700}
+.dtitle{font-size:10.5px;color:var(--muted)}
+.act{color:var(--muted);cursor:pointer;font-size:16px;text-align:center}
+.pager{display:flex;align-items:center;gap:6px;padding:10px 14px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);flex-wrap:wrap}
+.pager button{border:1px solid var(--line);background:#fff;border-radius:8px;min-width:28px;padding:4px 8px;font:inherit;font-size:12px;cursor:pointer}
+.pager button.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.pager button:disabled{opacity:.4;cursor:default}
+.prow{display:flex;justify-content:space-between;gap:8px;padding:7px 0;border-bottom:1px solid var(--line);font-size:12.8px;align-items:center}
+.prow:last-child{border-bottom:0}
+.prow .k{color:var(--muted);display:flex;align-items:center;gap:8px}
+.perm{display:flex;align-items:center;gap:9px;padding:4px 0;font-size:12.5px}
+.perm .ck{width:18px;height:18px;border-radius:50%;background:#d1fae5;display:grid;place-items:center;color:#065f46;font-size:10px;flex:none}
+.davatar-lg{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font-size:15px;font-weight:800;color:#fff;flex:none}
+.rchip-lg{font-size:10px;font-weight:700;padding:2px 10px;border-radius:99px}
+.modal{position:fixed;inset:0;background:rgba(2,6,23,.55);display:none;place-items:center;z-index:2600}
+.modal.open{display:grid}
+.modal .box{background:#fff;border-radius:16px;max-width:460px;width:92%;padding:22px 24px;position:relative}
+.modal .x{position:absolute;top:14px;right:16px;border:0;background:none;font-size:18px;cursor:pointer;color:var(--muted)}
 #toast{position:fixed;bottom:20px;right:20px;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;display:none;box-shadow:0 8px 24px rgba(2,6,23,.2);background:#d1fae5;color:#065f46;z-index:3000}
-@media (max-width:1200px){.g-main{grid-template-columns:1fr}.frm{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
@@ -97,8 +113,8 @@ main{flex:1;min-width:0;display:flex;flex-direction:column}
     <a href="reports.html"><span class="ic">📊</span> Analytics</a>
     <a href="reports.html"><span class="ic">📄</span> Reports</a>
     <a href="alerts.html"><span class="ic">🔔</span> Notifications</a>
-    <a href="settings.html"><span class="ic">👥</span> Users &amp; Roles</a>
-    <a class="active" href="settings.html"><span class="ic">⚙️</span> Settings</a>
+    <a class="active" href="settings.html"><span class="ic">👥</span> Users &amp; Roles</a>
+    <a href="settings.html"><span class="ic">⚙️</span> Settings</a>
   </nav>
 </aside>
 <main>
@@ -112,8 +128,8 @@ main{flex:1;min-width:0;display:flex;flex-direction:column}
   </div>
 
   <div class="content">
-    <div class="pagehead"><span class="ic">⚙️</span>
-      <div><h1>Settings</h1><div class="sub">Configure your fleet management system, organization settings and integrations.</div></div>
+    <div class="pagehead"><span class="ic">👥</span>
+      <div><h1>Users</h1><div class="sub">Manage system users, their roles and permissions.</div></div>
     </div>
 
     <div class="stabs" id="stabs">
@@ -130,119 +146,111 @@ main{flex:1;min-width:0;display:flex;flex-direction:column}
       <button data-s="system">🖥 System</button>
     </div>
 
-    <!-- ============ GENERAL (hidden by default) ============ -->
+    <!-- ============ GENERAL (hidden) ============ -->
     <div id="generalWrap" style="display:none">
-      <div class="grid g-main">
-        <div>
-          <div class="card" style="margin-bottom:16px">
-            <h3>General Settings</h3>
-            <div class="pad">
-              <div class="frm">
-                <div><label>System Name</label><input id="sName" value="FleetPulse"/></div>
-                <div><label>Timezone</label><select id="sTz"><option>Africa/Nairobi (EAT)</option><option>UTC</option></select></div>
-                <div><label>Date Format</label><select id="sDate"><option>DD/MM/YYYY</option><option>YYYY-MM-DD</option></select></div>
-                <div><label>Time Format</label><select id="sTime"><option>24 Hour</option><option>12 Hour</option></select></div>
-                <div><label>Language</label><select id="sLang"><option>English</option><option>Swahili</option></select></div>
-                <div><label>Default Map View</label><select id="sMap"><option>Roadmap</option><option>Satellite</option></select></div>
-                <div><label>Auto Refresh Interval</label><select id="sRef"><option>5 seconds</option><option selected>30 seconds</option></select></div>
-                <div><label>System Version</label><input value="v1.0.0" disabled style="background:#f1f5fb"/></div>
-              </div>
-              <div class="tgl on" id="tglRt" style="margin-top:12px"><span class="sw"></span>
-                <span class="tx">Enable Real-time Tracking<span class="d">Automatically update vehicle locations in real-time.</span></span></div>
-              <div style="display:flex;justify-content:flex-end;margin-top:10px">
-                <button class="btn" id="genSave">💾 Save Changes</button>
-              </div>
-            </div>
+      <div class="card" style="margin-bottom:16px">
+        <h3>General Settings</h3>
+        <div class="pad">
+          <div class="frm">
+            <div><label>System Name</label><input id="sName" value="FleetPulse"/></div>
+            <div><label>Timezone</label><select id="sTz"><option>Africa/Nairobi (EAT)</option><option>UTC</option></select></div>
+            <div><label>Date Format</label><select id="sDate"><option>DD/MM/YYYY</option><option>YYYY-MM-DD</option></select></div>
+            <div><label>Time Format</label><select id="sTime"><option>24 Hour</option><option>12 Hour</option></select></div>
+            <div><label>Language</label><select id="sLang"><option>English</option><option>Swahili</option></select></div>
+            <div><label>Default Map View</label><select id="sMap"><option>Roadmap</option><option>Satellite</option></select></div>
+            <div><label>Auto Refresh Interval</label><select id="sRef"><option>5 seconds</option><option selected>30 seconds</option></select></div>
+            <div><label>System Version</label><input value="v1.0.0" disabled style="background:#f1f5fb"/></div>
           </div>
-          <div class="grid" style="grid-template-columns:1fr 1fr 1fr">
-            <div class="card"><h3>🗺 Map &amp; Location</h3><div class="pad">
-              <label class="fl">Map Provider</label>
-              <select style="width:100%;border:1px solid var(--line);border-radius:9px;padding:8px 10px;font:inherit;margin-bottom:10px"><option>OpenStreetMap</option></select>
-              <div class="tgl on"><span class="sw"></span><span class="tx">Show Geofences</span></div>
-              <div class="tgl dis"><span class="sw"></span><span class="tx">Show Traffic Layer<span class="d">Requires provider — roadmap.</span></span></div>
-            </div></div>
-            <div class="card"><h3>🔔 Alert &amp; Notification</h3><div class="pad">
-              <div class="tgl on"><span class="sw"></span><span class="tx">In-app Notifications<span class="d">Live bell + alert pages.</span></span></div>
-              <div class="tgl dis"><span class="sw"></span><span class="tx">Email Notifications<span class="d">Requires notification module.</span></span></div>
-              <div class="tgl dis"><span class="sw"></span><span class="tx">SMS Notifications<span class="d">Requires SMS gateway.</span></span></div>
-            </div></div>
-            <div class="card"><h3>🔌 Integrations</h3><div class="pad">
-              <div class="irow"><span class="k">⚡ Kafka<span class="sub2">kafka:9092</span></span><span class="conn up">Connected</span></div>
-              <div class="irow"><span class="k">🗄 PostgreSQL<span class="sub2">timescaledb:5432</span></span><span class="conn up">Connected</span></div>
-              <div class="irow"><span class="k">🧠 Redis<span class="sub2">redis:6379</span></span><span class="conn up">Connected</span></div>
-              <div class="irow"><span class="k">☁ External API<span class="sub2">not configured</span></span><span class="conn warn">Not Configured</span></div>
-            </div></div>
-          </div>
-          <div class="footer-note" style="margin-top:2px">ℹ Changes made in settings may require a system restart to take effect.</div>
-        </div>
-        <div>
-          <div class="card" style="margin-bottom:16px">
-            <h3>Organization Details</h3>
-            <div class="orgcard">
-              <div class="orglogo"><div class="bub">🚛</div>
-                <div><div class="nm">FleetPulse</div><div class="tg">Smarter Fleets. Safer Roads.</div></div></div>
-              <div class="krow"><span class="k">Company Name</span><b>FleetPulse Logistics Ltd</b></div>
-              <div class="krow"><span class="k">Registration No.</span><b>CPI23456789</b></div>
-              <div class="krow"><span class="k">Email</span><b>info@fleetpulse.co.ke</b></div>
-              <div class="krow"><span class="k">Phone</span><b>+254 700 123 456</b></div>
-              <div class="krow"><span class="k">Address</span><b>Nairobi, Kenya</b></div>
-            </div>
-          </div>
-          <div class="card">
-            <h3>🛡 Security Settings</h3>
-            <div class="pad">
-              <div class="irow"><span class="k">Password Policy</span><span class="conn up">Strong</span></div>
-              <div class="irow"><span class="k">Session Timeout</span><b>8 hours</b></div>
-              <div class="irow"><span class="k">Two-Factor Authentication</span><span class="conn warn">Roadmap</span></div>
-            </div>
+          <div class="tgl on" style="margin-top:12px"><span class="sw"></span>
+            <span class="tx">Enable Real-time Tracking<span class="d">Automatically update vehicle locations in real-time.</span></span></div>
+          <div style="display:flex;justify-content:flex-end;margin-top:10px">
+            <button class="btn" id="genSave">💾 Save Changes</button>
           </div>
         </div>
       </div>
+      <div class="card"><h3>🔌 Integrations</h3><div class="pad">
+        <div class="irow"><span class="k">⚡ Kafka<span class="sub2">kafka:9092</span></span><span class="conn up">Connected</span></div>
+        <div class="irow"><span class="k">🗄 PostgreSQL<span class="sub2">timescaledb:5432</span></span><span class="conn up">Connected</span></div>
+        <div class="irow"><span class="k">🧠 Redis<span class="sub2">redis:6379</span></span><span class="conn up">Connected</span></div>
+        <div class="irow"><span class="k">☁ External API<span class="sub2">not configured</span></span><span class="conn warn">Not Configured</span></div>
+      </div></div>
+      <div class="footer-note" style="margin-top:2px">ℹ Changes made in settings may require a system restart to take effect.</div>
     </div>
 
-    <!-- ============ ORGANIZATION (hidden by default) ============ -->
+    <!-- ============ ORGANIZATION (hidden) ============ -->
     <div id="orgWrap" style="display:none">
       <div class="card" style="margin-bottom:16px">
-        <h3>🏢 Branches &amp; Depots <span class="muted small" style="font-weight:400;margin-left:8px">from live geofence zones</span></h3>
+        <h3>🏢 Branches &amp; Depots</h3>
         <div style="overflow:auto;max-height:300px"><table>
-          <thead><tr><th>Name</th><th>Location</th><th>Type</th><th>Status</th><th>Source</th></tr></thead>
-          <tbody id="branchRows"><tr><td colspan="5" style="color:#64748b">Loading…</td></tr></tbody></table></div>
+          <thead><tr><th>Name</th><th>Type</th><th>Status</th></tr></thead>
+          <tbody id="branchRows"><tr><td colspan="3" style="color:#64748b">Loading…</td></tr></tbody></table></div>
       </div>
       <div class="card">
-        <h3>👥 Fleet Groups <span class="muted small" style="font-weight:400;margin-left:8px">with live vehicle counts</span></h3>
+        <h3>👥 Fleet Groups <span class="muted small" style="font-weight:400;margin-left:8px">live vehicle counts</span></h3>
         <div style="overflow:auto;max-height:300px"><table>
-          <thead><tr><th>Group</th><th>Vehicles</th><th>Description</th></tr></thead>
-          <tbody id="groupRows"><tr><td colspan="3" style="color:#64748b">Loading…</td></tr></tbody></table></div>
+          <thead><tr><th>Group</th><th>Vehicles</th></tr></thead>
+          <tbody id="groupRows"><tr><td colspan="2" style="color:#64748b">Loading…</td></tr></tbody></table></div>
       </div>
     </div>
 
-    <!-- ============ USERS TAB (fully built) ============ -->
+    <!-- ============ USERS (default active tab) ============ -->
     <div id="usersWrap">
       <div class="card">
         <h3>👥 Manage Users
-          <span class="muted small" style="margin-left:auto;font-weight:400" id="uCount"></span>
+          <span class="sub" style="margin-left:8px">Add, edit, deactivate and manage user accounts.</span>
+          <button class="btn" id="uAddBtn" style="margin-left:auto;font-size:12px;padding:6px 12px">＋ Add User</button>
+          <button class="btn ghost" id="uExportBtn" style="font-size:12px;padding:6px 12px">⬇ Export</button>
         </h3>
         <div style="padding:10px 14px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;border-bottom:1px solid var(--line)">
-          <input id="uq" placeholder="🔍 Search by name, username..." style="flex:1;min-width:160px;border:1px solid var(--line);border-radius:9px;padding:7px 10px;font:inherit;background:#fff"/>
+          <input id="uq" placeholder="🔍 Search by name, email, username..." style="flex:1;min-width:150px;border:1px solid var(--line);border-radius:9px;padding:7px 10px;font:inherit;background:#fff"/>
           <select id="ufRole" style="border:1px solid var(--line);border-radius:9px;padding:7px 10px;font:inherit;background:#fff">
             <option value="">All Roles</option><option>ADMIN</option><option>FLEET_MANAGER</option>
             <option>DISPATCHER</option><option>ANALYST</option><option>MAINTENANCE_MANAGER</option><option>DRIVER</option></select>
           <select id="ufStat"><option value="">All Statuses</option><option>Active</option><option>Inactive</option></select>
+          <select id="ufDept"><option value="">All Departments</option></select>
+          <span class="clear" onclick="resetUFilters()" style="font-size:11.5px;color:var(--blue);font-weight:600;cursor:pointer">Clear Filters</span>
         </div>
         <div style="overflow:auto;max-height:480px"><table>
-          <thead><tr><th>Name</th><th>Username</th><th>Email</th><th>Role</th><th>Department</th><th>Status</th><th>Last Login</th></tr></thead>
-          <tbody id="uRows"><tr><td colspan="7" style="color:#64748b">Loading…</td></tr></tbody></table></div>
+          <thead><tr><th>Name</th><th>Username</th><th>Email</th><th>Role</th><th>Department</th><th>Status</th><th>Last Login</th><th style="text-align:center">Actions</th></tr></thead>
+          <tbody id="uRows"><tr><td colspan="8" style="color:#64748b">Loading…</td></tr></tbody></table></div>
+        <div id="uPager" style="display:flex;align-items:center;gap:6px;padding:10px 14px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);flex-wrap:wrap"></div>
       </div>
 
       <div class="card" style="margin-top:16px">
-        <h3>User Details</h3>
+        <h3>✏ User Details</h3>
         <div id="udBody" style="padding:14px 16px">
-          <div style="color:#64748b;font-size:12.5px">Click a user row above to see details.</div>
+          <div style="color:#64748b;font-size:12.5px">Click a user row to see details.</div>
+        </div>
+      </div>
+
+      <div class="modal" id="uAddModal" style="position:fixed;inset:0;background:rgba(2,6,23,.55);display:none;place-items:center;z-index:2600">
+        <div style="background:#fff;border-radius:16px;max-width:460px;width:92%;padding:22px 24px;position:relative">
+          <button onclick="closeUAdd()" style="position:absolute;top:14px;right:16px;border:0;background:none;font-size:18px;cursor:pointer;color:var(--muted)">✕</button>
+          <h2 style="font-size:18px;margin-bottom:12px">Add User</h2>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div style="grid-column:1/-1"><label class="muted small" style="display:block;margin-bottom:4px">Full name *</label>
+              <input id="nuName" placeholder="John Doe" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit"/></div>
+            <div><label class="muted small" style="display:block;margin-bottom:4px">Username *</label>
+              <input id="nuUser" placeholder="john" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit"/></div>
+            <div><label class="muted small" style="display:block;margin-bottom:4px">Role *</label>
+              <select id="nuRole" style="width:100%;border:1px solid var(--line);border-radius:9px;padding:8px;font:inherit">
+                <option>DISPATCHER</option><option>ANALYST</option><option>FLEET_MANAGER</option>
+                <option>MAINTENANCE_MANAGER</option><option>DRIVER</option><option>ADMIN</option></select></div>
+            <div style="grid-column:1/-1"><label class="muted small" style="display:block;margin-bottom:4px">Email</label>
+              <input id="nuMail" placeholder="john@fleetpulse.co.ke" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit"/></div>
+            <div style="grid-column:1/-1"><label class="muted small" style="display:block;margin-bottom:4px">Department</label>
+              <input id="nuDept" placeholder="Operations" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit"/></div>
+          </div>
+          <div style="display:flex;gap:10px;margin-top:14px">
+            <button class="btn" style="flex:1" id="nuSave">Add User</button>
+            <button class="btn ghost" style="flex:1;border:1px solid var(--line);background:#fff;color:var(--text)" onclick="closeUAdd()">Cancel</button>
+          </div>
+          <div class="muted small" id="nuMsg" style="margin-top:8px;min-height:16px"></div>
         </div>
       </div>
     </div>
 
-    <!-- ============ FALLBACK (other tabs) ============ -->
+    <!-- ============ FALLBACK ============ -->
     <div class="card" id="tabFallback" style="display:none">
       <h3 id="fbTitle">—</h3>
       <div class="pad" style="color:#64748b;font-size:12.5px" id="fbBody"></div>
@@ -259,7 +267,6 @@ const esc=s=>(s??'').replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"
 const toast=(m,ok)=>{const t=$('toast');t.textContent=m;
   t.style.background=ok===false?'#fee2e2':'#d1fae5';t.style.color=ok===false?'#991b1b':'#065f46';
   t.style.display='block';setTimeout(()=>t.style.display='none',2600);};
-const api=async p=>{const r=await fetch(p);if(!r.ok)throw new Error('HTTP '+r.status);return r.json();};
 const initials=n=>(n||'?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
 
 /* ================= session / bell / fullscreen ================= */
@@ -279,30 +286,11 @@ function refreshBell(){fetch('/api/v1/alerts/recent?limit=100').then(r=>r.ok?r.j
 refreshBell();setInterval(refreshBell,5000);
 
 /* ================= tab switching ================= */
-document.querySelectorAll('#stabs button').forEach(b=>b.onclick=()=>{
-  document.querySelectorAll('#stabs button').forEach(x=>x.classList.remove('on'));
-  b.classList.add('on');
-  const key=b.dataset.s;
-  ['generalWrap','orgWrap','usersWrap'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(el)el.style.display=(id===key+'Wrap')?'':'none';
-  });
-  const fb=$('tabFallback');
-  if(key==='general'||key==='org'||key==='users'){
-    fb.style.display='none';
-    if(key==='users')loadAppUsers();
-  } else {
-    fb.style.display='';
-    const meta=TAB_META[key];
-    $('fbTitle').textContent=meta.title;
-    $('fbBody').textContent=meta.body;
-  }
-});
 const TAB_META={
-  general:{title:'General Settings',body:'Switch to the General tab to see system preferences. This panel shows module info for the selected tab.'},
-  org:{title:'Organization',body:'Switch to the Organization tab to see branches, fleet groups and business units.'},
-  roles:{title:'Roles & Permissions',body:'Six roles are enforced server-side: ADMIN/FLEET_MANAGER (write), DISPATCHER/ANALYST/MAINTENANCE_MANAGER (read), DRIVER (none). A permission matrix UI arrives with users-in-PostgreSQL.'},
-  notif:{title:'Notifications',body:'In-app notifications are live (bells + alert feeds). Email/SMS channels arrive with the notification module.'},
+  general:{title:'General Settings',body:'System name, timezone, formats, map defaults and integrations status — switch to the General tab.'},
+  org:{title:'Organization',body:'Branches (from live geofence zones) and fleet groups with live vehicle counts — switch to the Organization tab.'},
+  roles:{title:'Roles & Permissions',body:'Six roles enforced server-side: ADMIN/FLEET_MANAGER (write), DISPATCHER/ANALYST/MAINTENANCE_MANAGER (read), DRIVER (none). Permission matrix UI arrives with users-in-PostgreSQL.'},
+  notif:{title:'Notifications',body:'In-app notifications are live (bell dropdowns). Email/SMS channels arrive with the notification module.'},
   alert:{title:'Alert Rules',body:'Thresholds are per-vehicle editable on the Vehicles tab. A rules UI arrives with the rules-engine milestone.'},
   geo:{title:'Geofence Settings',body:'Zones are managed on the Geofences tab. Zone defaults arrive with the org module.'},
   integr:{title:'Integrations',body:'Kafka, PostgreSQL/Timescale, Redis and MQTT are live. External API webhooks arrive with the integration milestone.'},
@@ -310,6 +298,25 @@ const TAB_META={
   api:{title:'API',body:'REST v1 under /api/v1. Session auth for browsers, HTTP Basic for API clients. OpenAPI spec arrives with the API milestone.'},
   system:{title:'System',body:'Java 21 · Spring Boot 3.3 · Kafka 3.7 · TimescaleDB 2.15 · Redis 7 · Mosquitto 2. Metrics: /actuator/prometheus.'}
 };
+function showTab(key){
+  ['generalWrap','orgWrap','usersWrap'].forEach(function(id){
+    const el=document.getElementById(id);
+    if(el)el.style.display=(id===key+'Wrap')?'':'none';
+  });
+  const fb=$('tabFallback');
+  if(key==='users'){fb.style.display='none';loadAppUsers();}
+  else if(key==='general'||key==='org'){fb.style.display='none';if(key==='org')loadOrgData();}
+  else{
+    fb.style.display='';
+    $('fbTitle').textContent=TAB_META[key].title;
+    $('fbBody').textContent=TAB_META[key].body;
+  }
+}
+document.querySelectorAll('#stabs button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#stabs button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');
+  showTab(b.dataset.s);
+});
 
 /* ================= general save ================= */
  $('genSave').onclick=()=>{
@@ -322,7 +329,7 @@ try{const p=JSON.parse(localStorage.getItem('fleetpulse-prefs')||'null');
   if(p){$('sName').value=p.name;$('sTz').value=p.tz;$('sDate').value=p.df;
     $('sTime').value=p.tf;$('sLang').value=p.lang;$('sMap').value=p.map;$('sRef').value=p.ref;}}catch(e){}
 
-/* ================= org data: branches + fleet groups ================= */
+/* ================= org data ================= */
 async function loadOrgData(){
   try{
     const [zones,vp]=await Promise.all([
@@ -332,80 +339,114 @@ async function loadOrgData(){
     $('branchRows').innerHTML=active.map(z=>{
       const col=(z.type==='RESTRICTED'||z.type==='DANGER')?'var(--red)':z.type==='DEPOT'?'var(--blue2)':'var(--green)';
       const t=z.type==='DEPOT'?'Depot':z.type==='RESTRICTED'?'Restricted':'Customer Site';
-      return '<tr><td><b>'+esc(z.name)+'</b></td><td style="color:#64748b">Kenya</td><td>'+esc(t)+'</td>'+
-        '<td><span style="font-size:10px;font-weight:700;padding:2px 9px;border-radius:99px;background:#d1fae5;color:#065f46">Active</span></td>'+
-        '<td style="color:#64748b;font-size:11px">geofence</td></tr>';
-    }).join('')||'<tr><td colspan="5" style="color:#64748b">No zones yet.</td></tr>';
+      return '<tr><td><b>'+esc(z.name)+'</b></td><td>'+esc(t)+'</td>'+
+        '<td><span style="font-size:10px;font-weight:700;padding:2px 9px;border-radius:99px;background:#d1fae5;color:#065f46">Active</span></td></tr>';
+    }).join('')||'<tr><td colspan="3" style="color:#64748b">No zones yet.</td></tr>';
     const cls={};
     vp.forEach(v=>{const mk=(v.make||'')+' '+(v.model||'');
       const c=/Hiace|Coaster|Rosa|Matatu|Bus/i.test(mk)?'Buses':/Hilux|Ranger|H1/i.test(mk)?'Pickups':'Trucks';
       cls[c]=(cls[c]||0)+1;});
     $('groupRows').innerHTML=Object.entries(cls).map(([nm,cnt])=>
-      '<tr><td><b>'+esc(nm)+'</b></td><td>'+cnt+'</td><td style="color:#64748b">Auto-grouped by vehicle class</td></tr>').join('')
-      ||'<tr><td colspan="3" style="color:#64748b">No vehicles.</td></tr>';
+      '<tr><td><b>'+esc(nm)+'</b></td><td>'+cnt+'</td></tr>').join('')
+      ||'<tr><td colspan="2" style="color:#64748b">No vehicles.</td></tr>';
   }catch(e){
-    $('branchRows').innerHTML='<tr><td colspan="5" style="color:#64748b">Load failed: '+esc(e.message)+'</td></tr>';
+    $('branchRows').innerHTML='<tr><td colspan="3" style="color:#64748b">Load failed: '+esc(e.message)+'</td></tr>';
   }
 }
 loadOrgData();setInterval(loadOrgData,60000);
 
-/* ================= users ================= */
-let __appUsers=[],__uSel=null;
+/* ================= USERS (mockup table + detail) ================= */
+let __appUsers=[],__uSel=null,__uPage=0,__uPageSize=10;
+const ROLE_DISPLAY={ADMIN:'Admin',FLEET_MANAGER:'Supervisor',DISPATCHER:'Dispatcher',
+  DRIVER:'Driver',MAINTENANCE_MANAGER:'Mechanic',ANALYST:'Analyst'};
+const ROLE_CHIP={ADMIN:['#ede9fe','#5b21b6'],FLEET_MANAGER:['#d1fae5','#065f46'],
+  DISPATCHER:['#fef3c7','#92400e'],DRIVER:['#dbeafe','#1e40af'],
+  MAINTENANCE_MANAGER:['#fee2e2','#991b1b'],ANALYST:['#cffafe','#0e7490']};
+const PERMS={
+  ADMIN:['View all vehicles and trips','Manage users and roles','Configure system settings','Access reports and analytics','Receive all notifications'],
+  FLEET_MANAGER:['View all vehicles and trips','Edit vehicle settings','Access reports and analytics','Receive all notifications'],
+  DISPATCHER:['View live fleet','View trips','View alerts'],
+  ANALYST:['View reports and analytics','View fleet data','Export reports'],
+  MAINTENANCE_MANAGER:['View maintenance alerts','View vehicle data'],
+  DRIVER:[]};
+
 async function loadAppUsers(){
   try{
     __appUsers=await api('/api/v1/users');
     renderAppUsers();
   }catch(e){
     const el=$('uRows');
-    if(el)el.innerHTML='<tr><td colspan="7" style="color:#64748b">Load failed: '+esc(e.message)+'</td></tr>';
+    if(el)el.innerHTML='<tr><td colspan="8" style="color:#64748b">Load failed: '+esc(e.message)+'</td></tr>';
   }
 }
 function renderAppUsers(){
-  const q=$('uq').value.toUpperCase(),fr=$('ufRole').value,fs=$('ufStat').value;
-  const rows=__appUsers.filter(u=>{
+  const q=($('uq')?$('uq').value:'').toUpperCase();
+  const fr=$('ufRole')?$('ufRole').value:'';
+  const fs=$('ufStat')?$('ufStat').value:'';
+  const fd=$('ufDept')?$('ufDept').value:'';
+  let rows=__appUsers.filter(u=>{
     const hay=(u.username+' '+u.name+' '+(u.email||'')).toUpperCase();
-    return(!q||hay.includes(q))&&(!fr||u.role===fr)&&(!fs||(u.active?'Active':'Inactive')===fs);});
-  $('uRows').innerHTML=rows.map(u=>{
     const st=u.active?'Active':'Inactive';
-    const rchipBg=u.role==='ADMIN'?'#ede9fe;color:#5b21b6':u.role==='FLEET_MANAGER'?'#d1fae5;color:#065f46':u.role==='DISPATCHER'?'#fef3c7;color:#92400e':u.role==='DRIVER'?'#dbeafe;color:#1e40af':u.role==='MAINTENANCE_MANAGER'?'#fee2e2;color:#991b1b':'#cffafe;color:#0e7490';
-    const avatarBg=u.role==='ADMIN'?'var(--navy)':'var(--blue2)';
+    return(!q||hay.includes(q))&&(!fr||u.role===fr)&&(!fs||st===fs)&&(!fd||u.department===fd);});
+  const total=rows.length;
+  const pages=Math.max(1,Math.ceil(total/__uPageSize));
+  if(__uPage>=pages)__uPage=pages-1;
+  const slice=rows.slice(__uPage*__uPageSize,__uPage*__uPageSize+__uPageSize);
+  const el=$('uRows');if(!el)return;
+  el.innerHTML=slice.map(u=>{
+    const st=u.active?'Active':'Inactive';
+    const cc=ROLE_CHIP[u.role]||['#e2e8f0','#334155'];
+    const ll=u.lastLogin?new Date(u.lastLogin).toLocaleString([],{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'-';
     return '<tr onclick="selAppUser(\''+esc(u.username)+'\')" style="cursor:pointer">'+
-      '<td><span style="display:flex;align-items:center;gap:8px">'+
-      '<span class="uavatar" style="background:'+avatarBg+'">'+initials(u.name)+'</span><b>'+esc(u.name)+'</b></span></td>'+
+      '<td><span style="display:flex;align-items:center;gap:9px">'+
+      '<span class="uavatar" style="background:'+(ROLE_CHIP[u.role]?ROLE_CHIP[u.role][0]:'#e2e8f0')+'">'+initials(u.name)+'</span>'+
+      '<span><span style="display:block;font-weight:700">'+esc(u.name)+'</span>'+
+      '<span style="display:block;font-size:10.5px;color:#64748b">'+esc(ROLE_DISPLAY[u.role]||'')+'</span></span></span></td>'+
       '<td style="color:#64748b">'+esc(u.username)+'</td>'+
       '<td style="color:#64748b">'+esc(u.email||'-')+'</td>'+
-      '<td><span class="uchip '+esc(u.role)+'">'+esc(u.role.replace(/_/g,' '))+'</span></td>'+
+      '<td><span class="uchip '+esc(u.role)+'" style="background:'+cc[0]+';color:'+cc[1]+'">'+esc(ROLE_DISPLAY[u.role]||u.role)+'</span></td>'+
       '<td style="color:#64748b">'+esc(u.department||'-')+'</td>'+
       '<td><span class="ustat '+st+'">'+st+'</span></td>'+
-      '<td style="color:#64748b;font-size:11.5px">'+(u.lastLogin?new Date(u.lastLogin).toLocaleString([],{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'-')+'</td></tr>';}).join('')
-    ||'<tr><td colspan="7" style="color:#64748b">No users match.</td></tr>';
+      '<td style="color:#64748b;font-size:11.5px">'+ll+'</td>'+
+      '<td class="act" onclick="event.stopPropagation();selAppUser(\''+esc(u.username)+'\')">⋮</td></tr>';}).join('')
+    ||'<tr><td colspan="8" style="color:#64748b">No users match.</td></tr>';
+  const pg=$('uPager');
+  if(pg){
+    let pb='';
+    for(let i=0;i<pages;i++)pb+='<button class="'+(i===__uPage?'on':'')+'" onclick="__uPage='+i+';renderAppUsers()">'+(i+1)+'</button>';
+    pg.innerHTML='<span>Showing '+(total?__uPage*__uPageSize+1:0)+' – '+Math.min((__uPage+1)*__uPageSize,total)+' of '+total+' users</span>'+
+      '<span style="flex:1"></span><button '+(__uPage===0?'disabled':'')+' onclick="__uPage--;renderAppUsers()">‹</button>'+pb+
+      '<button '+(__uPage>=pages-1?'disabled':'')+' onclick="__uPage++;renderAppUsers()">›</button>';
+  }
 }
 function selAppUser(un){
   __uSel=un;
   const u=__appUsers.find(x=>x.username===un);if(!u)return;
+  const cc=ROLE_CHIP[u.role]||['#e2e8f0','#334155'];
   const b=$('udBody');
-  const rchipBg=u.role==='ADMIN'?'#ede9fe':u.role==='FLEET_MANAGER'?'#d1fae5':u.role==='DISPATCHER'?'#fef3c7':u.role==='DRIVER'?'#dbeafe':u.role==='MAINTENANCE_MANAGER'?'#fee2e2':'#cffafe';
-  const rchipFg=u.role==='ADMIN'?'#5b21b6':u.role==='FLEET_MANAGER'?'#065f46':u.role==='DISPATCHER'?'#92400e':u.role==='DRIVER'?'#1e40af':u.role==='MAINTENANCE_MANAGER'?'#991b1b':'#0e7490';
-  const perms={
-    ADMIN:['View all vehicles and trips','Manage users and roles','Configure system settings','Access reports and analytics','Receive all notifications'],
-    FLEET_MANAGER:['View all vehicles and trips','Edit vehicle settings','Access reports and analytics'],
-    DISPATCHER:['View live fleet','View trips','View alerts'],
-    ANALYST:['View reports and analytics','View fleet data','Export reports'],
-    MAINTENANCE_MANAGER:['View maintenance alerts','View vehicle data'],
-    DRIVER:[]};
-  const list=perms[u.role]||[];
+  const st=u.active?'Active':'Inactive';
+  const since=u.createdAt?new Date(u.createdAt).toLocaleDateString([],{day:'numeric',month:'short',year:'numeric'}):'-';
+  const perms=PERMS[u.role]||[];
   b.innerHTML=
     '<div style="display:flex;gap:12px;align-items:center;margin-bottom:10px">'+
-    '<div style="width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-size:14px;font-weight:800;color:#fff;background:'+(u.role==='ADMIN'?'var(--navy)':'var(--blue2)')+'">'+initials(u.name)+'</div>'+
-    '<div><b style="font-size:15px">'+esc(u.name)+'</b><div style="font-size:11px;color:#64748b">Username: '+esc(u.username)+'</div></div>'+
-    '<span style="margin-left:auto;font-size:10px;font-weight:700;padding:2px 10px;border-radius:99px;background:'+rchipBg+';color:'+rchipFg+'">'+esc(u.role.replace(/_/g,' '))+'</span></div>'+
-    '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);font-size:12.5px"><span style="color:#64748b">✉ Email</span><b>'+esc(u.email||'-')+'</b></div>'+
-    '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);font-size:12.5px"><span style="color:#64748b">🏢 Department</span><b>'+esc(u.department||'-')+'</b></div>'+
-    '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);font-size:12.5px"><span style="color:#64748b">🕒 Last Login</span><b>'+(u.lastLogin?new Date(u.lastLogin).toLocaleString([],{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'-')+'</b></div>'+
-    '<b style="display:block;margin:12px 0 4px;font-size:12.5px">Permissions</b>'+
-    (list.length?list.map(p=>'<div style="display:flex;align-items:center;gap:8px;padding:4px 0;font-size:12.5px"><span style="width:18px;height:18px;border-radius:50%;background:#d1fae5;display:grid;place-items:center;color:#065f46;font-size:10px">✓</span>'+esc(p)+'</div>').join(''):'<div style="padding:4px 0;color:#64748b;font-size:12.5px">No API permissions for this role.</div>')+
+    '<div class="davatar-lg" style="background:'+cc[0]+'">'+initials(u.name)+'</div>'+
+    '<div><b style="font-size:15px">'+esc(u.name)+'</b>'+
+    '<div style="margin:3px 0"><span class="uchip '+esc(u.role)+'" style="background:'+cc[0]+';color:'+cc[1]+'">'+esc(ROLE_DISPLAY[u.role]||u.role)+'</span></div>'+
+    '<span class="ustat '+(u.active?'Active':'Inactive')+'">'+st+'</span></div></div>'+
+    '<div class="prow"><span class="k">✉ Email</span><b>'+esc(u.email||'-')+'</b></div>'+
+    '<div class="prow"><span class="k">🏢 Department</span><b>'+esc(u.department||'-')+'</b></div>'+
+    '<div class="prow"><span class="k">🕒 Last login</span><b>'+(u.lastLogin?new Date(u.lastLogin).toLocaleString([],{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'-')+'</b></div>'+
+    '<div style="border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:10px 0">'+
+    '<b class="small">Permissions</b>'+
+    (perms.length?perms.map(p=>'<div class="perm"><span class="ck">✓</span>'+esc(p)+'</div>').join('')
+      :'<div style="padding:4px 0;color:#64748b;font-size:12.5px">No API permissions for this role.</div>')+'</div>'+
+    '<div style="border:1px solid var(--line);border-radius:10px;padding:10px 12px">'+
+    '<b class="small">Role Information</b>'+
+    '<div class="prow"><span class="k">Role Name</span><b>'+esc(ROLE_DISPLAY[u.role]||u.role)+'</b></div>'+
+    '<div class="prow"><span class="k">Department</span><b>'+esc(u.department||'-')+'</b></div>'+
+    '<div class="prow"><span class="k">Assigned Since</span><b>'+since+'</b></div></div>'+
     '<button onclick="toggleUser(\''+esc(u.username)+'\')" style="display:block;width:100%;margin-top:12px;border:1.5px solid '+(u.active?'var(--red)':'var(--green)')+';background:#fff;color:'+(u.active?'var(--red)':'var(--green)')+';border-radius:10px;padding:10px;font:inherit;font-weight:700;cursor:pointer">'+
-    (u.active?'⛔ Deactivate User':'✓ Reactivate User')+'</button>';
+    (u.active?'⊘ Deactivate User':'✓ Reactivate User')+'</button>';
 }
 async function toggleUser(username){
   try{
@@ -415,6 +456,45 @@ async function toggleUser(username){
     else toast('❌ Failed ('+r.status+')',false);
   }catch(e){toast('❌ Network error',false);}
 }
+
+/* ================= add user ================= */
+function openUAdd(){ $('uAddModal').style.display='grid'; $('nuName').focus(); }
+function closeUAdd(){ $('uAddModal').style.display='none'; }
+ $('uAddBtn').onclick=()=>{ $('uAddModal').style.display='grid'; $('nuName').focus(); };
+ $('uAddModal').addEventListener('click',e=>{ if(e.target.id==='uAddModal') closeUAdd(); });
+ $('nuSave').onclick=async()=>{
+  const body={ name:$('nuName').value.trim(), username:$('nuUser').value.trim().toLowerCase(),
+    role:$('nuRole').value, email:$('nuMail').value.trim()||null,
+    department:$('nuDept').value.trim()||null };
+  const msg=$('nuMsg');
+  try{
+    const r=await fetch('/api/v1/users',{method:'POST',
+      headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    if(r.status===201){
+      msg.style.color='#065f46';msg.textContent='✅ User added';
+      setTimeout(function(){closeUAdd();msg.textContent='';loadAppUsers();},800);
+    } else if(r.status===403){msg.style.color='#991b1b';msg.textContent='⛔ ADMIN or FLEET_MANAGER required';}
+    else if(r.status===409){msg.style.color='#991b1b';msg.textContent='❌ Username already exists';}
+    else if(r.status===400){const t=await r.text();msg.style.color='#991b1b';msg.textContent='❌ '+t.slice(0,120);}
+    else{msg.style.color='#991b1b';msg.textContent='❌ Failed ('+r.status+')';}
+  }catch(e){msg.style.color='#991b1b';msg.textContent='❌ Network error';}
+};
+
+/* ================= export ================= */
+ $('uExportBtn').onclick=()=>{
+  const csv=['name,username,email,role,department,status,last_login',
+    ...__appUsers.map(u=>[u.name,u.username,u.email||'',u.role,u.active?'Active':'Inactive',
+      u.lastLogin?new Date(u.lastLogin).toISOString():''].map(x=>'"'+(x??'')+'"').join(','))].join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download='fleetpulse-users.csv';a.click();toast('Exported fleetpulse-users.csv',true);
+};
+function resetUFilters(){$('uq').value='';$('ufRole').value='';$('ufStat').value='';$('ufDept').value='';renderAppUsers();}
+
+/* ================= wiring ================= */
+ $('uq').oninput=()=>{__uPage=0;renderAppUsers();};
+ $('ufRole').onchange=()=>{__uPage=0;renderAppUsers();};
+ $('ufStat').onchange=()=>{__uPage=0;renderAppUsers();};
+ $('ufDept').onchange=()=>{__uPage=0;renderAppUsers();};
 
 /* ================= boot ================= */
 loadAppUsers();
