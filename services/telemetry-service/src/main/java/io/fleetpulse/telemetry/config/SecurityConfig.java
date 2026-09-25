@@ -20,7 +20,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 public class SecurityConfig {
 
     @Bean
-    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain filterChain(HttpSecurity http, org.springframework.jdbc.core.JdbcTemplate jdbcTemplate) throws Exception {
         http
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
@@ -36,7 +36,12 @@ public class SecurityConfig {
             .formLogin(form -> form
                 .loginPage("/login.html")
                 .loginProcessingUrl("/login")
-                .defaultSuccessUrl("/", true)
+                .successHandler((request, response, authentication) -> {
+                    try {
+                        jdbcTemplate.update("UPDATE app_users SET last_login = now() WHERE username = ?", authentication.getName());
+                    } catch (Exception ignored) {}
+                    response.sendRedirect("/");
+                })
                 .failureUrl("/login.html?error")
                 .permitAll())
             .logout(logout -> logout
