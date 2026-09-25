@@ -236,7 +236,7 @@ async function toggleUser(username){
     else toast('\u274c Failed ('+r.status+')',false);
   }catch(e){toast('\u274c Network error',false);}
 }
- $('addBtn').onclick=()=>toast('Add user arrives with DB-backed auth',false);
+ 
  $('exportBtn').onclick=()=>{
   var csv=['name,username,email,role,department,status,last_login',
     ...__appUsers.map(u=>[u.name,u.username,u.email||'',u.role,u.active?'Active':'Inactive',
@@ -245,6 +245,60 @@ async function toggleUser(username){
   a.download='fleetpulse-users.csv';a.click();toast('Exported fleetpulse-users.csv',true);
 };
 loadUsers();setInterval(loadUsers,10000);
+
+/* ================= Add User (end-of-script) ================= */
+function openAddUser(){ document.getElementById("addUserModal").style.display="grid"; document.getElementById("nuName").focus(); }
+function closeAddUser(){ document.getElementById("addUserModal").style.display="none"; }
+document.getElementById("addBtn").addEventListener("click",function(){ openAddUser(); });
+document.getElementById("addUserModal").addEventListener("click",function(e){ if(e.target.id==="addUserModal") closeAddUser(); });
+document.getElementById("nuSave").onclick=async function(){
+  var body={ name:document.getElementById("nuName").value.trim(),
+    username:document.getElementById("nuUser").value.trim().toLowerCase(),
+    role:document.getElementById("nuRole").value,
+    email:document.getElementById("nuMail").value.trim()||null,
+    department:document.getElementById("nuDept").value.trim()||null };
+  var msg=document.getElementById("nuMsg");
+  try{
+    var r=await fetch('/api/v1/users',{method:'POST',
+      headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    if(r.status===201){
+      msg.style.color='#065f46';msg.textContent='✅ User added';
+      setTimeout(function(){closeAddUser();msg.textContent='';
+        if(typeof loadUsers==='function')loadUsers();
+        else location.reload();},800);
+    } else if(r.status===403){msg.style.color='#991b1b';msg.textContent='⛔ ADMIN or FLEET_MANAGER required';}
+    else if(r.status===409){msg.style.color='#991b1b';msg.textContent='❌ Username already exists';}
+    else if(r.status===400){var t=await r.text();msg.style.color='#991b1b';msg.textContent='❌ '+t.slice(0,120);}
+    else{msg.style.color='#991b1b';msg.textContent='❌ Failed ('+r.status+')';}
+  }catch(e){msg.style.color='#991b1b';msg.textContent='❌ Network error';}
+};
 </script>
+
+<div class="modal" id="addUserModal" style="position:fixed;inset:0;background:rgba(2,6,23,.55);display:none;place-items:center;z-index:2600">
+  <div style="background:#fff;border-radius:16px;max-width:460px;width:92%;padding:22px 24px;position:relative">
+    <button onclick="closeAddUser()" style="position:absolute;top:14px;right:16px;border:0;background:none;font-size:18px;cursor:pointer;color:var(--muted)">✕</button>
+    <h2 style="font-size:18px;margin-bottom:12px">Add User</h2>
+    <div style="display:grid;gap:10px">
+      <div><label style="font-size:11.5px;color:var(--muted);display:block;margin-bottom:4px;font-weight:600">Full name *</label>
+        <input id="nuName" placeholder="Grace Wanjiku" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit"/></div>
+      <div><label style="font-size:11.5px;color:var(--muted);display:block;margin-bottom:4px;font-weight:600">Username *</label>
+        <input id="nuUser" placeholder="grace" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit"/></div>
+      <div><label style="font-size:11.5px;color:var(--muted);display:block;margin-bottom:4px;font-weight:600">Role *</label>
+        <select id="nuRole" style="width:100%;border:1px solid var(--line);border-radius:9px;padding:8px;font:inherit">
+          <option>DISPATCHER</option><option>ANALYST</option><option>FLEET_MANAGER</option>
+          <option>MAINTENANCE_MANAGER</option><option>DRIVER</option><option>ADMIN</option></select></div>
+      <div><label style="font-size:11.5px;color:var(--muted);display:block;margin-bottom:4px;font-weight:600">Email</label>
+        <input id="nuMail" placeholder="grace@fleetpulse.co.ke" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit"/></div>
+      <div><label style="font-size:11.5px;color:var(--muted);display:block;margin-bottom:4px;font-weight:600">Department</label>
+        <input id="nuDept" placeholder="Operations" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit"/></div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:14px">
+      <button style="flex:1;border:0;border-radius:9px;padding:9px;font:inherit;font-weight:600;background:var(--blue);color:#fff;cursor:pointer" id="nuSave">Add User</button>
+      <button style="flex:1;border:1px solid var(--line);border-radius:9px;padding:9px;font:inherit;font-weight:600;background:#fff;color:var(--text);cursor:pointer" onclick="closeAddUser()">Cancel</button>
+    </div>
+    <div id="nuMsg" style="margin-top:8px;min-height:16px;font-size:12.5px"></div>
+  </div>
+</div>
+
 </body>
 </html>
