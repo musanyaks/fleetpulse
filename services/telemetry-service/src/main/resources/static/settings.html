@@ -272,6 +272,32 @@ document.getElementById("nuSave").onclick=async function(){
     else{msg.style.color='#991b1b';msg.textContent='❌ Failed ('+r.status+')';}
   }catch(e){msg.style.color='#991b1b';msg.textContent='❌ Network error';}
 };
+
+/* ================= persistent independent toggles ================= */
+const togglePrefs = JSON.parse(localStorage.getItem('fleetpulse-toggles') || '{}');
+function applyTogglePrefs(){
+  document.querySelectorAll('.tgl[data-pref]').forEach(function(t){
+    const saved = togglePrefs[t.dataset.pref];
+    if(saved !== undefined) t.classList.toggle('on', saved);
+  });
+}
+document.querySelectorAll('.tgl').forEach(function(t){
+  const label = (t.textContent || '').trim().split('\n')[0] || 'Toggle';
+  t.dataset.pref = t.dataset.pref || label;
+  t.addEventListener('click', function(){
+    const on = !t.classList.contains('on');
+    t.classList.toggle('on', on);
+    togglePrefs[t.dataset.pref] = on;
+    localStorage.setItem('fleetpulse-toggles', JSON.stringify(togglePrefs));
+    const gated = ['Email Notifications','SMS Notifications','Two-Factor Authentication','IP Whitelist','Show Traffic Layer'];
+    if(on && gated.includes(label)){
+      toast(label + ': preference saved - delivery arrives with its roadmap module', false);
+    } else {
+      toast(label + ': ' + (on ? 'ON' : 'OFF'), true);
+    }
+  });
+});
+applyTogglePrefs();
 </script>
 
 <div class="modal" id="addUserModal" style="position:fixed;inset:0;background:rgba(2,6,23,.55);display:none;place-items:center;z-index:2600">

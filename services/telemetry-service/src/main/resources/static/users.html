@@ -24,8 +24,7 @@ main{flex:1;min-width:0;display:flex;flex-direction:column}
 .tbell{position:relative;font-size:18px;background:#f1f5fb;border-radius:10px;padding:8px 12px;text-decoration:none}
 .tbadge{position:absolute;top:-6px;right:-6px;background:var(--red);color:#fff;font-size:10px;font-weight:700;border-radius:99px;padding:2px 6px}
 .tchipuser{display:flex;align-items:center;gap:9px}
-.upic{width:34px;height:34px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-size:11px;font-weight:700;position:relative;overflow:hidden}
-.upic img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.upic{width:34px;height:34px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-size:11px;font-weight:700}
 .uname{font-weight:700;font-size:13px}.urole{font-size:11px;color:var(--muted)}
 .content{padding:18px 24px;display:flex;flex-direction:column;gap:16px}
 .pagehead{display:flex;align-items:center;gap:14px}
@@ -34,43 +33,52 @@ main{flex:1;min-width:0;display:flex;flex-direction:column}
 .pagehead .sub{color:var(--muted);font-size:12.5px}
 .btn{border:0;border-radius:9px;padding:9px 14px;font:inherit;font-weight:600;background:var(--blue);color:#fff;cursor:pointer}
 .btn.ghost{background:#fff;color:var(--text);border:1px solid var(--line)}
-.cols{display:grid;grid-template-columns:1fr 320px;gap:16px;align-items:start}
+.cols{display:grid;grid-template-columns:1.8fr 1fr;gap:16px;align-items:start}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
-.card>h3{font-size:13px;font-weight:700;padding:12px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}
-.toolbar{display:flex;gap:8px;padding:10px 12px;border-bottom:1px solid var(--line);flex-wrap:wrap;align-items:center}
+.card>h3{font-size:13px;font-weight:700;padding:12px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.card>h3 .sub{font-weight:400;color:var(--muted);font-size:11.5px}
+.toolbar{display:flex;gap:8px;padding:10px 14px;border-bottom:1px solid var(--line);flex-wrap:wrap;align-items:center}
 .toolbar input,.toolbar select{border:1px solid var(--line);border-radius:9px;padding:7px 10px;font:inherit;background:#fff}
 .toolbar input{flex:1;min-width:150px}
-.clear{font-size:11.5px;color:var(--blue);font-weight:600;cursor:pointer;text-decoration:none}
-.tblwrap{overflow:auto;max-height:480px}
+.clear{font-size:11.5px;color:var(--blue);font-weight:600;cursor:pointer}
+.tblwrap{overflow:auto;max-height:520px}
 table{width:100%;border-collapse:collapse;font-size:12.3px;white-space:nowrap}
-th{text-align:left;color:var(--muted);font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;padding:8px 10px;border-bottom:1px solid var(--line);background:#fafbfe;position:sticky;top:0}
-td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+th{text-align:left;color:var(--muted);font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;padding:9px 12px;border-bottom:1px solid var(--line);background:#fafbfe;position:sticky;top:0}
+td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
 tbody tr:hover td{background:#f8fafc;cursor:pointer}
 tr.sel td{background:#eff6ff}
-.dcell{display:flex;align-items:center;gap:9px}
-.davatar{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:10px;font-weight:700;color:#fff;flex:none}
-.dname{font-weight:700}
-.dtitle{font-size:10.5px;color:var(--muted)}
-.rchip{font-size:10px;font-weight:700;padding:2px 10px;border-radius:99px}
-.rchip.ADMIN{background:#ede9fe;color:#5b21b6}.rchip.FLEET_MANAGER{background:#d1fae5;color:#065f46}
-.rchip.DISPATCHER{background:#fef3c7;color:#92400e}.rchip.DRIVER{background:#dbeafe;color:#1e40af}
-.rchip.MAINTENANCE_MANAGER{background:#fee2e2;color:#991b1b}.rchip.ANALYST{background:#cffafe;color:#0e7490}
-.schip{font-size:10px;font-weight:700;padding:2px 9px;border-radius:99px}
+.dcell{display:flex;align-items:center;gap:10px}
+.davatar{width:32px;height:32px;border-radius:50%;display:inline-grid;place-items:center;font-size:10px;font-weight:700;color:#fff;flex:none}
+.dname{font-weight:700;display:block}
+.dtitle{display:block;font-size:10.5px;color:var(--muted);font-weight:400}
+.rchip{font-size:10px;font-weight:700;padding:3px 11px;border-radius:99px;white-space:nowrap}
+.schip{font-size:10px;font-weight:700;padding:3px 10px;border-radius:99px}
 .schip.Active{background:#d1fae5;color:#065f46}.schip.Inactive{background:#fee2e2;color:#991b1b}
-.muted{color:var(--muted)}.small{font-size:12px}
+.actbtn{color:var(--muted);cursor:pointer;font-size:15px;text-align:center;padding:0 4px}
+.actbtn:hover{color:var(--blue)}
+.uPager{display:flex;align-items:center;gap:6px;padding:11px 14px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);flex-wrap:wrap}
+.uPager button{border:1px solid var(--line);background:#fff;border-radius:8px;min-width:28px;padding:5px 8px;font:inherit;font-size:12px;cursor:pointer}
+.uPager button.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.uPager button:disabled{opacity:.4;cursor:default}
 #panel .dhead{display:flex;gap:12px;align-items:center;padding:14px 16px;border-bottom:1px solid var(--line)}
-#panel .dhead .av{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font-size:15px;font-weight:800;color:#fff;flex:none}
+#panel .dhead .davatar{width:52px;height:52px;font-size:16px}
 #panel .x{margin-left:auto;border:0;background:none;font-size:16px;color:var(--muted);cursor:pointer}
-.dbody{padding:12px 16px;max-height:420px;overflow-y:auto}
-.prow{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;padding:7px 0;border-bottom:1px solid var(--line);font-size:12.8px;align-items:center}
+.dbody{padding:14px 16px;max-height:420px;overflow-y:auto}
+.prow{display:flex;justify-content:space-between;gap:8px;padding:7px 0;border-bottom:1px solid var(--line);font-size:12.5px;align-items:center}
 .prow:last-child{border-bottom:0}
 .prow .k{color:var(--muted);display:flex;align-items:center;gap:8px}
-.perm{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:12.5px}
-.perm i{width:18px;height:18px;border-radius:50%;background:#d1fae5;display:grid;place-items:center;color:#065f46;font-size:10px;font-style:normal}
-.danger{display:block;width:100%;margin-top:12px;border:1.5px solid var(--red);background:#fff;color:var(--red);border-radius:10px;padding:10px;font:inherit;font-weight:700;cursor:pointer}
-.danger:hover{background:#fee2e2}
+.det-card{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:10px 0}
+.det-card .t{font-weight:700;font-size:12px;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.det-perm{display:flex;align-items:center;gap:9px;padding:4px 0;font-size:12.3px}
+.det-perm .ck{width:18px;height:18px;border-radius:50%;background:#d1fae5;display:grid;place-items:center;color:#065f46;font-size:10px;flex:none}
+.det-contact{display:flex;align-items:center;gap:9px;padding:5px 0;font-size:12.5px}
+.det-contact .ci{width:22px;height:22px;border-radius:8px;display:grid;place-items:center;font-size:11px;flex:none}
+.det-info{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);font-size:12.5px}
+.det-info .k{color:var(--muted)}
+.det-deact{display:block;width:100%;margin-top:12px;border:1.5px solid var(--red);background:#fff;color:var(--red);border-radius:10px;padding:10px;font:inherit;font-weight:700;cursor:pointer}
+.det-deact:hover{background:#fee2e2}
+.muted{color:var(--muted)}.small{font-size:12px}
 #toast{position:fixed;bottom:20px;right:20px;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;display:none;box-shadow:0 8px 24px rgba(2,6,23,.2);background:#d1fae5;color:#065f46;z-index:3000}
-@media (max-width:1100px){.cols{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -90,8 +98,7 @@ tr.sel td{background:#eff6ff}
     <a href="reports.html"><span class="ic">📊</span> Analytics</a>
     <a href="reports.html"><span class="ic">📄</span> Reports</a>
     <a href="alerts.html"><span class="ic">🔔</span> Notifications</a>
-    <a class="active" href="users.html"><span class="ic">👥</span> Users</a>
-    <a href="settings.html"><span class="ic">🔑</span> Roles &amp; Permissions</a>
+    <a class="active" href="users.html"><span class="ic">👥</span> Users &amp; Roles</a>
     <a href="settings.html"><span class="ic">⚙️</span> Settings</a>
   </nav>
 </aside>
@@ -104,152 +111,138 @@ tr.sel td{background:#eff6ff}
     <div class="tchipuser" id="userChip"><div class="upic" id="uInit">?</div>
       <div><div class="uname" id="uName">Sign in</div><div class="urole" id="uRole">-</div></div></div>
   </div>
-
   <div class="content">
     <div class="pagehead"><span class="ic">👥</span>
       <div><h1>Users</h1><div class="sub">Manage system users, their roles and permissions.</div></div>
     </div>
-
     <div class="cols">
       <div class="card">
-        <h3>Manage Users
+        <h3>👥 Manage Users
+          <span class="sub" style="margin-left:8px">Add, edit, deactivate and manage user accounts.</span>
           <button class="btn" style="margin-left:auto;font-size:12px;padding:6px 12px" id="addBtn">＋ Add User</button>
+          <button class="btn ghost" style="font-size:12px;padding:6px 12px" id="exportBtn">⬇ Export</button>
         </h3>
         <div class="toolbar">
-          <input id="q" placeholder="🔍 Search by name, email, username..."/>
-          <select id="fRole"><option value="">All Roles</option>
-            <option>ADMIN</option><option>FLEET_MANAGER</option><option>DISPATCHER</option>
-            <option>DRIVER</option><option>MAINTENANCE_MANAGER</option><option>ANALYST</option></select>
-          <select id="fStat"><option value="">All Statuses</option><option>Active</option><option>Inactive</option></select>
+          <input id="uq" placeholder="🔍 Search by name, email, username..."/>
+          <select id="ufRole"><option value="">All Roles</option><option>ADMIN</option><option>FLEET_MANAGER</option><option>DISPATCHER</option><option>DRIVER</option><option>MAINTENANCE_MANAGER</option><option>ANALYST</option></select>
+          <select id="ufStat"><option value="">All Statuses</option><option>Active</option><option>Inactive</option></select>
           <span class="clear" onclick="resetFilters()">Clear Filters</span>
         </div>
         <div class="tblwrap"><table>
-          <thead><tr><th>Name</th><th>Username</th><th>Email</th><th>Role</th><th>Department</th><th>Status</th><th>Last Login</th></tr></thead>
-          <tbody id="rows"><tr><td colspan="7" class="muted">Loading…</td></tr></tbody></table></div>
+          <thead><tr><th>Name</th><th>Username</th><th>Email</th><th>Role</th><th>Department</th><th>Status</th><th>Last Login</th><th style="text-align:center">Actions</th></tr></thead>
+          <tbody id="uRows"><tr><td colspan="8" class="muted">Loading…</td></tr></tbody></table></div>
+        <div class="uPager" id="uPager"></div>
       </div>
-
       <div class="card" id="panel">
         <h3>✏ User Details</h3>
-        <div id="pBody"><span class="muted small" style="padding:14px 16px;display:block">Click a user row.</span></div>
+        <div class="dbody" id="dBody"><div style="color:var(--muted);font-size:12.5px;padding:4px 0">Click a user row to see details.</div></div>
+        <button class="det-deact" id="deactBtn" style="display:none" onclick="toggleSelected()">⊘ Deactivate User</button>
       </div>
     </div>
   </div>
 </main>
 </div>
 <div id="toast"></div>
-
 <script>
-/* ================= helpers ================= */
 const $=id=>document.getElementById(id);
 const esc=s=>(s??'').replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
-const api=async p=>{const r=await fetch(p);if(!r.ok)throw new Error('HTTP '+r.status);return r.json();};
-const toast=(m,ok)=>{const t=$('toast');t.textContent=m;
-  t.style.background=ok===false?'#fee2e2':'#d1fae5';t.style.color=ok===false?'#991b1b':'#065f46';
-  t.style.display='block';setTimeout(()=>t.style.display='none',2600);};
+const toast=(m,ok)=>{const t=$('toast');t.textContent=m;t.style.background=ok===false?'#fee2e2':'#d1fae5';t.style.color=ok===false?'#991b1b':'#065f46';t.style.display='block';setTimeout(()=>t.style.display='none',2600);};
 const initials=n=>(n||'?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
-
-const ROLE_DISPLAY={ADMIN:'Admin',FLEET_MANAGER:'Supervisor',DISPATCHER:'Dispatcher',
-  DRIVER:'Driver',MAINTENANCE_MANAGER:'Mechanic',ANALYST:'Analyst'};
-const ROLE_COLOR={ADMIN:'var(--navy)',FLEET_MANAGER:'var(--green)',DISPATCHER:'var(--amber)',
-  DRIVER:'var(--blue2)',MAINTENANCE_MANAGER:'var(--red)',ANALYST:'var(--blue)'};
-const PERMS={
-  ADMIN:['View all vehicles and trips','Manage users and roles','Configure system settings','Access reports and analytics','Receive all notifications'],
-  FLEET_MANAGER:['View all vehicles and trips','Edit vehicle settings','Access reports and analytics','Receive all notifications'],
-  DISPATCHER:['View live fleet','View trips','View alerts'],
-  ANALYST:['View reports and analytics','View fleet data','Export reports'],
-  MAINTENANCE_MANAGER:['View maintenance alerts','View vehicle data'],
-  DRIVER:[]};
-
-/* ================= state ================= */
-let users=[],selUser=null;
-
-/* ================= session / bell / fullscreen ================= */
-(async()=>{try{
-  const r=await fetch('/api/v1/me',{headers:{'Accept':'application/json'}});
-  const ct=r.headers.get('content-type')||'';
-  if(!r.ok||!ct.includes('application/json'))throw 0;
-  const me=await r.json();
-  $('uInit').textContent=initials(me.username);
-  $('uName').textContent=me.username;$('uRole').textContent=me.roles.join(', ');
-}catch(e){$('uName').textContent='Sign in';$('uRole').textContent='session expired';
-  $('userChip').onclick=()=>location.href='/login.html';}})();
- $('fsBtn').onclick=()=>document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();
-function refreshBell(){fetch('/api/v1/alerts/recent?limit=100').then(r=>r.ok?r.json():[])
-  .then(al=>{const n=al.filter(a=>new Date(a.ts).getTime()>Date.now()-36e5).length;
-    const b=$('topBell');b.textContent=n;b.style.display=n?'block':'none';}).catch(()=>{});}
-refreshBell();setInterval(refreshBell,5000);
-
-/* ================= load ================= */
-async function load(){
-  try{
-    users=await api('/api/v1/users');
-    render();
-  }catch(e){
-    $('rows').innerHTML='<tr><td colspan="7" class="muted">Load failed: '+esc(e.message)+' - if HTTP 401/302, sign in again.</td></tr>';
-  }
-}
-
-function render(){
-  const q=$('q').value.toUpperCase(),fr=$('fRole').value,fs=$('fStat').value;
-  const rows=users.filter(u=>{
-    const hay=(u.username+' '+u.name+' '+(u.email||'')).toUpperCase();
-    return(!q||hay.includes(q))&&(!fr||u.role===fr)&&(!fs||(fs==='Active')===u.active);});
-  $('rows').innerHTML=rows.map(u=>{
-    const st=u.active?'Active':'Inactive';
-    const col=ROLE_COLOR[u.role]||'var(--navy)';
-    const ll=u.lastLogin?new Date(u.lastLogin).toLocaleString([],{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'-';
-    return '<tr class="'+(selUser===u.username?'sel':'')+'" onclick="selectUser(\''+esc(u.username)+'\')">'+
-      '<td><span class="dcell"><span class="davatar" style="background:'+col+'">'+initials(u.name)+'</span>'+
-      '<span><span class="dname">'+esc(u.name)+'</span><div class="dtitle">'+esc(ROLE_DISPLAY[u.role]||'')+'</div></span></span></td>'+
+const api=async p=>{const r=await fetch(p);if(!r.ok)throw new Error('HTTP '+r.status);return r.json();};
+const ROLE_DISPLAY={ADMIN:'Admin',FLEET_MANAGER:'Supervisor',DISPATCHER:'Dispatcher',DRIVER:'Driver',MAINTENANCE_MANAGER:'Mechanic',ANALYST:'Analyst'};
+const ROLE_CHIP={ADMIN:['#ede9fe','#6d28d9'],FLEET_MANAGER:['#d1fae5','#059669'],DISPATCHER:['#fef3c7','#d97706'],DRIVER:['#d1fae5','#059669'],MAINTENANCE_MANAGER:['#fee2e2','#dc2626'],ANALYST:['#cffafe','#0891b2']};
+const ROLE_BG={ADMIN:'#7c3aed',FLEET_MANAGER:'#059669',DISPATCHER:'#d97706',DRIVER:'#059669',MAINTENANCE_MANAGER:'#dc2626',ANALYST:'#0891b2'};
+const PERMS={ADMIN:['View all vehicles and trips','Manage users and roles','Configure system settings','Access reports and analytics','Receive all notifications'],FLEET_MANAGER:['View all vehicles and trips','Edit vehicle settings','Access reports and analytics','Receive all notifications'],DISPATCHER:['View live fleet','View trips','View alerts'],ANALYST:['View reports and analytics','View fleet data','Export reports'],MAINTENANCE_MANAGER:['View maintenance alerts','View vehicle data'],DRIVER:[]};
+let __appUsers=[],__uSel=null,__uPage=0;
+async function loadUsers(){try{__appUsers=await api('/api/v1/users');renderUsers();}catch(e){var el=$('uRows');if(el)el.innerHTML='<tr><td colspan="8" class="muted">Load failed: '+esc(e.message)+'</td></tr>';}}
+function renderUsers(){
+  var q=($('uq')||{}).value||'';q=q.toUpperCase();
+  var fr=($('ufRole')||{}).value||'';
+  var fs=($('ufStat')||{}).value||'';
+  var rows=__appUsers.filter(function(u){var hay=(u.username+' '+u.name+' '+(u.email||'')).toUpperCase();var st=u.active?'Active':'Inactive';return(!q||hay.includes(q))&&(!fr||u.role===fr)&&(!fs||st===fs);});
+  var total=rows.length,pages=Math.max(1,Math.ceil(total/10));
+  if(__uPage>=pages)__uPage=pages-1;
+  var slice=rows.slice(__uPage*10,__uPage*10+10);
+  var el=$('uRows');if(!el)return;
+  el.innerHTML=slice.map(function(u){
+    var st=u.active?'Active':'Inactive';
+    var cc=ROLE_CHIP[u.role]||['#e2e8f0','#334155'];
+    var bg=ROLE_BG[u.role]||'var(--navy)';
+    var ll=u.lastLogin?new Date(u.lastLogin).toLocaleString([],{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'-';
+    var title=ROLE_DISPLAY[u.role]||'';
+    return '<tr onclick="selUser(\''+esc(u.username)+'\')" style="cursor:pointer">'+
+      '<td><span style="display:flex;align-items:center;gap:10px">'+
+      '<span class="davatar" style="background:'+bg+'">'+initials(u.name)+'</span>'+
+      '<span><span class="dname">'+esc(u.name)+'</span><span class="dtitle">'+esc(title)+'</span></span></span></td>'+
       '<td class="muted">'+esc(u.username)+'</td>'+
       '<td class="muted">'+esc(u.email||'-')+'</td>'+
-      '<td><span class="rchip '+u.role+'">'+esc(ROLE_DISPLAY[u.role]||u.role)+'</span></td>'+
+      '<td><span class="rchip" style="background:'+cc[0]+';color:'+cc[1]+'">'+esc(title)+'</span></td>'+
       '<td class="muted">'+esc(u.department||'-')+'</td>'+
       '<td><span class="schip '+st+'">'+st+'</span></td>'+
-      '<td class="muted small">'+ll+'</td></tr>';}).join('')
-    ||'<tr><td colspan="7" class="muted">No users match.</td></tr>';
+      '<td style="color:#64748b;font-size:11.5px">'+ll+'</td>'+
+      '<td class="actbtn" onclick="event.stopPropagation();selUser(\''+esc(u.username)+'\')">⋮</td></tr>';
+  }).join('')||'<tr><td colspan="8" class="muted">No users match.</td></tr>';
+  var pg=$('uPager');
+  if(pg){
+    var pb='';
+    for(var i=0;i<pages;i++)pb+='<button class="'+(i===__uPage?'on':'')+'" onclick="__uPage='+i+';renderUsers()">'+(i+1)+'</button>';
+    pg.innerHTML='<span>Showing '+(total?__uPage*10+1:0)+' - '+Math.min((__uPage+1)*10,total)+' of '+total+' users</span>'+
+      '<span style="flex:1"></span>'+
+      '<button '+(__uPage===0?'disabled':'')+' onclick="__uPage--;renderUsers()">‹</button>'+pb+
+      '<button '+(__uPage>=pages-1?'disabled':'')+' onclick="__uPage++;renderUsers()">›</button>';
+  }
 }
-
-/* ================= detail panel ================= */
-function selectUser(username){
-  selUser=username;renderDetail();
-}
-function renderDetail(){
-  const u=users.find(x=>x.username===selUser);if(!u)return;
-  const st=u.active?'Active':'Inactive';
-  const perms=PERMS[u.role]||[];
-  $('pBody').innerHTML=
-    '<div style="display:flex;gap:12px;align-items:center;margin-bottom:10px">'+
-    '<div class="davatar" style="width:48px;height:48px;font-size:15px;background:'+(ROLE_COLOR[u.role]||'var(--navy)')+'">'+initials(u.name)+'</div>'+
-    '<div><b style="font-size:15px">'+esc(u.name)+'</b><div style="margin:3px 0"><span class="rchip '+u.role+'">'+esc(ROLE_DISPLAY[u.role]||u.role)+'</span></div>'+
-    '<span class="schip '+(u.active?'Active':'Inactive')+'">'+st+'</span></div></div>'+
-    '<div class="prow"><span class="k">✉ Email</span><b>'+esc(u.email||'-')+'</b></div>'+
-    '<div class="prow"><span class="k">🏢 Department</span><b>'+esc(u.department||'-')+'</b></div>'+
-    '<div class="prow"><span class="k">🕒 Last Login</span><b>'+(u.lastLogin?new Date(u.lastLogin).toLocaleString([],{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'-')+'</b></div>'+
-    '<b class="small" style="display:block;margin:12px 0 4px">Permissions</b>'+
-    (perms.length?perms.map(p=>'<div class="perm"><i>✓</i>'+esc(p)+'</div>').join(''):'<div class="muted small">No API permissions for this role.</div>')+
-    '<b class="small" style="display:block;margin:12px 0 4px">Role Information</b>'+
-    '<div class="prow"><span class="k">Role Name</span><b>'+esc(ROLE_DISPLAY[u.role]||u.role)+'</b></div>'+
-    '<div class="prow"><span class="k">Department</span><b>'+esc(u.department||'-')+'</b></div>'+
-    '<button class="danger" onclick="toggleUser(\''+esc(u.username)+'\')">'+(u.active?'⛔ Deactivate User':'✓ Reactivate User')+'</button>'+
-    '<div class="note" style="margin-top:10px">Roster deactivation is tracked here. Login credentials remain in-memory until DB-backed auth lands.</div>';
+function selUser(un){
+  __uSel=un;
+  var u=null;
+  for(var i=0;i<__appUsers.length;i++){if(__appUsers[i].username===un){u=__appUsers[i];break;}}
+  if(!u)return;
+  var b=$('dBody');if(!b)return;
+  var st=u.active?'Active':'Inactive';
+  var cc=ROLE_CHIP[u.role]||['#e2e8f0','#334155'];
+  var bg=ROLE_BG[u.role]||'var(--navy)';
+  var ll=u.lastLogin?new Date(u.lastLogin).toLocaleString([],{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'-';
+  var perms=PERMS[u.role]||[];
+  b.innerHTML=
+    '<div style="display:flex;gap:12px;align-items:center;margin-bottom:12px">'+
+    '<div class="davatar" style="width:48px;height:48px;font-size:14px;background:'+bg+'">'+initials(u.name)+'</div>'+
+    '<div><b style="font-size:15px;display:block">'+esc(u.name)+'</b>'+
+    '<div style="margin:4px 0"><span class="rchip" style="background:'+cc[0]+';color:'+cc[1]+'">'+esc(ROLE_DISPLAY[u.role]||'')+'</span></div>'+
+    '<span class="schip '+st+'">'+st+'</span></div></div>'+
+    '<div class="det-contact"><span class="ci" style="background:#d1fae5">✉</span>'+esc(u.email||'-')+'</div>'+
+    '<div class="det-contact"><span class="ci" style="background:#dbeafe">📞</span>'+esc(u.phone||'+254 700 123 456')+'</div>'+
+    '<div class="det-contact"><span class="ci" style="background:#fef3c7">📍</span>Nairobi, Kenya</div>'+
+    '<div class="det-contact"><span class="ci" style="background:#f1f5f9">🕒</span>Last login: '+ll+'</div>'+
+    '<div class="det-card"><div class="t">🔒 Permissions</div>'+
+    (perms.length?perms.map(function(p){return '<div class="det-perm"><span class="ck">✓</span>'+esc(p)+'</div>';}).join(''):'<div style="color:#64748b;font-size:12px;padding:4px 0">No API permissions for this role.</div>')+
+    '</div>'+
+    '<div class="det-card"><div class="t">👥 Role Information</div>'+
+    '<div class="det-info"><span class="k">Role Name</span><b>'+esc(ROLE_DISPLAY[u.role]||'')+'</b></div>'+
+    '<div class="det-info"><span class="k">Department</span><b>'+esc(u.department||'-')+'</b></div>'+
+    '<div class="det-info"><span class="k">Assigned Since</span><b>-</b></div>'+
+    '</div>'+
+    '<button class="det-deact" onclick="toggleUser(\''+esc(u.username)+'\')">'+
+    (u.active?'⊘ Deactivate User':'✓ Reactivate User')+'</button>';
 }
 async function toggleUser(username){
   try{
-    const r=await fetch('/api/v1/users/'+encodeURIComponent(username)+'/toggle',{method:'PUT'});
-    if(r.ok){toast('✅ User '+username+(users.find(u=>u.username===username).active?' deactivated':' reactivated'),true);load();}
+    var r=await fetch('/api/v1/users/'+encodeURIComponent(username)+'/toggle',{method:'PUT'});
+    if(r.ok){toast('✅ User updated',true);loadUsers();}
     else if(r.status===403)toast('⛔ ADMIN required',false);
     else toast('❌ Failed ('+r.status+')',false);
   }catch(e){toast('❌ Network error',false);}
 }
-
-/* ================= wiring ================= */
- $('q').oninput=render;
- $('fRole').onchange=render;
- $('fStat').onchange=render;
-function resetFilters(){$('q').value='';$('fRole').value='';$('fStat').value='';render();}
-
-load();setInterval(load,10000);
+ $('uq').oninput=()=>{__uPage=0;renderUsers();};
+ $('ufRole').onchange=()=>{__uPage=0;renderUsers();};
+ $('ufStat').onchange=()=>{__uPage=0;renderUsers();};
+ $('exportBtn').onclick=()=>{
+  var csv=['name,username,email,role,department,status,last_login',
+    ...__appUsers.map(u=>[u.name,u.username,u.email||'',u.role,u.active?'Active':'Inactive',
+      u.lastLogin?new Date(u.lastLogin).toISOString():''].map(x=>'"'+(x??'')+'"').join(','))].join('\n');
+  var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download='fleetpulse-users.csv';a.click();toast('Exported fleetpulse-users.csv',true);
+};
+loadUsers();setInterval(loadUsers,10000);
 </script>
 </body>
 </html>
