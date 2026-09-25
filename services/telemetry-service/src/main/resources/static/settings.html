@@ -87,6 +87,21 @@ tbody tr:hover td{background:#f8fafc}
 .g-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;align-items:start;margin-top:16px}
 #toast{position:fixed;bottom:20px;right:20px;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;display:none;box-shadow:0 8px 24px rgba(2,6,23,.2);background:#d1fae5;color:#065f46;z-index:3000}
 @media (max-width:1300px){.g-org{grid-template-columns:1fr}.g-3{grid-template-columns:1fr}}
+  .uavatar{width:30px;height:30px;border-radius:50%;display:inline-grid;place-items:center;font-size:10px;font-weight:700;color:#fff;margin-right:8px;vertical-align:middle}
+  .uchip{font-size:10px;font-weight:700;padding:2px 9px;border-radius:99px}
+  .uchip.ADMIN{background:#ede9fe;color:#5b21b6}.uchip.FLEET_MANAGER{background:#d1fae5;color:#065f46}
+  .uchip.DISPATCHER{background:#fef3c7;color:#92400e}.uchip.DRIVER{background:#dbeafe;color:#1e40af}
+  .uchip.MAINTENANCE_MANAGER{background:#fee2e2;color:#991b1b}.uchip.ANALYST{background:#cffafe;color:#0e7490}
+  .ustat{font-size:10px;font-weight:700;padding:2px 9px;border-radius:99px}
+  .ustat.Active{background:#d1fae5;color:#065f46}.ustat.Inactive{background:#fee2e2;color:#991b1b}
+  .ustat\ {\}
+  .udel{color:var(--red);cursor:pointer;font-weight:700}
+  .udel:hover{text-decoration:underline}
+  #usersWrap .card>h3{display:flex;align-items:center;gap:8px}
+  #usersWrap input,#usersWrap select{font:inherit}
+  .ubtn-sm{border:0;border-radius:8px;padding:5px 10px;font:inherit;font-size:11px;font-weight:700;cursor:pointer}
+  .ubtn-sm.deact{border:1.5px solid var(--red);background:#fff;color:var(--red)}
+  .ubtn-sm.deact:hover{background:#fee2e2}
 </style>
 </head>
 <body>
@@ -237,6 +252,34 @@ tbody tr:hover td{background:#f8fafc}
     <!-- ============ /ORGANIZATION TAB ============ -->
 
     <!-- ============ OTHER TABS ============ -->
+    <div id="usersWrap" style="display:none">
+      <div class="cols" style="display:grid;grid-template-columns:1fr 320px;gap:16px;align-items:start">
+        <div class="card">
+          <h3>Manage Users
+            <button class="btn" style="margin-left:auto;font-size:12px;padding:6px 12px" id="uAddBtn">＋ Add User</button>
+          </h3>
+          <div style="padding:10px 12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;border-bottom:1px solid var(--line)">
+            <input id="uq" placeholder="🔍 Search by name, username..." style="flex:1;min-width:150px;border:1px solid var(--line);border-radius:9px;padding:7px 10px;font:inherit;background:#fff"/>
+            <select id="ufRole" style="border:1px solid var(--line);border-radius:9px;padding:7px 10px;font:inherit;background:#fff">
+              <option value="">All Roles</option><option>ADMIN</option><option>FLEET_MANAGER</option>
+              <option>DISPATCHER</option><option>ANALYST</option><option>MAINTENANCE_MANAGER</option><option>DRIVER</option></select>
+            <select id="ufStat"><option value="">All Statuses</option><option>Active</option><option>Inactive</option></select>
+          </div>
+          <div style="overflow:auto;max-height:440px"><table>
+            <thead><tr><th>Name</th><th>Username</th><th>Email</th><th>Role</th><th>Department</th><th>Status</th><th>Last Login</th><th></th></tr></thead>
+            <tbody id="uRows"><tr><td colspan="8" class="muted">Loading…</td></tr></tbody></table></div>
+        </div>
+        <div class="card" id="uPanel">
+          <div style="display:flex;gap:12px;align-items:center;padding:14px 16px;border-bottom:1px solid var(--line)">
+            <div style="width:48px;height:48px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-size:14px;font-weight:800" id="udInit">–</div>
+            <div><b id="udName" style="font-size:15px">–</b><div class="muted small" id="udId">select a user</div></div>
+            <span id="udChip" style="margin-left:auto"></span>
+          </div>
+          <div style="padding:12px 16px;max-height:380px;overflow-y:auto" id="udBody">
+            <span class="muted small">Click a user row.</span></div>
+        </div>
+      </div>
+    </div>
     <div class="card" id="tabFallback" style="display:none">
       <h3 id="fbTitle">—</h3>
       <div class="pad muted small" id="fbBody"></div>
@@ -499,6 +542,66 @@ async function loadBranches(){
 }
 loadBranches();
 setInterval(loadBranches, 30000);
+
+/* ================= users tab (end-of-script) ================= */
+let __appUsers=[],__uSel=null,__uRoleFilter='',__uStatFilter='',__uSearch='';
+async function loadAppUsers(){
+  try{
+    __appUsers=await api('/api/v1/users');
+    renderAppUsers();
+  }catch(e){
+    const el=$("uRows");if(el)el.innerHTML='<tr><td colspan="8" class="muted">Load failed: '+esc(e.message)+'</td></tr>';
+  }
+}
+function renderAppUsers(){
+  const q=__uSearch.toUpperCase();
+  const rows=__appUsers.filter(u=>{
+    const hay=(u.username+' '+u.name+' '+(u.email||'')).toUpperCase();
+    return(!q||hay.includes(q))&&(!__uRoleFilter||u.role===__uRoleFilter)&&
+      (!__uStatFilter||(u.active?'Active':'Inactive')===__uStatFilter);});
+  const el=$("uRows");if(!el)return;
+  el.innerHTML=rows.map(u=>{
+    const st=u.active?'Active':'Inactive';
+    return '<tr onclick="selAppUser(\''+esc(u.username)+'\')">'+
+      '<td><span style="display:flex;align-items:center;gap:8px">'+
+      '<span class="uavatar" style="background:'+(u.role==='ADMIN'?'var(--navy)':'var(--blue2)')+'">'+initials(u.name)+'</span><b>'+esc(u.name)+'</b></span></td>'+
+      '<td class="muted">'+esc(u.username)+'</td>'+
+      '<td class="muted small">'+esc(u.email||'-')+'</td>'+
+      '<td><span class="uchip '+esc(u.role)+'">'+esc(u.role.replace('_',' '))+'</span></td>'+
+      '<td class="muted">'+esc(u.department||'-')+'</td>'+
+      '<td><span class="ustat '+st+'">'+st+'</span></td>'+
+      '<td class="muted small">'+(u.lastLogin?new Date(u.lastLogin).toLocaleString([],{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'-')+'</td></tr>';
+  }).join('')||'<tr><td colspan="8" class="muted">No users match.</td></tr>';
+}
+function selAppUser(un){
+  __uSel=un;
+  const u=__appUsers.find(x=>x.username===un);if(!u)return;
+  const b=$("udBody");
+  $("udInit").textContent=initials(u.name);
+  $("udName").textContent=u.name;
+  $("udId").textContent='Username: '+u.username;
+  $("udChip").innerHTML='<span class="uchip '+esc(u.role)+'">'+esc(u.role.replace('_',' '))+'</span>';
+  const perms={
+    ADMIN:['View all vehicles and trips','Manage users and roles','Configure system settings','Access reports and analytics','Receive all notifications'],
+    FLEET_MANAGER:['View all vehicles and trips','Edit vehicle settings','Access reports and analytics'],
+    DISPATCHER:['View live fleet','View trips','View alerts'],
+    ANALYST:['View reports and analytics','View fleet data','Export reports'],
+    MAINTENANCE_MANAGER:['View maintenance alerts','View vehicle data'],
+    DRIVER:[]};
+  const list=perms[u.role]||[];
+  b.innerHTML='<div class="prow" style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);font-size:12.5px"><span class="muted">✉ Email</span><b>'+esc(u.email||'-')+'</b></div>'+
+    '<div class="prow" style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);font-size:12.5px"><span class="muted">🏢 Department</span><b>'+esc(u.department||'-')+'</b></div>'+
+    '<div class="prow" style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);font-size:12.5px"><span class="muted">🕒 Last Login</span><b>'+(u.lastLogin?new Date(u.lastLogin).toLocaleString([],{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'-')+'</b></div>'+
+    '<b class="small" style="display:block;margin:12px 0 4px">Permissions</b>'+
+    (list.length?list.map(p=>'<div style="display:flex;align-items:center;gap:8px;padding:4px 0;font-size:12.5px"><span style="width:18px;height:18px;border-radius:50%;background:#d1fae5;display:grid;place-items:center;color:#065f46;font-size:10px">✓</span>'+esc(p)+'</div>').join(''):'<div class="muted small">No API permissions for this role.</div>');
+}
+/* wire the users tab to trigger load */
+document.querySelectorAll('#stabs button').forEach(function(b){
+  const orig=b.onclick;
+  b.addEventListener('click',function(){
+    if(b.dataset.s==='users'&&!__appUsers.length){loadAppUsers();}
+  });
+});
 </script>
 </body>
 </html>
