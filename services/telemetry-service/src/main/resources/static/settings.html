@@ -94,6 +94,28 @@ main{flex:1;min-width:0;display:flex;flex-direction:column}
 .modal .box{background:#fff;border-radius:16px;max-width:460px;width:92%;padding:22px 24px;position:relative}
 .modal .x{position:absolute;top:14px;right:16px;border:0;background:none;font-size:18px;cursor:pointer;color:var(--muted)}
 #toast{position:fixed;bottom:20px;right:20px;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;display:none;box-shadow:0 8px 24px rgba(2,6,23,.2);background:#d1fae5;color:#065f46;z-index:3000}
+  #usersWrap{display:grid;grid-template-columns:1.8fr 1fr;gap:16px;align-items:start}
+  #usersWrap .card:first-child{grid-row:span 2}
+  .urow-check{width:14px;height:14px;cursor:pointer}
+  .uroletitle{display:block;font-size:10.5px;color:var(--muted);font-weight:400}
+  .actbtn{color:var(--muted);cursor:pointer;font-size:15px;text-align:center}
+  .actbtn:hover{color:var(--blue)}
+  .uPager{display:flex;align-items:center;gap:6px;padding:10px 14px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);flex-wrap:wrap}
+  .uPager button{border:1px solid var(--line);background:#fff;border-radius:8px;min-width:28px;padding:4px 8px;font:inherit;font-size:12px;cursor:pointer}
+  .uPager button.on{background:var(--blue);border-color:var(--blue);color:#fff}
+  .uPager button:disabled{opacity:.4;cursor:default}
+  .det-av{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font-size:16px;font-weight:800;color:#fff;flex:none}
+  .det-chip{font-size:10px;font-weight:700;padding:2px 10px;border-radius:99px}
+  .det-contact{display:flex;align-items:center;gap:9px;padding:5px 0;font-size:12.5px}
+  .det-contact .ci{width:22px;height:22px;border-radius:8px;display:grid;place-items:center;font-size:11px;flex:none}
+  .det-card{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:10px 0}
+  .det-card .t{font-weight:700;font-size:12px;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+  .det-perm{display:flex;align-items:center;gap:9px;padding:4px 0;font-size:12.3px}
+  .det-perm .ck{width:18px;height:18px;border-radius:50%;background:#d1fae5;display:grid;place-items:center;color:#065f46;font-size:10px;flex:none}
+  .det-info{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);font-size:12.5px}
+  .det-info .k{color:var(--muted)}
+  .det-deact{display:block;width:100%;margin-top:12px;border:1.5px solid var(--red);background:#fff;color:var(--red);border-radius:10px;padding:10px;font:inherit;font-weight:700;cursor:pointer}
+  .det-deact:hover{background:#fee2e2}
 </style>
 </head>
 <body>
@@ -381,73 +403,81 @@ async function loadAppUsers(){
   }
 }
 function renderAppUsers(){
-  const q=($('uq')?$('uq').value:'').toUpperCase();
-  const fr=$('ufRole')?$('ufRole').value:'';
-  const fs=$('ufStat')?$('ufStat').value:'';
-  const fd=$('ufDept')?$('ufDept').value:'';
-  let rows=__appUsers.filter(u=>{
-    const hay=(u.username+' '+u.name+' '+(u.email||'')).toUpperCase();
-    const st=u.active?'Active':'Inactive';
-    return(!q||hay.includes(q))&&(!fr||u.role===fr)&&(!fs||st===fs)&&(!fd||u.department===fd);});
-  const total=rows.length;
-  const pages=Math.max(1,Math.ceil(total/__uPageSize));
+  var q=($('uq')||{}).value||'';q=q.toUpperCase();
+  var fr=($('ufRole')||{}).value||'';
+  var fs=($('ufStat')||{}).value||'';
+  var rows=__appUsers.filter(function(u){
+    var hay=(u.username+' '+u.name+' '+(u.email||'')).toUpperCase();
+    var st=u.active?'Active':'Inactive';
+    return(!q||hay.includes(q))&&(!fr||u.role===fr)&&(!fs||st===fs);
+  });
+  var total=rows.length;
+  var pages=Math.max(1,Math.ceil(total/10));
   if(__uPage>=pages)__uPage=pages-1;
-  const slice=rows.slice(__uPage*__uPageSize,__uPage*__uPageSize+__uPageSize);
-  const el=$('uRows');if(!el)return;
-  el.innerHTML=slice.map(u=>{
-    const st=u.active?'Active':'Inactive';
-    const cc=ROLE_CHIP[u.role]||['#e2e8f0','#334155'];
-    const ll=u.lastLogin?new Date(u.lastLogin).toLocaleString([],{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'-';
+  var slice=rows.slice(__uPage*10,__uPage*10+10);
+  var el=$('uRows');if(!el)return;
+  el.innerHTML=slice.map(function(u){
+    var st=u.active?'Active':'Inactive';
+    var cc=ROLE_CHIP[u.role]||['#e2e8f0','#334155'];
+    var ll=u.lastLogin?new Date(u.lastLogin).toLocaleString([],{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'-';
+    var title=ROLE_DISPLAY[u.role]||'';
     return '<tr onclick="selAppUser(\''+esc(u.username)+'\')" style="cursor:pointer">'+
+      '<td><input type="checkbox" class="urow-check" onclick="event.stopPropagation()"/></td>'+
       '<td><span style="display:flex;align-items:center;gap:9px">'+
-      '<span class="uavatar" style="background:'+(ROLE_CHIP[u.role]?ROLE_CHIP[u.role][0]:'#e2e8f0')+'">'+initials(u.name)+'</span>'+
-      '<span><span style="display:block;font-weight:700">'+esc(u.name)+'</span>'+
-      '<span style="display:block;font-size:10.5px;color:#64748b">'+esc(ROLE_DISPLAY[u.role]||'')+'</span></span></span></td>'+
+      '<span class="uavatar" style="background:'+cc[0]+'">'+initials(u.name)+'</span>'+
+      '<span><span class="dname">'+esc(u.name)+'</span>'+
+      '<span class="uroletitle">'+esc(title)+'</span></span></span></td>'+
       '<td style="color:#64748b">'+esc(u.username)+'</td>'+
       '<td style="color:#64748b">'+esc(u.email||'-')+'</td>'+
-      '<td><span class="uchip '+esc(u.role)+'" style="background:'+cc[0]+';color:'+cc[1]+'">'+esc(ROLE_DISPLAY[u.role]||u.role)+'</span></td>'+
+      '<td><span class="uchip '+esc(u.role)+'" style="background:'+cc[0]+';color:'+cc[1]+'">'+esc(title)+'</span></td>'+
       '<td style="color:#64748b">'+esc(u.department||'-')+'</td>'+
       '<td><span class="ustat '+st+'">'+st+'</span></td>'+
       '<td style="color:#64748b;font-size:11.5px">'+ll+'</td>'+
-      '<td class="act" onclick="event.stopPropagation();selAppUser(\''+esc(u.username)+'\')">⋮</td></tr>';}).join('')
-    ||'<tr><td colspan="8" style="color:#64748b">No users match.</td></tr>';
-  const pg=$('uPager');
+      '<td class="actbtn" onclick="event.stopPropagation();selAppUser(\''+esc(u.username)+'\')">⋮</td></tr>';
+  }).join('')||'<tr><td colspan="9" style="color:#64748b">No users match.</td></tr>';
+  var pg=$('uPager');
   if(pg){
-    let pb='';
-    for(let i=0;i<pages;i++)pb+='<button class="'+(i===__uPage?'on':'')+'" onclick="__uPage='+i+';renderAppUsers()">'+(i+1)+'</button>';
-    pg.innerHTML='<span>Showing '+(total?__uPage*__uPageSize+1:0)+' – '+Math.min((__uPage+1)*__uPageSize,total)+' of '+total+' users</span>'+
-      '<span style="flex:1"></span><button '+(__uPage===0?'disabled':'')+' onclick="__uPage--;renderAppUsers()">‹</button>'+pb+
-      '<button '+(__uPage>=pages-1?'disabled':'')+' onclick="__uPage++;renderAppUsers()">›</button>';
+    var pb='';
+    for(var i=0;i<pages;i++)pb+='<button class="'+(i===__uPage?'on':'')+'" onclick="__uPage='+i+';renderAppUsers()">'+(i+1)+'</button>';
+    pg.innerHTML='<span>Showing '+(total?__uPage*10+1:0)+' - '+Math.min((__uPage+1)*10,total)+' of '+total+' users</span>'+
+      '<span style="flex:1"></span>'+
+      '<button '+(__uPage===0?'disabled':'')+' onclick="__uPage--;renderAppUsers()">\u2039</button>'+pb+
+      '<button '+(__uPage>=pages-1?'disabled':'')+' onclick="__uPage++;renderAppUsers()">\u203a</button>';
   }
 }
 function selAppUser(un){
   __uSel=un;
-  const u=__appUsers.find(x=>x.username===un);if(!u)return;
-  const cc=ROLE_CHIP[u.role]||['#e2e8f0','#334155'];
-  const b=$('udBody');
-  const st=u.active?'Active':'Inactive';
-  const since=u.createdAt?new Date(u.createdAt).toLocaleDateString([],{day:'numeric',month:'short',year:'numeric'}):'-';
-  const perms=PERMS[u.role]||[];
+  var u=null;
+  for(var i=0;i<__appUsers.length;i++){if(__appUsers[i].username===un){u=__appUsers[i];break;}}
+  if(!u)return;
+  var b=$('udBody');if(!b)return;
+  var st=u.active?'Active':'Inactive';
+  var cc=ROLE_CHIP[u.role]||['#e2e8f0','#334155'];
+  var p=persona(u);
+  var ll=u.lastLogin?new Date(u.lastLogin).toLocaleString([],{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'-';
+  var perms=PERMS[u.role]||[];
   b.innerHTML=
-    '<div style="display:flex;gap:12px;align-items:center;margin-bottom:10px">'+
-    '<div class="davatar-lg" style="background:'+cc[0]+'">'+initials(u.name)+'</div>'+
-    '<div><b style="font-size:15px">'+esc(u.name)+'</b>'+
-    '<div style="margin:3px 0"><span class="uchip '+esc(u.role)+'" style="background:'+cc[0]+';color:'+cc[1]+'">'+esc(ROLE_DISPLAY[u.role]||u.role)+'</span></div>'+
-    '<span class="ustat '+(u.active?'Active':'Inactive')+'">'+st+'</span></div></div>'+
-    '<div class="prow"><span class="k">✉ Email</span><b>'+esc(u.email||'-')+'</b></div>'+
-    '<div class="prow"><span class="k">🏢 Department</span><b>'+esc(u.department||'-')+'</b></div>'+
-    '<div class="prow"><span class="k">🕒 Last login</span><b>'+(u.lastLogin?new Date(u.lastLogin).toLocaleString([],{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'-')+'</b></div>'+
-    '<div style="border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:10px 0">'+
-    '<b class="small">Permissions</b>'+
-    (perms.length?perms.map(p=>'<div class="perm"><span class="ck">✓</span>'+esc(p)+'</div>').join('')
-      :'<div style="padding:4px 0;color:#64748b;font-size:12.5px">No API permissions for this role.</div>')+'</div>'+
-    '<div style="border:1px solid var(--line);border-radius:10px;padding:10px 12px">'+
-    '<b class="small">Role Information</b>'+
-    '<div class="prow"><span class="k">Role Name</span><b>'+esc(ROLE_DISPLAY[u.role]||u.role)+'</b></div>'+
-    '<div class="prow"><span class="k">Department</span><b>'+esc(u.department||'-')+'</b></div>'+
-    '<div class="prow"><span class="k">Assigned Since</span><b>'+since+'</b></div></div>'+
-    '<button onclick="toggleUser(\''+esc(u.username)+'\')" style="display:block;width:100%;margin-top:12px;border:1.5px solid '+(u.active?'var(--red)':'var(--green)')+';background:#fff;color:'+(u.active?'var(--red)':'var(--green)')+';border-radius:10px;padding:10px;font:inherit;font-weight:700;cursor:pointer">'+
-    (u.active?'⊘ Deactivate User':'✓ Reactivate User')+'</button>';
+    '<div style="display:flex;gap:12px;align-items:center;margin-bottom:12px">'+
+    '<div class="det-av" style="background:'+cc[0]+'">'+initials(u.name)+'</div>'+
+    '<div><b style="font-size:15px;display:block">'+esc(u.name)+'</b>'+
+    '<div style="margin:4px 0 2px"><span class="det-chip" style="background:'+cc[0]+';color:'+cc[1]+'">'+esc(ROLE_DISPLAY[u.role]||u.role)+'</span></div>'+
+    '<span class="ustat '+st+'">'+st+'</span></div></div>'+
+    '<div style="margin:10px 0">'+
+    '<div class="det-contact"><span class="ci" style="background:#d1fae5">\u2709</span>'+esc(u.email||'-')+'</div>'+
+    '<div class="det-contact"><span class="ci" style="background:#dbeafe">\u260e</span>'+esc(p.phone||'-')+'</div>'+
+    '<div class="det-contact"><span class="ci" style="background:#fef3c7">\ud83d\udccd</span>Nairobi, Kenya</div>'+
+    '<div class="det-contact"><span class="ci" style="background:#f1f5f9">\u23f1</span>Last login: '+ll+'</div>'+
+    '</div>'+
+    '<div class="det-card"><div class="t">\ud83d\udd12 Permissions</div>'+
+    (perms.length?perms.map(function(p){return '<div class="det-perm"><span class="ck">\u2713</span>'+esc(p)+'</div>';}).join(''):'<div style="color:#64748b;font-size:12px;padding:4px 0">No API permissions for this role.</div>')+
+    '</div>'+
+    '<div class="det-card"><div class="t">\ud83d\udc65 Role Information</div>'+
+    '<div class="det-info"><span class="k">Role Name</span><b>'+esc(ROLE_DISPLAY[u.role]||u.role)+'</b></div>'+
+    '<div class="det-info"><span class="k">Department</span><b>'+esc(u.department||'-')+'</b></div>'+
+    '<div class="det-info"><span class="k">Assigned Since</span><b>-</b></div>'+
+    '</div>'+
+    '<button class="det-deact" onclick="toggleUser(\''+esc(u.username)+'\')">'+
+    (u.active?'\u2298 Deactivate User':'\u2713 Reactivate User')+'</button>';
 }
 async function toggleUser(username){
   try{
