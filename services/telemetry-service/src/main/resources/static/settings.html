@@ -22,14 +22,14 @@ main{flex:1;min-width:0;display:flex;flex-direction:column}
 .pagehead .ic{font-size:26px}
 .pagehead h1{font-size:22px;font-weight:800}
 .pagehead .sub{color:var(--muted);font-size:12.5px}
+.stabs{display:flex;gap:4px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:6px;overflow-x:auto}
+.stabs button{border:0;background:transparent;padding:9px 13px;font:inherit;font-size:12.5px;font-weight:600;color:var(--muted);cursor:pointer;border-radius:9px;white-space:nowrap;display:flex;align-items:center;gap:6px}
+.stabs button.on{background:var(--blue);color:#fff}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
-.card>h3{font-size:13px;font-weight:700;padding:12px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}
-.card>h3 .ic{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;font-size:13px}
+.card>h3{font-size:13px;font-weight:700;padding:12px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .card .sub{font-weight:400;color:var(--muted);font-size:11.5px}
 .pad{padding:14px 16px}
 .frm{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.frm2{grid-template-columns:1fr 1fr}
-.frm3{grid-template-columns:1fr 1fr 1fr}
 .frm label,.fl{font-size:11.5px;color:var(--muted);display:block;margin-bottom:4px;font-weight:600}
 .frm input,.frm select{width:100%;border:1px solid var(--line);border-radius:9px;padding:8px 10px;font:inherit;background:#fff;color:var(--text)}
 .tgl{display:inline-flex;align-items:center;gap:10px;cursor:pointer;user-select:none;margin:4px 0}
@@ -58,8 +58,6 @@ main{flex:1;min-width:0;display:flex;flex-direction:column}
 .colorrow b{margin-left:8px}
 .footer-note{background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;border-radius:12px;padding:9px 14px;font-size:12px}
 .muted{color:var(--muted)}.small{font-size:12px}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;align-items:start}
 .two-col{display:grid;grid-template-columns:1fr 340px;gap:16px;align-items:start}
 .davatar{width:34px;height:34px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-size:11px;font-weight:700}
 #toast{position:fixed;bottom:20px;right:20px;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;display:none;box-shadow:0 8px 24px rgba(2,6,23,.2);background:#d1fae5;color:#065f46;z-index:3000}
@@ -92,116 +90,215 @@ main{flex:1;min-width:0;display:flex;flex-direction:column}
       <div><h1>Settings</h1><div class="sub">Configure your fleet management system, organization settings and integrations.</div></div>
     </div>
 
-    <div class="two-col">
-      <div>
-        <div class="card" style="margin-bottom:16px">
-          <h3>General Settings</h3>
-          <div class="pad">
-            <div class="frm frm3">
-              <div><label>System Name</label><input id="sName" value="FleetPulse"/></div>
-              <div><label>Timezone</label><select id="sTz"><option>Africa/Nairobi (EAT)</option><option>UTC</option></select></div>
-              <div><label>Date Format</label><select id="sDate"><option>DD/MM/YYYY</option><option>YYYY-MM-DD</option></select></div>
-              <div><label>Time Format</label><select id="sTime"><option>24 Hour</option><option>12 Hour</option></select></div>
-              <div><label>Language</label><select id="sLang"><option>English</option><option>Swahili</option></select></div>
-              <div><label>Default Map View</label><select id="sMap"><option>Roadmap</option><option>Satellite</option></select></div>
-              <div><label>Auto Refresh Interval</label><select id="sRef"><option>5 seconds</option><option selected>30 seconds</option><option>60 seconds</option></select></div>
-              <div><label>System Version</label><input value="v1.0.0" disabled style="background:#f1f5fb"/></div>
-            </div>
-            <div class="tgl on" style="margin-top:12px"><span class="sw"></span>
-              <span class="tx">Enable Real-time Tracking<span class="d">Automatically update vehicle locations in real-time.</span></span></div>
-            <div style="display:flex;justify-content:flex-end;margin-top:10px">
-              <button class="btn" id="genSave">💾 Save Changes</button>
-            </div>
-          </div>
-        </div>
+    <div class="stabs" id="stabs">
+      <button class="on" data-s="general">⚙️ General</button>
+      <button data-s="org">🏢 Organization</button>
+      <button data-s="users">👥 Users</button>
+      <button data-s="roles">🔑 Roles &amp; Permissions</button>
+      <button data-s="notif">🔔 Notifications</button>
+      <button data-s="alert">⚠️ Alert Rules</button>
+      <button data-s="geo">🎯 Geofences</button>
+      <button data-s="integr">🔌 Integrations</button>
+      <button data-s="security">🛡 Security</button>
+      <button data-s="api">🔗 API</button>
+      <button data-s="system">🖥 System</button>
+    </div>
 
-        <div class="grid3" style="margin-top:16px">
-          <div class="card">
-            <h3><span class="ic" style="background:#e8f0fe">🗺</span> Map &amp; Location Settings</h3>
+    <!-- ============ GENERAL TAB ============ -->
+    <div id="tab-general">
+      <div class="two-col">
+        <div>
+          <div class="card" style="margin-bottom:16px">
+            <h3>General Settings</h3>
             <div class="pad">
-              <div class="muted small" style="margin-bottom:8px">Configure map providers and location services.</div>
-              <label class="fl">Map Provider</label>
-              <select style="width:100%;border:1px solid var(--line);border-radius:9px;padding:8px 10px;font:inherit;margin-bottom:10px"><option>OpenStreetMap</option><option disabled>Google Maps (key required)</option></select>
-              <label class="fl">API Key</label>
-              <input type="password" value="••••••••••••" disabled style="width:100%;border:1px solid var(--line);border-radius:9px;padding:8px 10px;font:inherit;margin-bottom:10px;background:#f1f5fb"/>
-              <label class="fl">Default Zoom Level</label>
-              <select style="width:100%;border:1px solid var(--line);border-radius:9px;padding:8px 10px;font:inherit;margin-bottom:10px"><option>7</option><option selected>10</option><option>13</option></select>
-              <div class="tgl on"><span class="sw"></span><span class="tx">Show Geofences<span class="d">Display geofence zones on the map.</span></span></div>
-              <div class="tgl dis"><span class="sw"></span><span class="tx">Show Traffic Layer<span class="d">Enable traffic information on the map.</span></span></div>
+              <div class="frm">
+                <div><label>System Name</label><input id="sName" value="FleetPulse"/></div>
+                <div><label>Timezone</label><select id="sTz"><option>Africa/Nairobi (EAT)</option><option>UTC</option></select></div>
+                <div><label>Date Format</label><select id="sDate"><option>DD/MM/YYYY</option><option>YYYY-MM-DD</option></select></div>
+                <div><label>Time Format</label><select id="sTime"><option>24 Hour</option><option>12 Hour</option></select></div>
+                <div><label>Language</label><select id="sLang"><option>English</option><option>Swahili</option></select></div>
+                <div><label>Default Map View</label><select id="sMap"><option>Roadmap</option><option>Satellite</option></select></div>
+                <div><label>Auto Refresh Interval</label><select id="sRef"><option>5 seconds</option><option selected>30 seconds</option><option>60 seconds</option></select></div>
+                <div><label>System Version</label><input value="v1.0.0" disabled style="background:#f1f5fb"/></div>
+              </div>
+              <div class="tgl on" style="margin-top:12px"><span class="sw"></span>
+                <span class="tx">Enable Real-time Tracking<span class="d">Automatically update vehicle locations in real-time.</span></span></div>
+              <div style="display:flex;justify-content:flex-end;margin-top:10px">
+                <button class="btn" id="genSave">💾 Save Changes</button>
+              </div>
             </div>
           </div>
-          <div class="card">
-            <h3><span class="ic" style="background:#dbeafe">🔔</span> Alert &amp; Notification Settings</h3>
-            <div class="pad">
-              <div class="muted small" style="margin-bottom:8px">Manage how you receive alerts and notifications.</div>
-              <div class="tgl on"><span class="sw"></span><span class="tx">Email Notifications<span class="d">Receive alerts via email.</span></span></div>
-              <div class="tgl on"><span class="sw"></span><span class="tx">SMS Notifications<span class="d">Receive alerts via SMS.</span></span></div>
-              <div class="tgl on"><span class="sw"></span><span class="tx">In-app Notifications<span class="d">Show in-app notifications.</span></span></div>
-              <div style="margin-top:10px"><label class="fl">Notification Frequency</label>
-                <select style="width:100%;border:1px solid var(--line);border-radius:9px;padding:8px 10px;font:inherit"><option>Instant</option><option>Hourly digest</option></select></div>
-              <div style="margin-top:10px"><label class="fl">Alert Sound</label>
-                <select style="width:100%;border:1px solid var(--line);border-radius:9px;padding:8px 10px;font:inherit"><option>Default</option><option>None</option></select></div>
+          <div class="grid3">
+            <div class="card">
+              <h3>🗺 Map &amp; Location</h3>
+              <div class="pad">
+                <div class="muted small" style="margin-bottom:8px">Configure map providers and location services.</div>
+                <label class="fl">Map Provider</label>
+                <select style="width:100%;border:1px solid var(--line);border-radius:9px;padding:8px 10px;font:inherit;margin-bottom:10px"><option>OpenStreetMap</option><option disabled>Google Maps (key required)</option></select>
+                <label class="fl">API Key</label>
+                <input type="password" value="••••••••••••" disabled style="width:100%;border:1px solid var(--line);border-radius:9px;padding:8px 10px;font:inherit;margin-bottom:10px;background:#f1f5fb"/>
+                <label class="fl">Default Zoom Level</label>
+                <select style="width:100%;border:1px solid var(--line);border-radius:9px;padding:8px 10px;font:inherit;margin-bottom:10px"><option>7</option><option selected>10</option><option>13</option></select>
+                <div class="tgl on"><span class="sw"></span><span class="tx">Show Geofences<span class="d">Display geofence zones on the map.</span></span></div>
+                <div class="tgl dis"><span class="sw"></span><span class="tx">Show Traffic Layer<span class="d">Enable traffic information on the map.</span></span></div>
+              </div>
+            </div>
+            <div class="card">
+              <h3>🔔 Alert &amp; Notification</h3>
+              <div class="pad">
+                <div class="muted small" style="margin-bottom:8px">Manage how you receive alerts and notifications.</div>
+                <div class="tgl on"><span class="sw"></span><span class="tx">Email Notifications<span class="d">Receive alerts via email.</span></span></div>
+                <div class="tgl on"><span class="sw"></span><span class="tx">SMS Notifications<span class="d">Receive alerts via SMS.</span></span></div>
+                <div class="tgl on"><span class="sw"></span><span class="tx">In-app Notifications<span class="d">Show in-app notifications.</span></span></div>
+                <div style="margin-top:10px"><label class="fl">Notification Frequency</label>
+                  <select style="width:100%;border:1px solid var(--line);border-radius:9px;padding:8px 10px;font:inherit"><option>Instant</option><option>Hourly digest</option></select></div>
+                <div style="margin-top:10px"><label class="fl">Alert Sound</label>
+                  <select style="width:100%;border:1px solid var(--line);border-radius:9px;padding:8px 10px;font:inherit"><option>Default</option><option>None</option></select></div>
+              </div>
+            </div>
+            <div class="card">
+              <h3>🔌 Integration Settings</h3>
+              <div class="pad">
+                <div class="muted small" style="margin-bottom:8px">Configure external integrations and services.</div>
+                <div class="irow"><span class="k">⚡ Kafka<span class="sub2">kafka:9092</span></span><span class="conn up">Connected</span></div>
+                <div class="irow"><span class="k">🗄 PostgreSQL<span class="sub2">timescaledb:5432</span></span><span class="conn up">Connected</span></div>
+                <div class="irow"><span class="k">🧠 Redis<span class="sub2">redis:6379</span></span><span class="conn up">Connected</span></div>
+                <div class="irow"><span class="k">☁ External API<span class="sub2">API key not set</span></span><span class="conn warn">Not Configured</span></div>
+              </div>
             </div>
           </div>
-          <div class="card">
-            <h3><span class="ic" style="background:#d1fae5">🔌</span> Integration Settings</h3>
-            <div class="pad">
-              <div class="muted small" style="margin-bottom:8px">Configure external integrations and services.</div>
-              <div class="irow"><span class="k">⚡ Kafka<span class="sub2">kafka:9092</span></span><span class="conn up">Connected</span></div>
-              <div class="irow"><span class="k">🗄 PostgreSQL<span class="sub2">timescaledb:5432</span></span><span class="conn up">Connected</span></div>
-              <div class="irow"><span class="k">🧠 Redis<span class="sub2">redis:6379</span></span><span class="conn up">Connected</span></div>
-              <div class="irow"><span class="k">☁ External API<span class="sub2">API key not set</span></span><span class="conn warn">Not Configured</span></div>
-            </div>
-          </div>
+          <div class="footer-note" style="margin-top:2px">ℹ Changes made in settings may require a system restart or service reload to take effect.</div>
         </div>
-
-        <div class="footer-note" style="margin-top:2px">ℹ Changes made in settings may require a system restart or service reload to take effect.</div>
-      </div>
-
-      <div>
-        <div class="card" style="margin-bottom:16px">
-          <h3>Organization Details <span class="muted small" style="margin-left:auto;font-weight:400">Manage your company information and branding.</span></h3>
-          <div class="orgcard">
-            <div class="orglogo"><div class="bub">🚛</div>
-              <div><div class="nm">FleetPulse</div><div class="tg">Smarter Fleets. Safer Roads.</div></div></div>
-            <div class="irow"><span class="k">Company Name</span><b>FleetPulse Logistics Ltd</b></div>
-            <div class="irow"><span class="k">Registration No.</span><b>CPI23456789</b></div>
-            <div class="irow"><span class="k">Email</span><b>info@fleetpulse.co.ke</b></div>
-            <div class="irow"><span class="k">Phone</span><b>+254 700 123 456</b></div>
-            <div class="irow"><span class="k">Address</span><b>Nairobi, Kenya</b></div>
-            <b class="small" style="display:block;margin:12px 0 6px">Branding</b>
-            <div class="colorrow"><span class="muted" style="width:110px">Logo</span><span class="bub" style="width:28px;height:28px;border-radius:8px;background:var(--blue2);display:grid;place-items:center">🚛</span><span class="small muted" style="margin-left:8px">fleetpulse-logo.png (128×128)</span></div>
-            <div class="colorrow"><span class="muted" style="width:110px">Primary Color</span><span class="sw2" style="width:22px;height:22px;border-radius:8px;background:#2563EB;display:inline-block"></span><b style="margin-left:8px">#2563EB</b></div>
-            <div class="colorrow"><span class="muted" style="width:110px">Secondary Color</span><span class="sw2" style="width:22px;height:22px;border-radius:8px;background:#0D2B57;display:inline-block"></span><b style="margin-left:8px">#0D2B57</b></div>
+        <div>
+          <div class="card" style="margin-bottom:16px">
+            <h3>Organization Details</h3>
+            <div class="orgcard">
+              <div class="orglogo"><div class="bub">🚛</div>
+                <div><div class="nm">FleetPulse</div><div class="tg">Smarter Fleets. Safer Roads.</div></div></div>
+              <div class="irow"><span class="k">Company Name</span><b>FleetPulse Logistics Ltd</b></div>
+              <div class="irow"><span class="k">Registration No.</span><b>CPI23456789</b></div>
+              <div class="irow"><span class="k">Email</span><b>info@fleetpulse.co.ke</b></div>
+              <div class="irow"><span class="k">Phone</span><b>+254 700 123 456</b></div>
+              <div class="irow"><span class="k">Address</span><b>Nairobi, Kenya</b></div>
+              <b class="small" style="display:block;margin:12px 0 6px">Branding</b>
+              <div class="colorrow"><span class="muted" style="width:110px">Logo</span><span class="bub" style="width:28px;height:28px;border-radius:8px;background:var(--blue2);display:grid;place-items:center">🚛</span><span class="small muted" style="margin-left:8px">fleetpulse-logo.png (128 × 128)</span></div>
+              <div class="colorrow"><span class="muted" style="width:110px">Primary Color</span><span class="sw2" style="width:22px;height:22px;border-radius:8px;background:#2563EB;display:inline-block"></span><b style="margin-left:8px">#2563EB</b></div>
+              <div class="colorrow"><span class="muted" style="width:110px">Secondary Color</span><span class="sw2" style="width:22px;height:22px;border-radius:8px;background:#0D2B57;display:inline-block"></span><b style="margin-left:8px">#0D2B57</b></div>
+            </div>
           </div>
-        </div>
-        <div class="card">
-          <h3><span class="ic" style="background:#dbeafe">🛡</span> Security Settings</h3>
-          <div class="pad">
-            <div class="irow"><span class="k">Password Policy</span><span class="conn up">Strong</span></div>
-            <div class="irow"><span class="k">Session Timeout</span><b>8 hours</b></div>
-            <div class="irow"><span class="k">Two-Factor Authentication</span><span class="tgl on" style="margin:0"><span class="sw"></span></span></div>
-            <div class="irow"><span class="k">IP Whitelist</span><span class="tgl" style="margin:0"><span class="sw"></span></span></div>
-            <div class="irow"><span class="k">Login Attempts Limit</span><b>5</b></div>
+          <div class="card">
+            <h3>🛡 Security Settings</h3>
+            <div class="pad">
+              <div class="irow"><span class="k">Password Policy</span><span class="conn up">Strong</span></div>
+              <div class="irow"><span class="k">Session Timeout</span><b>8 hours</b></div>
+              <div class="irow"><span class="k">Two-Factor Authentication</span><span class="tgl on" style="margin:0"><span class="sw"></span></span></div>
+              <div class="irow"><span class="k">IP Whitelist</span><span class="tgl" style="margin:0"><span class="sw"></span></span></div>
+              <div class="irow"><span class="k">Login Attempts Limit</span><b>5</b></div>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="footer-note" style="margin-top:2px">ℹ Changes made in settings may require a system restart or service reload to take effect.</div>
+    <!-- ============ ORGANIZATION TAB ============ -->
+    <div id="tab-org" style="display:none">
+      <div class="card">
+        <h3>🏢 Branches &amp; Depots</h3>
+        <div style="overflow:auto;max-height:300px"><table>
+          <thead><tr><th>Name</th><th>Type</th><th>Status</th></tr></thead>
+          <tbody id="branchRows"><tr><td colspan="3" style="color:#64748b">Loading…</td></tr></tbody></table></div>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <h3>👥 Fleet Groups <span class="muted small" style="font-weight:400;margin-left:8px">live vehicle counts</span></h3>
+        <div style="overflow:auto;max-height:300px"><table>
+          <thead><tr><th>Group</th><th>Vehicles</th></tr></thead>
+          <tbody id="groupRows"><tr><td colspan="2" style="color:#64748b">Loading…</td></tr></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- ============ USERS TAB ============ -->
+    <div id="tab-users" style="display:none">
+      <div class="card">
+        <h3>👥 Manage Users</h3>
+        <div style="overflow:auto;max-height:480px"><table>
+          <thead><tr><th>Name</th><th>Username</th><th>Email</th><th>Role</th><th>Department</th><th>Status</th><th>Last Login</th></tr></thead>
+          <tbody id="uRows"><tr><td colspan="7" style="color:#64748b">Loading…</td></tr></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- ============ FALLBACK ============ -->
+    <div class="card" id="tabFallback" style="display:none">
+      <h3 id="fbTitle">—</h3>
+      <div class="pad" style="color:#64748b;font-size:12.5px" id="fbBody"></div>
+    </div>
   </div>
 </main>
 </div>
 <div id="toast"></div>
 <script>
 const $=id=>document.getElementById(id);
+const esc=s=>(s??'').replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
 const toast=(m,ok)=>{const t=$('toast');t.textContent=m;t.style.background=ok===false?'#fee2e2':'#d1fae5';t.style.color=ok===false?'#991b1b':'#065f46';t.style.display='block';setTimeout(()=>t.style.display='none',2600);};
 const initials=n=>(n||'?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
 (async()=>{try{const r=await fetch('/api/v1/me',{headers:{'Accept':'application/json'}});const ct=r.headers.get('content-type')||'';if(!r.ok||!ct.includes('application/json'))throw 0;const me=await r.json();console.log('session:',me.username);}catch(e){}})();
-document.querySelectorAll('.tgl:not(.dis)').forEach(t=>t.addEventListener('click',()=>t.classList.toggle('on')));
-document.querySelectorAll('.tgl.dis').forEach(t=>t.addEventListener('click',()=>toast('Requires a roadmap module',false)));
+document.querySelectorAll('#stabs button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#stabs button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');
+  const key=b.dataset.s;
+  ['tab-general','tab-org','tab-users'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)el.style.display=(id==='tab-'+key)?'':'none';
+  });
+  const fb=$('tabFallback');
+  if(key==='general'||key==='org'||key==='users'){fb.style.display='none';}
+  else{
+    fb.style.display='';
+    $('fbTitle').textContent=key.charAt(0).toUpperCase()+key.slice(1);
+    $('fbBody').textContent='This section arrives with its roadmap module.';
+  }
+  if(key==='org')loadOrgData();
+  if(key==='users')loadAppUsers();
+});
+document.querySelectorAll('#stabs button').forEach(b=>{if(b.dataset.s!=='general')return;});
+// wire general/org/users on load
  $('genSave').onclick=()=>{const prefs={name:$('sName').value,tz:$('sTz').value,df:$('sDate').value,tf:$('sTime').value,lang:$('sLang').value,map:$('sMap').value,ref:$('sRef').value};localStorage.setItem('fleetpulse-prefs',JSON.stringify(prefs));toast('✅ General settings saved (client preferences)',true);};
 try{const p=JSON.parse(localStorage.getItem('fleetpulse-prefs')||'null');if(p){$('sName').value=p.name;$('sTz').value=p.tz;$('sDate').value=p.df;$('sTime').value=p.tf;$('sLang').value=p.lang;$('sMap').value=p.map;$('sRef').value=p.ref;}}catch(e){}
+async function loadOrgData(){
+  try{
+    const zones=await fetch('/api/v1/geofences').then(r=>r.ok?r.json():[]).catch(()=>[]);
+    const active=zones.filter(z=>z.active);
+    const el=$('branchRows');if(!el)return;
+    el.innerHTML=active.map(z=>{
+      const col=(z.type==='RESTRICTED'||z.type==='DANGER')?'var(--red)':z.type==='DEPOT'?'var(--blue2)':'var(--green)';
+      const t=z.type==='DEPOT'?'Depot':z.type==='RESTRICTED'?'Restricted':'Customer Site';
+      return '<tr><td><b>'+esc(z.name)+'</b></td><td>'+esc(t)+'</td>'+
+        '<td><span style="font-size:10px;font-weight:700;padding:2px 9px;border-radius:99px;background:#d1fae5;color:#065f46">Active</span></td></tr>';
+    }).join('')||'<tr><td colspan="3" style="color:#64748b">No zones yet.</td></tr>';
+    const cls={};
+    (await fetch('/api/v1/vehicles?size=200').then(r=>r.ok?r.json():[]).catch(()=>[])).forEach(v=>{
+      const mk=(v.make||'')+' '+(v.model||'');
+      const c=/Hiace|Coaster|Rosa|Matatu|Bus/i.test(mk)?'Buses':/Hilux|Ranger|H1/i.test(mk)?'Pickups':'Trucks';
+      cls[c]=(cls[c]||0)+1;});
+    const gEl=$('groupRows');if(gEl)gEl.innerHTML=Object.entries(cls).map(([nm,cnt])=>
+      '<tr><td><b>'+esc(nm)+'</b></td><td>'+cnt+'</td></tr>').join('')
+      ||'<tr><td colspan="2" style="color:#64748b">No vehicles.</td></tr>';
+  }catch(e){}
+}
+async function loadAppUsers(){
+  try{
+    const vp=await api('/api/v1/users');
+    const el=$('uRows');if(!el)return;
+    el.innerHTML=vp.map(u=>{
+      const st=u.active?'Active':'Inactive';
+      return '<tr><td><b>'+esc(u.name)+'</b></td><td style="color:#64748b">'+esc(u.username)+'</td>'+
+        '<td style="color:#64748b">'+esc(u.email||'-')+'</td>'+
+        '<td><span style="font-size:10px;font-weight:700;padding:2px 10px;border-radius:99px;background:#dbeafe;color:#1e40af">'+esc(u.role.replace(/_/g,' '))+'</span></td>'+
+        '<td style="color:#64748b">'+esc(u.department||'-')+'</td>'+
+        '<td><span class="ustat" style="font-size:10px;font-weight:700;padding:2px 9px;border-radius:99px;background:'+(u.active?'#d1fae5':'#fee2e2')+';color:'+(u.active?'#065f46':'#991b1b')+'">'+st+'</span></td>'+
+        '<td style="color:#64748b;font-size:11.5px">'+(u.lastLogin?new Date(u.lastLogin).toLocaleString([],{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'-')+'</td></tr>';
+    }).join('')||'<tr><td colspan="7" style="color:#64748b">No users.</td></tr>';
+  }catch(e){}
+}
 </script>
 </body>
 </html>
