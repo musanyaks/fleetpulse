@@ -17,28 +17,19 @@ nav a .ic{width:18px;text-align:center}
 nav a:hover{background:rgba(255,255,255,.06);color:#fff}
 nav a.active{background:var(--blue2);color:#fff;font-weight:600}
 main{flex:1;min-width:0;display:flex;flex-direction:column}
-.topbar{display:flex;align-items:center;gap:12px;padding:12px 24px;background:var(--panel);border-bottom:1px solid var(--line)}
-.gsearch{flex:1;max-width:300px;display:flex;align-items:center;gap:8px;background:#f1f5fb;border:1px solid var(--line);border-radius:10px;padding:8px 14px}
-.gsearch input{border:0;background:transparent;outline:none;font:inherit;width:100%}
-.spacer{flex:1}
-.tbell{position:relative;font-size:18px;background:#f1f5fb;border-radius:10px;padding:8px 12px;text-decoration:none}
-.tbadge{position:absolute;top:-6px;right:-6px;background:var(--red);color:#fff;font-size:10px;font-weight:700;border-radius:99px;padding:2px 6px}
-.fbtn{border:1px solid var(--line);background:#fff;border-radius:9px;padding:7px 11px;cursor:pointer;font-size:15px}
-.tchipuser{display:flex;align-items:center;gap:9px}
-.upic{width:34px;height:34px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-size:11px;font-weight:700}
-.uname{font-weight:700;font-size:13px}.urole{font-size:11px;color:var(--muted)}
 .content{padding:18px 24px;display:flex;flex-direction:column;gap:16px}
 .pagehead{display:flex;align-items:center;gap:14px}
 .pagehead .ic{font-size:26px}
 .pagehead h1{font-size:22px;font-weight:800}
 .pagehead .sub{color:var(--muted);font-size:12.5px}
-.stabs{display:flex;gap:4px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:6px;overflow-x:auto}
-.stabs button{border:0;background:transparent;padding:9px 13px;font:inherit;font-size:12.5px;font-weight:600;color:var(--muted);cursor:pointer;border-radius:9px;white-space:nowrap}
-.stabs button.on{background:var(--blue);color:#fff}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
-.card>h3{font-size:13px;font-weight:700;padding:12px 16px;border-bottom:1px solid var(--line)}
+.card>h3{font-size:13px;font-weight:700;padding:12px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}
+.card>h3 .ic{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;font-size:13px}
+.card .sub{font-weight:400;color:var(--muted);font-size:11.5px}
 .pad{padding:14px 16px}
-.frm{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.frm{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.frm2{grid-template-columns:1fr 1fr}
+.frm3{grid-template-columns:1fr 1fr 1fr}
 .frm label,.fl{font-size:11.5px;color:var(--muted);display:block;margin-bottom:4px;font-weight:600}
 .frm input,.frm select{width:100%;border:1px solid var(--line);border-radius:9px;padding:8px 10px;font:inherit;background:#fff;color:var(--text)}
 .tgl{display:inline-flex;align-items:center;gap:10px;cursor:pointer;user-select:none;margin:4px 0}
@@ -65,10 +56,13 @@ main{flex:1;min-width:0;display:flex;flex-direction:column}
 .colorrow{display:flex;align-items:center;gap:10px;padding:5px 0;font-size:12.5px}
 .colorrow .sw2{width:22px;height:22px;border-radius:8px;border:1px solid var(--line)}
 .colorrow b{margin-left:8px}
-.note{background:#fffbeb;border:1px solid #fde68a;color:#92400e;border-radius:10px;padding:7px 10px;font-size:10.5px;margin:8px 0}
+.footer-note{background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;border-radius:12px;padding:9px 14px;font-size:12px}
 .muted{color:var(--muted)}.small{font-size:12px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;align-items:start}
+.two-col{display:grid;grid-template-columns:1fr 340px;gap:16px;align-items:start}
+.davatar{width:34px;height:34px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-size:11px;font-weight:700}
 #toast{position:fixed;bottom:20px;right:20px;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;display:none;box-shadow:0 8px 24px rgba(2,6,23,.2);background:#d1fae5;color:#065f46;z-index:3000}
-@media (max-width:1200px){.frm{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
@@ -93,95 +87,119 @@ main{flex:1;min-width:0;display:flex;flex-direction:column}
   </nav>
 </aside>
 <main>
-  <div class="topbar">
-    <div class="gsearch">🔍<input id="gq" placeholder="Search vehicles, trips, drivers, locations..."/></div>
-    <span class="spacer"></span>
-    <a href="alerts.html" class="tbell" id="bell" title="Notifications">🔔<span class="tbadge" id="topBell" style="display:none">0</span></a>
-    <button class="fbtn" id="fsBtn">⛶</button>
-    <div class="tchipuser" id="userChip"><div class="upic" id="uInit">?</div>
-      <div><div class="uname" id="uName">Sign in</div><div class="urole" id="uRole">-</div></div></div>
-  </div>
   <div class="content">
     <div class="pagehead"><span class="ic">⚙️</span>
       <div><h1>Settings</h1><div class="sub">Configure your fleet management system, organization settings and integrations.</div></div>
     </div>
-    <div class="card">
-      <h3>General Settings</h3>
-      <div class="pad">
-        <div class="frm">
-          <div><label>System Name</label><input id="sName" value="FleetPulse"/></div>
-          <div><label>Timezone</label><select id="sTz"><option>Africa/Nairobi (EAT)</option><option>UTC</option></select></div>
-          <div><label>Date Format</label><select id="sDate"><option>DD/MM/YYYY</option><option>YYYY-MM-DD</option></select></div>
-          <div><label>Time Format</label><select id="sTime"><option>24 Hour</option><option>12 Hour</option></select></div>
-          <div><label>Language</label><select id="sLang"><option>English</option><option>Swahili</option></select></div>
-          <div><label>Default Map View</label><select id="sMap"><option>Roadmap</option><option>Satellite</option></select></div>
-          <div><label>Auto Refresh Interval</label><select id="sRef"><option>5 seconds</option><option selected>30 seconds</option></select></div>
-          <div><label>System Version</label><input value="v1.0.0" disabled style="background:#f1f5fb"/></div>
+
+    <div class="two-col">
+      <div>
+        <div class="card" style="margin-bottom:16px">
+          <h3>General Settings</h3>
+          <div class="pad">
+            <div class="frm frm3">
+              <div><label>System Name</label><input id="sName" value="FleetPulse"/></div>
+              <div><label>Timezone</label><select id="sTz"><option>Africa/Nairobi (EAT)</option><option>UTC</option></select></div>
+              <div><label>Date Format</label><select id="sDate"><option>DD/MM/YYYY</option><option>YYYY-MM-DD</option></select></div>
+              <div><label>Time Format</label><select id="sTime"><option>24 Hour</option><option>12 Hour</option></select></div>
+              <div><label>Language</label><select id="sLang"><option>English</option><option>Swahili</option></select></div>
+              <div><label>Default Map View</label><select id="sMap"><option>Roadmap</option><option>Satellite</option></select></div>
+              <div><label>Auto Refresh Interval</label><select id="sRef"><option>5 seconds</option><option selected>30 seconds</option><option>60 seconds</option></select></div>
+              <div><label>System Version</label><input value="v1.0.0" disabled style="background:#f1f5fb"/></div>
+            </div>
+            <div class="tgl on" style="margin-top:12px"><span class="sw"></span>
+              <span class="tx">Enable Real-time Tracking<span class="d">Automatically update vehicle locations in real-time.</span></span></div>
+            <div style="display:flex;justify-content:flex-end;margin-top:10px">
+              <button class="btn" id="genSave">💾 Save Changes</button>
+            </div>
+          </div>
         </div>
-        <div class="tgl on" style="margin-top:12px"><span class="sw"></span>
-          <span class="tx">Enable Real-time Tracking<span class="d">Automatically update vehicle locations in real-time.</span></span></div>
-        <div style="display:flex;justify-content:flex-end;margin-top:10px">
-          <button class="btn" id="genSave">💾 Save Changes</button>
+
+        <div class="grid3" style="margin-top:16px">
+          <div class="card">
+            <h3><span class="ic" style="background:#e8f0fe">🗺</span> Map &amp; Location Settings</h3>
+            <div class="pad">
+              <div class="muted small" style="margin-bottom:8px">Configure map providers and location services.</div>
+              <label class="fl">Map Provider</label>
+              <select style="width:100%;border:1px solid var(--line);border-radius:9px;padding:8px 10px;font:inherit;margin-bottom:10px"><option>OpenStreetMap</option><option disabled>Google Maps (key required)</option></select>
+              <label class="fl">API Key</label>
+              <input type="password" value="••••••••••••" disabled style="width:100%;border:1px solid var(--line);border-radius:9px;padding:8px 10px;font:inherit;margin-bottom:10px;background:#f1f5fb"/>
+              <label class="fl">Default Zoom Level</label>
+              <select style="width:100%;border:1px solid var(--line);border-radius:9px;padding:8px 10px;font:inherit;margin-bottom:10px"><option>7</option><option selected>10</option><option>13</option></select>
+              <div class="tgl on"><span class="sw"></span><span class="tx">Show Geofences<span class="d">Display geofence zones on the map.</span></span></div>
+              <div class="tgl dis"><span class="sw"></span><span class="tx">Show Traffic Layer<span class="d">Enable traffic information on the map.</span></span></div>
+            </div>
+          </div>
+          <div class="card">
+            <h3><span class="ic" style="background:#dbeafe">🔔</span> Alert &amp; Notification Settings</h3>
+            <div class="pad">
+              <div class="muted small" style="margin-bottom:8px">Manage how you receive alerts and notifications.</div>
+              <div class="tgl on"><span class="sw"></span><span class="tx">Email Notifications<span class="d">Receive alerts via email.</span></span></div>
+              <div class="tgl on"><span class="sw"></span><span class="tx">SMS Notifications<span class="d">Receive alerts via SMS.</span></span></div>
+              <div class="tgl on"><span class="sw"></span><span class="tx">In-app Notifications<span class="d">Show in-app notifications.</span></span></div>
+              <div style="margin-top:10px"><label class="fl">Notification Frequency</label>
+                <select style="width:100%;border:1px solid var(--line);border-radius:9px;padding:8px 10px;font:inherit"><option>Instant</option><option>Hourly digest</option></select></div>
+              <div style="margin-top:10px"><label class="fl">Alert Sound</label>
+                <select style="width:100%;border:1px solid var(--line);border-radius:9px;padding:8px 10px;font:inherit"><option>Default</option><option>None</option></select></div>
+            </div>
+          </div>
+          <div class="card">
+            <h3><span class="ic" style="background:#d1fae5">🔌</span> Integration Settings</h3>
+            <div class="pad">
+              <div class="muted small" style="margin-bottom:8px">Configure external integrations and services.</div>
+              <div class="irow"><span class="k">⚡ Kafka<span class="sub2">kafka:9092</span></span><span class="conn up">Connected</span></div>
+              <div class="irow"><span class="k">🗄 PostgreSQL<span class="sub2">timescaledb:5432</span></span><span class="conn up">Connected</span></div>
+              <div class="irow"><span class="k">🧠 Redis<span class="sub2">redis:6379</span></span><span class="conn up">Connected</span></div>
+              <div class="irow"><span class="k">☁ External API<span class="sub2">API key not set</span></span><span class="conn warn">Not Configured</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="footer-note" style="margin-top:2px">ℹ Changes made in settings may require a system restart or service reload to take effect.</div>
+      </div>
+
+      <div>
+        <div class="card" style="margin-bottom:16px">
+          <h3>Organization Details <span class="muted small" style="margin-left:auto;font-weight:400">Manage your company information and branding.</span></h3>
+          <div class="orgcard">
+            <div class="orglogo"><div class="bub">🚛</div>
+              <div><div class="nm">FleetPulse</div><div class="tg">Smarter Fleets. Safer Roads.</div></div></div>
+            <div class="irow"><span class="k">Company Name</span><b>FleetPulse Logistics Ltd</b></div>
+            <div class="irow"><span class="k">Registration No.</span><b>CPI23456789</b></div>
+            <div class="irow"><span class="k">Email</span><b>info@fleetpulse.co.ke</b></div>
+            <div class="irow"><span class="k">Phone</span><b>+254 700 123 456</b></div>
+            <div class="irow"><span class="k">Address</span><b>Nairobi, Kenya</b></div>
+            <b class="small" style="display:block;margin:12px 0 6px">Branding</b>
+            <div class="colorrow"><span class="muted" style="width:110px">Logo</span><span class="bub" style="width:28px;height:28px;border-radius:8px;background:var(--blue2);display:grid;place-items:center">🚛</span><span class="small muted" style="margin-left:8px">fleetpulse-logo.png (128×128)</span></div>
+            <div class="colorrow"><span class="muted" style="width:110px">Primary Color</span><span class="sw2" style="width:22px;height:22px;border-radius:8px;background:#2563EB;display:inline-block"></span><b style="margin-left:8px">#2563EB</b></div>
+            <div class="colorrow"><span class="muted" style="width:110px">Secondary Color</span><span class="sw2" style="width:22px;height:22px;border-radius:8px;background:#0D2B57;display:inline-block"></span><b style="margin-left:8px">#0D2B57</b></div>
+          </div>
+        </div>
+        <div class="card">
+          <h3><span class="ic" style="background:#dbeafe">🛡</span> Security Settings</h3>
+          <div class="pad">
+            <div class="irow"><span class="k">Password Policy</span><span class="conn up">Strong</span></div>
+            <div class="irow"><span class="k">Session Timeout</span><b>8 hours</b></div>
+            <div class="irow"><span class="k">Two-Factor Authentication</span><span class="tgl on" style="margin:0"><span class="sw"></span></span></div>
+            <div class="irow"><span class="k">IP Whitelist</span><span class="tgl" style="margin:0"><span class="sw"></span></span></div>
+            <div class="irow"><span class="k">Login Attempts Limit</span><b>5</b></div>
+          </div>
         </div>
       </div>
     </div>
-    <div class="grid" style="grid-template-columns:1fr 1fr 1fr;gap:16px">
-      <div class="card"><h3>🗺 Map &amp; Location</h3><div class="pad">
-        <label class="fl">Map Provider</label>
-        <select style="width:100%;border:1px solid var(--line);border-radius:9px;padding:8px 10px;font:inherit;margin-bottom:10px"><option>OpenStreetMap</option></select>
-        <div class="tgl on"><span class="sw"></span><span class="tx">Show Geofences</span></div>
-        <div class="tgl dis"><span class="sw"></span><span class="tx">Show Traffic Layer<span class="d">Requires provider — roadmap.</span></span></div>
-      </div></div>
-      <div class="card"><h3>🔔 Alerts</h3><div class="pad">
-        <div class="tgl on"><span class="sw"></span><span class="tx">In-app Notifications</span></div>
-        <div class="tgl dis"><span class="sw"></span><span class="tx">Email<span class="d">Roadmap.</span></span></div>
-        <div class="tgl dis"><span class="sw"></span><span class="tx">SMS<span class="d">Roadmap.</span></span></div>
-      </div></div>
-      <div class="card"><h3>🔌 Integrations</h3><div class="pad">
-        <div class="irow"><span class="k">⚡ Kafka</span><span class="conn up">Connected</span></div>
-        <div class="irow"><span class="k">🗄 PostgreSQL</span><span class="conn up">Connected</span></div>
-        <div class="irow"><span class="k">🧠 Redis</span><span class="conn up">Connected</span></div>
-        <div class="irow"><span class="k">☁ External API</span><span class="conn warn">Not Configured</span></div>
-      </div></div>
-    </div>
-    <div class="card" style="margin-top:16px">
-      <h3>🏢 Organization Details</h3>
-      <div class="pad">
-        <div class="orglogo"><div class="bub">🚛</div>
-          <div><div class="nm">FleetPulse</div><div class="tg">Smarter Fleets. Safer Roads.</div></div></div>
-        <div class="irow"><span class="k">Company Name</span><b>FleetPulse Logistics Ltd</b></div>
-        <div class="irow"><span class="k">Registration No.</span><b>CPI23456789</b></div>
-        <div class="irow"><span class="k">Email</span><b>info@fleetpulse.co.ke</b></div>
-        <div class="irow"><span class="k">Phone</span><b>+254 700 123 456</b></div>
-        <div class="irow"><span class="k">Address</span><b>Nairobi, Kenya</b></div>
-        <div class="colorrow" style="margin-top:8px"><span class="k" style="width:110px">Primary Color</span><span class="sw2" style="width:22px;height:22px;border-radius:8px;background:#2563EB;display:inline-block"></span><b style="margin-left:8px">#2563EB</b></div>
-        <div class="colorrow"><span class="k" style="width:110px">Secondary Color</span><span class="sw2" style="width:22px;height:22px;border-radius:8px;background:#0D2B57;display:inline-block"></span><b style="margin-left:8px">#0D2B57</b></div>
-      </div>
-    </div>
-    <div class="card" style="margin-top:16px">
-      <h3>🛡 Security Settings</h3>
-      <div class="pad">
-        <div class="irow"><span class="k">Password Policy</span><span class="conn up">Strong</span></div>
-        <div class="irow"><span class="k">Session Timeout</span><b>8 hours</b></div>
-        <div class="irow"><span class="k">Two-Factor Auth</span><span class="conn warn">Roadmap</span></div>
-        <div class="irow"><span class="k">Login Attempts Limit</span><b>5</b></div>
-      </div>
-    </div>
-    <div class="footer-note" style="margin-top:2px">ℹ Changes made in settings may require a system restart to take effect.</div>
+
+    <div class="footer-note" style="margin-top:2px">ℹ Changes made in settings may require a system restart or service reload to take effect.</div>
   </div>
 </main>
 </div>
 <div id="toast"></div>
 <script>
 const $=id=>document.getElementById(id);
-const esc=s=>(s??'').replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
 const toast=(m,ok)=>{const t=$('toast');t.textContent=m;t.style.background=ok===false?'#fee2e2':'#d1fae5';t.style.color=ok===false?'#991b1b':'#065f46';t.style.display='block';setTimeout(()=>t.style.display='none',2600);};
 const initials=n=>(n||'?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
-const api=async p=>{const r=await fetch(p);if(!r.ok)throw new Error('HTTP '+r.status);return r.json();};
-(async()=>{try{const r=await fetch('/api/v1/me',{headers:{'Accept':'application/json'}});const ct=r.headers.get('content-type')||'';if(!r.ok||!ct.includes('application/json'))throw 0;const me=await r.json();$('uInit').textContent=initials(me.username);$('uName').textContent=me.username;$('uRole').textContent=me.roles.join(', ');}catch(e){$('uName').textContent='Sign in';$('uRole').textContent='session expired';$('userChip').onclick=()=>location.href='/login.html';}})();
- $('fsBtn').onclick=()=>document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();
-function refreshBell(){fetch('/api/v1/alerts/recent?limit=100').then(r=>r.ok?r.json():[]).then(al=>{const n=al.filter(a=>new Date(a.ts).getTime()>Date.now()-36e5).length;const b=$('topBell');b.textContent=n;b.style.display=n?'block':'none';}).catch(()=>{});}
-refreshBell();setInterval(refreshBell,5000);
+(async()=>{try{const r=await fetch('/api/v1/me',{headers:{'Accept':'application/json'}});const ct=r.headers.get('content-type')||'';if(!r.ok||!ct.includes('application/json'))throw 0;const me=await r.json();console.log('session:',me.username);}catch(e){}})();
+document.querySelectorAll('.tgl:not(.dis)').forEach(t=>t.addEventListener('click',()=>t.classList.toggle('on')));
+document.querySelectorAll('.tgl.dis').forEach(t=>t.addEventListener('click',()=>toast('Requires a roadmap module',false)));
  $('genSave').onclick=()=>{const prefs={name:$('sName').value,tz:$('sTz').value,df:$('sDate').value,tf:$('sTime').value,lang:$('sLang').value,map:$('sMap').value,ref:$('sRef').value};localStorage.setItem('fleetpulse-prefs',JSON.stringify(prefs));toast('✅ General settings saved (client preferences)',true);};
 try{const p=JSON.parse(localStorage.getItem('fleetpulse-prefs')||'null');if(p){$('sName').value=p.name;$('sTz').value=p.tz;$('sDate').value=p.df;$('sTime').value=p.tf;$('sLang').value=p.lang;$('sMap').value=p.map;$('sRef').value=p.ref;}}catch(e){}
 </script>
