@@ -211,6 +211,27 @@ tbody tr:hover td{background:#f8fafc}
         </div>
       </div>
     </div>
+    
+    <div class="card" style="margin-top:16px">
+      <h3>🏢 Branches &amp; Depots <span class="muted small" style="margin-left:8px;font-weight:400">from live geofence zones</span></h3>
+      <div style="overflow:auto;max-height:300px"><table>
+        <thead><tr><th>Name</th><th>Type</th><th>Status</th></tr></thead>
+        <tbody id="orgBranchRows"><tr><td colspan="3" style="color:#64748b">Loading…</td></tr></tbody></table></div>
+      <div class="note">Branches are seeded from your live geofence zones (DEPOT-type zones become depots). Adding branches here arrives with the org module.</div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <h3>👥 Fleet Groups <span class="muted small" style="margin-left:8px;font-weight:400">with live vehicle counts</span></h3>
+      <div style="overflow:auto;max-height:300px"><table>
+        <thead><tr><th>Group</th><th>Vehicles</th></tr></thead>
+        <tbody id="orgGroupRows"><tr><td colspan="2" style="color:#64748b">Loading…</td></tr></tbody></table></div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <h3>👥 Users</h3>
+      <div style="overflow:auto;max-height:400px"><table>
+        <thead><tr><th>Name</th><th>Username</th><th>Email</th><th>Role</th><th>Department</th><th>Status</th><th>Last Login</th></tr></thead>
+        <tbody id="orgUserRows"><tr><td colspan="7" style="color:#64748b">Loading…</td></tr></tbody></table></div>
+    </div>
+    
     <div class="footer-note" style="margin-top:2px">ℹ Changes made in settings may require a system restart or service reload to take effect.</div>
   </div>
 </main>
@@ -286,6 +307,40 @@ const DAYS=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 };
 try{const o=JSON.parse(localStorage.getItem('fleetpulse-org')||'null');
   if(o){$('orgName').value=o.name;$('orgMail').value=o.mail;$('orgReg').value=o.reg;$('orgPhone').value=o.phone;}}catch(e){}
+
+async function loadOrgContent(){
+  try{
+    const [zones,vp,users]=await Promise.all([
+      fetch('/api/v1/geofences').then(r=>r.ok?r.json():[]).catch(()=>[]),
+      fetch('/api/v1/vehicles?size=200').then(r=>r.ok?r.json():[]).catch(()=>[]),
+      fetch('/api/v1/users').then(r=>r.ok?r.json():[]).catch(()=>[])]);
+    const active=zones.filter(z=>z.active);
+    const el=$('orgBranchRows');if(!el)return;
+    el.innerHTML=active.map(z=>{
+      const col=(z.type==='RESTRICTED'||z.type==='DANGER')?'var(--red)':z.type==='DEPOT'?'var(--blue2)':'var(--green)';
+      const t=z.type==='DEPOT'?'Depot':z.type==='RESTRICTED'?'Restricted':'Customer Site';
+      return '<tr><td><b>'+esc(z.name)+'</b></td><td>'+esc(t)+'</td>'+
+        '<td><span class="chip Active">Active</span></td></tr>';
+    }).join('')||'<tr><td colspan="3" style="color:#64748b">No zones yet.</td></tr>';
+    const cls={};
+    vp.forEach(v=>{const mk=(v.make||'')+' '+(v.model||'');
+      const c=/Hiace|Coaster|Rosa|Matatu|Bus/i.test(mk)?'Buses':/Hilux|Ranger|H1/i.test(mk)?'Pickups':'Trucks';
+      cls[c]=(cls[c]||0)+1;});
+    const gEl=$('orgGroupRows');if(gEl)gEl.innerHTML=Object.entries(cls).map(([nm,cnt])=>
+      '<tr><td><b>'+esc(nm)+'</b></td><td>'+cnt+'</td></tr>').join('')
+      ||'<tr><td colspan="2" style="color:#64748b">No vehicles.</td></tr>';
+    const uEl=$('orgUserRows');if(uEl)uEl.innerHTML=users.map(u=>
+      '<tr><td><b>'+esc(u.name||u.username)+'</b></td>'+
+      '<td style="color:#64748b">'+esc(u.username||'-')+'</td>'+
+      '<td style="color:#64748b">'+esc(u.email||'-')+'</td>'+
+      '<td>'+esc(u.role||'-')+'</td>'+
+      '<td style="color:#64748b">'+esc(u.department||'-')+'</td>'+
+      '<td><span class="chip Active">Active</span></td></tr>').join('')
+      ||'<tr><td colspan="7" style="color:#64748b">No users.</td></tr>';
+  }catch(e){}
+}
+
+setTimeout(loadOrgContent,500);
 </script>
 </body>
 </html>
